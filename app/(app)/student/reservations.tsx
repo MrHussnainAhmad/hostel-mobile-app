@@ -145,7 +145,7 @@ export default function ReservationsScreen() {
           title="Proceed to booking"
           onPress={() =>
             router.push(
-              `/(app)/student/book/${item.hostel.id}?roomType=${item.roomType}`
+              `/(app)/student/book/${item.hostel.id}?roomType=${item.roomType}&reservationId=${item.id}`
             )
           }
           size="sm"

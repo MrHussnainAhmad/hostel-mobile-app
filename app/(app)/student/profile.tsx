@@ -1,4 +1,4 @@
-import { useFocusEffect, useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
 import {
   AlertCircle,
   Building,
@@ -10,9 +10,8 @@ import {
   Phone,
   User,
 } from 'lucide-react-native';
-import React, { useCallback, useState } from 'react';
+import React from 'react';
 import {
-  RefreshControl,
   ScrollView,
   StyleSheet,
   Text,
@@ -21,67 +20,25 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { usersApi } from '@/api/users';
-import { Badge, Button, Card, LoadingScreen } from '@/components/ui';
+import { Badge, Button, Card } from '@/components/ui';
 import { COLORS } from '@/constants/colors';
 import { useAuthStore } from '@/stores/authStore';
-import { StudentProfile } from '@/types';
 
 export default function ProfileScreen() {
   const { user, logout } = useAuthStore();
   const router = useRouter();
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
-  const [profile, setProfile] = useState<StudentProfile | null>(null);
-
-  const fetchProfile = async () => {
-    try {
-      const response = await usersApi.getStudentProfile();
-      if (response.success) {
-        setProfile(response.data);
-      }
-    } catch (error: any) {
-      console.log('Profile fetch error:', error);
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
-  };
-
-  useFocusEffect(
-    useCallback(() => {
-      fetchProfile();
-    }, [])
-  );
-
-  const onRefresh = () => {
-    setRefreshing(true);
-    fetchProfile();
-  };
 
   const handleLogout = async () => {
     await logout();
     router.replace('/(auth)/login');
   };
 
-  if (loading) {
-    return <LoadingScreen />;
-  }
-
-  const isVerified = profile?.isSelfVerified;
+  const isVerified = user?.studentProfile?.selfVerified;
+  const profile = user?.studentProfile;
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            tintColor={COLORS.primary}
-          />
-        }
-      >
+      <ScrollView showsVerticalScrollIndicator={false}>
         {/* Header */}
         <View style={styles.header}>
           <Text style={styles.title}>Profile</Text>

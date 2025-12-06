@@ -33,9 +33,10 @@ import { Hostel } from '@/types';
 
 export default function BookHostelScreen() {
   const router = useRouter();
-  const { id, roomType: preselectedRoomType } = useLocalSearchParams<{
+  const { id, roomType: preselectedRoomType, reservationId } = useLocalSearchParams<{
     id: string;
     roomType?: string;
+    reservationId?: string;
   }>();
 
   const [loading, setLoading] = useState(true);
@@ -160,6 +161,10 @@ export default function BookHostelScreen() {
       formData.append('transactionTime', transactionTime.trim());
       formData.append('fromAccount', fromAccount.trim());
       formData.append('toAccount', toAccount.trim());
+
+      if (reservationId) {
+        formData.append('reservationId', reservationId);
+      }
 
       if (transactionImage) {
         const filename = transactionImage.split('/').pop() || 'payment.jpg';

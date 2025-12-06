@@ -1,6 +1,6 @@
-import { useRouter } from 'expo-router';
+import { useFocusEffect, useRouter } from 'expo-router';
 import { Building2, MapPin, Plus, Star, Users } from 'lucide-react-native';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import {
   FlatList,
   Image,
@@ -50,9 +50,11 @@ export default function HostelsScreen() {
     }
   };
 
-  useEffect(() => {
-    fetchHostels();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      fetchHostels();
+    }, [])
+  );
 
   const onRefresh = () => {
     setRefreshing(true);

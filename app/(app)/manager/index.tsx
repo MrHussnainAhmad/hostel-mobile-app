@@ -22,12 +22,13 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
+import { bookingsApi } from '@/api/bookings';
 import { hostelsApi } from '@/api/hostels';
 import { Verification, verificationApi } from '@/api/verification';
 import { Badge, Card, LoadingScreen } from '@/components/ui';
 import { COLORS } from '@/constants/colors';
 import { useAuthStore } from '@/stores/authStore';
-import { Hostel } from '@/types';
+import { Booking, Hostel } from '@/types';
 
 export default function ManagerDashboard() {
   const { user } = useAuthStore();
@@ -35,19 +36,25 @@ export default function ManagerDashboard() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [hostels, setHostels] = useState<Hostel[]>([]);
+  const [bookings, setBookings] = useState<Booking[]>([]);
   const [verification, setVerification] = useState<Verification | null>(
     null
   );
 
   const fetchData = async () => {
     try {
-      const [hostelsRes, verificationRes] = await Promise.all([
+      const [hostelsRes, verificationRes, bookingsRes] = await Promise.all([
         hostelsApi.getMyHostels(),
         verificationApi.getMyVerifications(),
+        bookingsApi.getManagerBookings(),
       ]);
 
       if (hostelsRes.success) {
         setHostels(hostelsRes.data);
+      }
+      
+      if (bookingsRes.success) {
+        setBookings(bookingsRes.data);
       }
 
       if (verificationRes.success && verificationRes.data.length > 0) {
@@ -78,16 +85,7 @@ export default function ManagerDashboard() {
   const isVerified = verification?.status === 'APPROVED';
   const isPending = verification?.status === 'PENDING';
 
-  const totalStudents = hostels.reduce((acc, h) => {
-    const occupied =
-      h.roomTypes?.reduce(
-        (sum, rt) =>
-          sum +
-          (rt.totalRooms * rt.personsInRoom - rt.availableRooms),
-        0
-      ) || 0;
-    return acc + occupied;
-  }, 0);
+  const totalStudents = bookings.filter(b => b.status === 'APPROVED').length;
 
   if (loading) {
     return <LoadingScreen />;

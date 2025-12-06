@@ -32,10 +32,10 @@ import { COLORS } from '@/constants/colors';
 
 type RoomTypeConfig = {
   type: 'SHARED' | 'PRIVATE' | 'SHARED_FULLROOM';
-  totalRooms: string;
-  personsInRoom: string;
-  price: string;
-  fullRoomPriceDiscounted: string;
+  totalRooms: number;
+  personsInRoom: number;
+  price: number;
+  fullRoomPriceDiscounted?: number;
 };
 
 export default function CreateHostelScreen() {
@@ -53,7 +53,7 @@ export default function CreateHostelScreen() {
   const [seoKeywords, setSeoKeywords] = useState<string[]>(['']);
 
   // Step 2: Room Types
-  const [roomTypes, setRoomTypes] = useState<RoomTypeConfig[]>([
+  const [roomTypes, setRoomTypes] = useState<any[]>([
     {
       type: 'SHARED',
       totalRooms: '',
@@ -304,126 +304,33 @@ export default function CreateHostelScreen() {
     try {
       setLoading(true);
 
+      const hostelData = {
+        hostelName: hostelName.trim(),
+        city: city.trim(),
+        address: address.trim(),
+        hostelFor,
+        rules: rules.trim(),
+        nearbyLocations: nearbyLocations.filter((l) => l.trim()),
+        seoKeywords: seoKeywords.filter((k) => k.trim()),
+        roomTypes: roomTypes.map(rt => ({
+          ...rt,
+          totalRooms: parseInt(rt.totalRooms, 10),
+          personsInRoom: parseInt(rt.personsInRoom, 10),
+          price: parseFloat(rt.price),
+          availableRooms: parseInt(rt.totalRooms, 10),
+          fullRoomPriceDiscounted: rt.fullRoomPriceDiscounted ? parseFloat(rt.fullRoomPriceDiscounted) : undefined,
+        })),
+        facilities: {
+          ...facilities,
+          electricityRatePerUnit: facilities.electricityRatePerUnit ? parseFloat(facilities.electricityRatePerUnit) : undefined,
+          wifiMaxUsers: facilities.wifiMaxUsers ? parseInt(facilities.wifiMaxUsers, 10) : undefined,
+          customFacilities: facilities.customFacilities.filter(f => f.trim()),
+        },
+      };
+
       const formData = new FormData();
-      formData.append('hostelName', hostelName.trim());
-      formData.append('city', city.trim());
-      formData.append('address', address.trim());
-      formData.append('hostelFor', hostelFor);
+      formData.append('data', JSON.stringify(hostelData));
 
-      if (rules.trim()) {
-        formData.append('rules', rules.trim());
-      }
-
-      // Nearby locations
-      nearbyLocations
-        .filter((l) => l.trim())
-        .forEach((location, index) => {
-          formData.append(
-            `nearbyLocations[${index}]`,
-            location.trim()
-          );
-        });
-
-      // SEO keywords
-      seoKeywords
-        .filter((k) => k.trim())
-        .forEach((keyword, index) => {
-          formData.append(
-            `seoKeywords[${index}]`,
-            keyword.trim()
-          );
-        });
-
-      // Room types
-      roomTypes.forEach((rt, index) => {
-        formData.append(
-          `roomTypes[${index}][type]`,
-          rt.type
-        );
-        formData.append(
-          `roomTypes[${index}][totalRooms]`,
-          rt.totalRooms
-        );
-        formData.append(
-          `roomTypes[${index}][personsInRoom]`,
-          rt.personsInRoom
-        );
-        formData.append(
-          `roomTypes[${index}][price]`,
-          rt.price
-        );
-        if (
-          rt.type === 'SHARED_FULLROOM' &&
-          rt.fullRoomPriceDiscounted
-        ) {
-          formData.append(
-            `roomTypes[${index}][fullRoomPriceDiscounted]`,
-            rt.fullRoomPriceDiscounted
-          );
-        }
-      });
-
-      // Facilities
-      formData.append(
-        'facilities[hotColdWaterBath]',
-        String(facilities.hotColdWaterBath)
-      );
-      formData.append(
-        'facilities[drinkingWater]',
-        String(facilities.drinkingWater)
-      );
-      formData.append(
-        'facilities[electricityBackup]',
-        String(facilities.electricityBackup)
-      );
-      formData.append(
-        'facilities[electricityType]',
-        facilities.electricityType
-      );
-
-      if (
-        facilities.electricityType === 'SELF' &&
-        facilities.electricityRatePerUnit
-      ) {
-        formData.append(
-          'facilities[electricityRatePerUnit]',
-          facilities.electricityRatePerUnit
-        );
-      }
-
-      formData.append(
-        'facilities[wifiEnabled]',
-        String(facilities.wifiEnabled)
-      );
-
-      if (facilities.wifiEnabled) {
-        if (facilities.wifiPlan)
-          formData.append(
-            'facilities[wifiPlan]',
-            facilities.wifiPlan
-          );
-        if (facilities.wifiMaxUsers)
-          formData.append(
-            'facilities[wifiMaxUsers]',
-            facilities.wifiMaxUsers
-          );
-        if (facilities.wifiAvgSpeed)
-          formData.append(
-            'facilities[wifiAvgSpeed]',
-            facilities.wifiAvgSpeed
-          );
-      }
-
-      facilities.customFacilities
-        .filter((f) => f.trim())
-        .forEach((facility, index) => {
-          formData.append(
-            `facilities[customFacilities][${index}]`,
-            facility.trim()
-          );
-        });
-
-      // Images
       roomImages.forEach((uri, index) => {
         const filename =
           uri.split('/').pop() || `image${index}.jpg`;
@@ -451,12 +358,14 @@ export default function CreateHostelScreen() {
         router.replace('/(app)/manager/hostels');
       }
     } catch (error: any) {
+      const errorMessage = error.response?.data?.errors 
+        ? Object.values(error.response.data.errors).flat().join('\n')
+        : error?.response?.data?.message || 'Failed to create hostel';
+
       Toast.show({
         type: 'error',
         text1: 'Error',
-        text2:
-          error?.response?.data?.message ||
-          'Failed to create hostel',
+        text2: errorMessage,
       });
     } finally {
       setLoading(false);

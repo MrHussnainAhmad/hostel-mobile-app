@@ -32,8 +32,7 @@ const verifySchema = z.object({
 type VerifyFormData = z.infer<typeof verifySchema>;
 
 export default function VerifyScreen() {
-  const router = useRouter();
-  const { checkAuth } = useAuthStore();
+  const { setUser, user } = useAuthStore();
   const [loading, setLoading] = useState(false);
 
   const {
@@ -65,7 +64,17 @@ export default function VerifyScreen() {
       const response = await usersApi.selfVerify(data);
 
       if (response.success) {
-        await checkAuth();
+        if (user) {
+          const newUser = {
+            ...user,
+            studentProfile: {
+              ...user.studentProfile,
+              selfVerified: true,
+            },
+          };
+          // @ts-ignore
+          setUser(newUser);
+        }
 
         Toast.show({
           type: 'success',

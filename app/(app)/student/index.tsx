@@ -85,7 +85,7 @@ export default function StudentHomeScreen() {
     return <LoadingScreen />;
   }
 
-  const isVerified = profile?.isSelfVerified;
+  const isVerified = user?.studentProfile?.selfVerified;
 
   return (
     <SafeAreaView style={styles.container}>

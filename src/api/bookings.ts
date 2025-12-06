@@ -2,6 +2,12 @@ import { Booking } from '@/types';
 import apiClient from './client';
 
 export const bookingsApi = {
+  // Manager: Get all bookings
+  getManagerBookings: async (): Promise<{ success: boolean; data: Booking[] }> => {
+    const response = await apiClient.get('/bookings/manager');
+    return response.data;
+  },
+
   // Manager: Get hostel bookings
   getHostelBookings: async (hostelId: string): Promise<{ success: boolean; data: Booking[] }> => {
     const response = await apiClient.get(`/bookings/hostel/${hostelId}`);
