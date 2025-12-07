@@ -1,5 +1,6 @@
 // app/(app)/manager/index.tsx
 
+import { COLORS, OPACITY } from '@/constants/colors';
 import { useRouter } from 'expo-router';
 import {
   AlertCircle,
@@ -8,15 +9,16 @@ import {
   CheckCircle,
   ChevronRight,
   Clock,
+  MessageCircle,
   Users,
 } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
 import {
+  Pressable,
   RefreshControl,
   ScrollView,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -25,8 +27,7 @@ import Toast from 'react-native-toast-message';
 import { bookingsApi } from '@/api/bookings';
 import { hostelsApi } from '@/api/hostels';
 import { Verification, verificationApi } from '@/api/verification';
-import { Badge, Card, LoadingScreen } from '@/components/ui';
-import { COLORS } from '@/constants/colors';
+import { Badge, LoadingScreen } from '@/components/ui';
 import { useAuthStore } from '@/stores/authStore';
 import { Booking, Hostel } from '@/types';
 
@@ -37,9 +38,7 @@ export default function ManagerDashboard() {
   const [refreshing, setRefreshing] = useState(false);
   const [hostels, setHostels] = useState<Hostel[]>([]);
   const [bookings, setBookings] = useState<Booking[]>([]);
-  const [verification, setVerification] = useState<Verification | null>(
-    null
-  );
+  const [verification, setVerification] = useState<Verification | null>(null);
 
   const fetchData = async () => {
     try {
@@ -49,14 +48,8 @@ export default function ManagerDashboard() {
         bookingsApi.getManagerBookings(),
       ]);
 
-      if (hostelsRes.success) {
-        setHostels(hostelsRes.data);
-      }
-      
-      if (bookingsRes.success) {
-        setBookings(bookingsRes.data);
-      }
-
+      if (hostelsRes.success) setHostels(hostelsRes.data);
+      if (bookingsRes.success) setBookings(bookingsRes.data);
       if (verificationRes.success && verificationRes.data.length > 0) {
         setVerification(verificationRes.data[0]);
       }
@@ -64,8 +57,7 @@ export default function ManagerDashboard() {
       Toast.show({
         type: 'error',
         text1: 'Error',
-        text2:
-          error?.response?.data?.message || 'Failed to fetch data',
+        text2: error?.response?.data?.message || 'Failed to fetch data',
       });
     } finally {
       setLoading(false);
@@ -84,8 +76,8 @@ export default function ManagerDashboard() {
 
   const isVerified = verification?.status === 'APPROVED';
   const isPending = verification?.status === 'PENDING';
-
-  const totalStudents = bookings.filter(b => b.status === 'APPROVED').length;
+  const totalStudents = bookings.filter((b) => b.status === 'APPROVED').length;
+  const pendingBookings = bookings.filter((b) => b.status === 'PENDING').length;
 
   if (loading) {
     return <LoadingScreen />;
@@ -95,11 +87,13 @@ export default function ManagerDashboard() {
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       <ScrollView
         showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
             tintColor={COLORS.primary}
+            colors={[COLORS.primary]}
           />
         }
       >
@@ -113,149 +107,132 @@ export default function ManagerDashboard() {
 
         {/* Verification Status */}
         {!isVerified && (
-          <Card style={styles.verificationCard}>
+          <View style={styles.verificationCard}>
             <View style={styles.verificationHeader}>
-              {isPending ? (
-                <Clock size={24} color={COLORS.warning} />
-              ) : (
-                <AlertCircle size={24} color={COLORS.error} />
-              )}
+              <View style={[
+                styles.verificationIcon,
+                { backgroundColor: isPending ? COLORS.warningLight : COLORS.errorLight },
+              ]}>
+                {isPending ? (
+                  <Clock size={22} color={COLORS.warning} strokeWidth={1.5} />
+                ) : (
+                  <AlertCircle size={22} color={COLORS.error} strokeWidth={1.5} />
+                )}
+              </View>
               <View style={styles.verificationText}>
                 <Text style={styles.verificationTitle}>
-                  {isPending
-                    ? 'Verification pending'
-                    : 'Verification required'}
+                  {isPending ? 'Verification Pending' : 'Verification Required'}
                 </Text>
                 <Text style={styles.verificationDesc}>
                   {isPending
-                    ? 'Your verification is under review.'
-                    : 'Complete verification to add hostels.'}
+                    ? 'Your verification is under review'
+                    : 'Complete verification to add hostels'}
                 </Text>
               </View>
             </View>
 
             {!isPending && (
-              <TouchableOpacity
-                style={styles.verificationButton}
-                onPress={() =>
-                  router.push('/(app)/manager/verification')
-                }
-                activeOpacity={0.8}
+              <Pressable
+                style={({ pressed }) => [
+                  styles.verificationButton,
+                  pressed && { opacity: OPACITY.pressed },
+                ]}
+                onPress={() => router.push('/(app)/manager/verification')}
               >
-                <Text style={styles.verificationButtonText}>
-                  Start verification
-                </Text>
-                <ChevronRight size={18} color={COLORS.primary} />
-              </TouchableOpacity>
+                <Text style={styles.verificationButtonText}>Start Verification</Text>
+                <ChevronRight size={18} color={COLORS.primary} strokeWidth={2} />
+              </Pressable>
             )}
-          </Card>
+          </View>
         )}
 
         {/* Stats */}
-        <View style={styles.statsGrid}>
-          <Card style={styles.statCard}>
-            <Building2 size={28} color={COLORS.primary} />
+        <View style={styles.statsRow}>
+          <View style={styles.statCard}>
+            <View style={[styles.statIcon, { backgroundColor: COLORS.primaryLight }]}>
+              <Building2 size={22} color={COLORS.primary} strokeWidth={1.5} />
+            </View>
             <Text style={styles.statNumber}>{hostels.length}</Text>
             <Text style={styles.statLabel}>Hostels</Text>
-          </Card>
+          </View>
 
-          <Card style={styles.statCard}>
-            <Users size={28} color={COLORS.success} />
+          <View style={styles.statCard}>
+            <View style={[styles.statIcon, { backgroundColor: COLORS.successLight }]}>
+              <Users size={22} color={COLORS.success} strokeWidth={1.5} />
+            </View>
             <Text style={styles.statNumber}>{totalStudents}</Text>
             <Text style={styles.statLabel}>Students</Text>
-          </Card>
+          </View>
+
+          <View style={styles.statCard}>
+            <View style={[styles.statIcon, { backgroundColor: COLORS.warningLight }]}>
+              <Clock size={22} color={COLORS.warning} strokeWidth={1.5} />
+            </View>
+            <Text style={styles.statNumber}>{pendingBookings}</Text>
+            <Text style={styles.statLabel}>Pending</Text>
+          </View>
         </View>
 
         {/* Quick Actions */}
-        <Text style={styles.sectionTitle}>Quick actions</Text>
+        <Text style={styles.sectionTitle}>Quick Actions</Text>
         <View style={styles.actionsGrid}>
-          <TouchableOpacity
-            style={styles.actionCard}
+          <ActionCard
+            icon={<Building2 size={24} color={COLORS.primary} strokeWidth={1.5} />}
+            label="My Hostels"
+            color={COLORS.primaryLight}
             onPress={() => router.push('/(app)/manager/hostels')}
-            activeOpacity={0.85}
-          >
-            <View
-              style={[
-                styles.actionIcon,
-                { backgroundColor: COLORS.primary + '20' },
-              ]}
-            >
-              <Building2 size={24} color={COLORS.primary} />
-            </View>
-            <Text style={styles.actionText}>My hostels</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.actionCard}
+          />
+          <ActionCard
+            icon={<Calendar size={24} color={COLORS.warning} strokeWidth={1.5} />}
+            label="Reservations"
+            color={COLORS.warningLight}
             onPress={() => router.push('/(app)/manager/reservations')}
-            activeOpacity={0.85}
-          >
-            <View
-              style={[
-                styles.actionIcon,
-                { backgroundColor: COLORS.warning + '20' },
-              ]}
-            >
-              <Calendar size={24} color={COLORS.warning} />
-            </View>
-            <Text style={styles.actionText}>Reservations</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.actionCard}
+          />
+          <ActionCard
+            icon={<CheckCircle size={24} color={COLORS.success} strokeWidth={1.5} />}
+            label="Bookings"
+            color={COLORS.successLight}
+            badge={pendingBookings > 0 ? pendingBookings : undefined}
             onPress={() => router.push('/(app)/manager/bookings')}
-            activeOpacity={0.85}
-          >
-            <View
-              style={[
-                styles.actionIcon,
-                { backgroundColor: COLORS.success + '20' },
-              ]}
-            >
-              <CheckCircle size={24} color={COLORS.success} />
-            </View>
-            <Text style={styles.actionText}>Bookings</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.actionCard}
+          />
+          <ActionCard
+            icon={<MessageCircle size={24} color={COLORS.info} strokeWidth={1.5} />}
+            label="Messages"
+            color={COLORS.infoLight}
             onPress={() => router.push('/(app)/manager/chat')}
-            activeOpacity={0.85}
-          >
-            <View
-              style={[
-                styles.actionIcon,
-                { backgroundColor: COLORS.info + '20' },
-              ]}
-            >
-              <Users size={24} color={COLORS.info} />
-            </View>
-            <Text style={styles.actionText}>Messages</Text>
-          </TouchableOpacity>
+          />
         </View>
 
         {/* Recent Hostels */}
         {hostels.length > 0 && (
           <>
             <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>Your hostels</Text>
-              <TouchableOpacity
+              <Text style={styles.sectionTitle}>Your Hostels</Text>
+              <Pressable
                 onPress={() => router.push('/(app)/manager/hostels')}
-                activeOpacity={0.7}
+                style={({ pressed }) => pressed && { opacity: OPACITY.pressed }}
               >
                 <Text style={styles.seeAll}>See all</Text>
-              </TouchableOpacity>
+              </Pressable>
             </View>
 
             {hostels.slice(0, 2).map((h) => (
-              <Card key={h.id} style={styles.hostelCard}>
+              <Pressable
+                key={h.id}
+                style={({ pressed }) => [
+                  styles.hostelCard,
+                  pressed && { opacity: OPACITY.pressed },
+                ]}
+                onPress={() => router.push(`/(app)/manager/hostel/${h.id}`)}
+              >
                 <View style={styles.hostelHeader}>
-                  <Text style={styles.hostelName}>
+                  <Text style={styles.hostelName} numberOfLines={1}>
                     {h.hostelName}
                   </Text>
                   <Badge
                     label={h.isActive ? 'ACTIVE' : 'INACTIVE'}
                     variant={h.isActive ? 'success' : 'error'}
+                    size="sm"
                   />
                 </View>
                 <Text style={styles.hostelLocation}>
@@ -268,7 +245,7 @@ export default function ManagerDashboard() {
                   <Text style={styles.hostelDot}>•</Text>
                   <Text style={styles.hostelStat}>{h.hostelFor}</Text>
                 </View>
-              </Card>
+              </Pressable>
             ))}
           </>
         )}
@@ -279,36 +256,82 @@ export default function ManagerDashboard() {
   );
 }
 
+// Action Card Component
+interface ActionCardProps {
+  icon: React.ReactNode;
+  label: string;
+  color: string;
+  badge?: number;
+  onPress: () => void;
+}
+
+const ActionCard: React.FC<ActionCardProps> = ({ icon, label, color, badge, onPress }) => (
+  <Pressable
+    style={({ pressed }) => [
+      styles.actionCard,
+      pressed && { opacity: OPACITY.pressed },
+    ]}
+    onPress={onPress}
+  >
+    <View style={[styles.actionIcon, { backgroundColor: color }]}>{icon}</View>
+    <Text style={styles.actionText}>{label}</Text>
+    
+    {badge !== undefined && badge > 0 && (
+      <View style={styles.actionBadge}>
+        <Text style={styles.actionBadgeText}>{badge}</Text>
+      </View>
+    )}
+  </Pressable>
+);
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.bgPrimary,
   },
+  scrollContent: {
+    paddingBottom: 24,
+  },
+
+  // Header
   header: {
     paddingHorizontal: 24,
-    paddingTop: 16,
-    paddingBottom: 20,
+    paddingTop: 20,
+    paddingBottom: 24,
   },
   greeting: {
-    fontSize: 16,
+    fontSize: 15,
     color: COLORS.textSecondary,
+    marginBottom: 4,
   },
   name: {
-    fontSize: 26,
+    fontSize: 28,
     fontWeight: '700',
     color: COLORS.textPrimary,
+    letterSpacing: -0.5,
   },
 
   // Verification
   verificationCard: {
-    marginHorizontal: 24,
+    marginHorizontal: 20,
     marginBottom: 24,
-    backgroundColor: COLORS.bgSecondary,
+    backgroundColor: COLORS.bgCard,
+    borderRadius: 16,
+    padding: 18,
+    borderWidth: 1,
+    borderColor: COLORS.borderLight,
   },
   verificationHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+  },
+  verificationIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 14,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 14,
   },
   verificationText: {
     flex: 1,
@@ -317,20 +340,20 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: COLORS.textPrimary,
+    marginBottom: 4,
   },
   verificationDesc: {
     fontSize: 13,
     color: COLORS.textMuted,
-    marginTop: 2,
   },
   verificationButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 16,
-    paddingTop: 14,
+    marginTop: 18,
+    paddingTop: 16,
     borderTopWidth: 1,
-    borderTopColor: COLORS.border,
+    borderTopColor: COLORS.borderLight,
     gap: 4,
   },
   verificationButtonText: {
@@ -340,43 +363,55 @@ const styles = StyleSheet.create({
   },
 
   // Stats
-  statsGrid: {
+  statsRow: {
     flexDirection: 'row',
-    paddingHorizontal: 24,
-    gap: 16,
-    marginBottom: 24,
+    paddingHorizontal: 20,
+    gap: 12,
+    marginBottom: 28,
   },
   statCard: {
     flex: 1,
+    backgroundColor: COLORS.bgCard,
+    borderRadius: 16,
+    padding: 16,
     alignItems: 'center',
-    paddingVertical: 18,
+    borderWidth: 1,
+    borderColor: COLORS.borderLight,
+  },
+  statIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 14,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 10,
   },
   statNumber: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: '700',
     color: COLORS.textPrimary,
-    marginTop: 8,
+    marginBottom: 4,
   },
   statLabel: {
-    fontSize: 13,
+    fontSize: 12,
     color: COLORS.textMuted,
-    marginTop: 4,
   },
 
-  // Sections
+  // Section
   sectionTitle: {
     fontSize: 18,
     fontWeight: '600',
     color: COLORS.textPrimary,
     paddingHorizontal: 24,
-    marginBottom: 16,
+    marginBottom: 14,
+    letterSpacing: -0.2,
   },
   sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 24,
-    marginBottom: 16,
+    marginBottom: 14,
   },
   seeAll: {
     fontSize: 14,
@@ -384,27 +419,29 @@ const styles = StyleSheet.create({
     color: COLORS.primary,
   },
 
-  // Actions
+  // Actions Grid
   actionsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    paddingHorizontal: 24,
+    paddingHorizontal: 20,
     gap: 12,
-    marginBottom: 24,
+    marginBottom: 28,
   },
   actionCard: {
     width: '47%',
     backgroundColor: COLORS.bgCard,
     borderRadius: 16,
-    padding: 16,
+    paddingVertical: 20,
+    paddingHorizontal: 16,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: COLORS.borderLight,
+    position: 'relative',
   },
   actionIcon: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    width: 52,
+    height: 52,
+    borderRadius: 16,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 12,
@@ -413,12 +450,35 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     color: COLORS.textPrimary,
+    letterSpacing: -0.1,
+  },
+  actionBadge: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
+    backgroundColor: COLORS.error,
+    minWidth: 22,
+    height: 22,
+    borderRadius: 11,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 6,
+  },
+  actionBadgeText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: COLORS.textInverse,
   },
 
-  // Hostel cards
+  // Hostel Card
   hostelCard: {
-    marginHorizontal: 24,
-    marginBottom: 12,
+    marginHorizontal: 20,
+    marginBottom: 10,
+    backgroundColor: COLORS.bgCard,
+    borderRadius: 16,
+    padding: 18,
+    borderWidth: 1,
+    borderColor: COLORS.borderLight,
   },
   hostelHeader: {
     flexDirection: 'row',
@@ -431,12 +491,13 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: COLORS.textPrimary,
     flex: 1,
-    marginRight: 10,
+    marginRight: 12,
+    letterSpacing: -0.1,
   },
   hostelLocation: {
     fontSize: 14,
     color: COLORS.textSecondary,
-    marginBottom: 6,
+    marginBottom: 8,
   },
   hostelStats: {
     flexDirection: 'row',

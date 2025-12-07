@@ -9,11 +9,14 @@ const apiClient = axios.create({
   },
 });
 
-// Request interceptor - add token
+// =========================
+// REQUEST INTERCEPTOR
+// =========================
 apiClient.interceptors.request.use(
   async (config) => {
     const token = await SecureStore.getItemAsync('token');
     if (token) {
+      config.headers = config.headers ?? {};
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
@@ -21,13 +24,21 @@ apiClient.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response interceptor - handle errors
+// =========================
+// RESPONSE INTERCEPTOR
+// - clears token on 401/403 so user is fully logged out
+//   (works nicely with account deletion)
+// =========================
 apiClient.interceptors.response.use(
   (response) => response,
   async (error) => {
-    if (error.response?.status === 401) {
+    const status = error.response?.status;
+
+    if (status === 401 || status === 403) {
+      // remove token so app auth state can reset
       await SecureStore.deleteItemAsync('token');
     }
+
     return Promise.reject(error);
   }
 );

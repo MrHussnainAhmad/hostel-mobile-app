@@ -2,6 +2,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { ArrowLeft, Send } from 'lucide-react-native';
 import React, { useEffect, useRef, useState } from 'react';
 import {
+  Animated,
   FlatList,
   KeyboardAvoidingView,
   Platform,
@@ -31,11 +32,23 @@ export default function ManagerConversationScreen() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
 
+  // Smooth fade-in animation for messages
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+
+  const animateMessages = () => {
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 250,
+      useNativeDriver: true,
+    }).start();
+  };
+
   const fetchMessages = async () => {
     try {
       const response = await chatApi.getMessages(id);
       if (response.success) {
         setMessages(response.data);
+        animateMessages();
       }
     } catch (error: any) {
       Toast.show({
@@ -54,14 +67,12 @@ export default function ManagerConversationScreen() {
     if (router.canGoBack()) {
       router.back();
     } else {
-      // Manager fallback
       router.replace('/(app)/manager/chat');
     }
   };
 
   useEffect(() => {
     fetchMessages();
-
     const interval = setInterval(fetchMessages, 5000);
     return () => clearInterval(interval);
   }, [id]);
@@ -71,6 +82,7 @@ export default function ManagerConversationScreen() {
 
     try {
       setSending(true);
+
       const response = await chatApi.sendMessage({
         conversationId: id,
         text: newMessage.trim(),
@@ -79,9 +91,10 @@ export default function ManagerConversationScreen() {
       if (response.success) {
         setMessages((prev) => [...prev, response.data]);
         setNewMessage('');
+
         setTimeout(() => {
           flatListRef.current?.scrollToEnd({ animated: true });
-        }, 100);
+        }, 120);
       }
     } catch (error: any) {
       Toast.show({
@@ -108,10 +121,11 @@ export default function ManagerConversationScreen() {
     const isMe = item.senderId === user?.id;
 
     return (
-      <View
+      <Animated.View
         style={[
           styles.messageRow,
           isMe && styles.messageRowMe,
+          { opacity: fadeAnim },
         ]}
       >
         <View
@@ -128,6 +142,7 @@ export default function ManagerConversationScreen() {
           >
             {item.text}
           </Text>
+
           <Text
             style={[
               styles.messageTime,
@@ -137,42 +152,31 @@ export default function ManagerConversationScreen() {
             {formatTime(item.createdAt)}
           </Text>
         </View>
-      </View>
+      </Animated.View>
     );
   };
 
-  if (loading) {
-    return <LoadingScreen />;
-  }
+  if (loading) return <LoadingScreen />;
 
   return (
-    <SafeAreaView
-      style={styles.container}
-      edges={['top', 'bottom']}
-    >
-      {/* Header */}
+    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+      {/* HEADER */}
       <View style={styles.header}>
-        <TouchableOpacity
-          onPress={handleGoBack}
-          style={styles.backButton}
-        >
-          <ArrowLeft
-            size={24}
-            color={COLORS.textPrimary}
-          />
+        <TouchableOpacity onPress={handleGoBack} style={styles.backButton}>
+          <ArrowLeft size={26} color={COLORS.textPrimary} />
         </TouchableOpacity>
+
         <Text style={styles.headerTitle}>Conversation</Text>
+
         <View style={{ width: 40 }} />
       </View>
 
-      {/* Messages */}
       <KeyboardAvoidingView
         style={styles.content}
-        behavior={
-          Platform.OS === 'ios' ? 'padding' : undefined
-        }
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         keyboardVerticalOffset={90}
       >
+        {/* MESSAGE LIST */}
         <FlatList
           ref={flatListRef}
           data={messages}
@@ -180,37 +184,33 @@ export default function ManagerConversationScreen() {
           renderItem={renderMessage}
           contentContainerStyle={styles.messagesList}
           showsVerticalScrollIndicator={false}
-          onContentSizeChange={() =>
-            flatListRef.current?.scrollToEnd()
-          }
+          onContentSizeChange={() => flatListRef.current?.scrollToEnd()}
           ListEmptyComponent={
             <View style={styles.emptyContainer}>
-              <Text style={styles.emptyText}>
-                No messages yet
-              </Text>
-              <Text style={styles.emptySubtext}>
-                Start the conversation!
-              </Text>
+              <Text style={styles.emptyText}>No messages yet</Text>
+              <Text style={styles.emptySubtext}>Start the conversation!</Text>
             </View>
           }
         />
 
-        {/* Input */}
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder="Type a message..."
-            placeholderTextColor={COLORS.textMuted}
-            value={newMessage}
-            onChangeText={setNewMessage}
-            multiline
-            maxLength={500}
-          />
+        {/* INPUT AREA */}
+        <View style={styles.inputWrapper}>
+          <View style={styles.inputFieldWrapper}>
+            <TextInput
+              style={styles.input}
+              placeholder="Message..."
+              placeholderTextColor={COLORS.textMuted}
+              value={newMessage}
+              onChangeText={setNewMessage}
+              multiline
+              maxLength={500}
+            />
+          </View>
+
           <TouchableOpacity
             style={[
               styles.sendButton,
-              !newMessage.trim() &&
-                styles.sendButtonDisabled,
+              !newMessage.trim() && styles.sendButtonDisabled,
             ]}
             onPress={handleSend}
             disabled={!newMessage.trim() || sending}
@@ -230,20 +230,25 @@ export default function ManagerConversationScreen() {
   );
 }
 
+/* ----------------------------------------------------------
+   Redesigned Modern Styles
+---------------------------------------------------------- */
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.bgPrimary,
   },
+
+  /* HEADER */
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingHorizontal: 18,
+    paddingVertical: 14,
+    backgroundColor: COLORS.bgPrimary,
     borderBottomWidth: 1,
     borderBottomColor: COLORS.border,
-    backgroundColor: COLORS.bgPrimary,
   },
   backButton: {
     width: 40,
@@ -252,98 +257,117 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   headerTitle: {
-    fontSize: 18,
-    fontWeight: '600',
+    fontSize: 20,
+    fontWeight: '700',
     color: COLORS.textPrimary,
   },
+
+  /* CONTENT */
   content: {
     flex: 1,
   },
   messagesList: {
     paddingHorizontal: 16,
-    paddingVertical: 16,
+    paddingVertical: 20,
     flexGrow: 1,
   },
+
+  /* MESSAGES */
   messageRow: {
-    marginBottom: 12,
+    marginBottom: 14,
     flexDirection: 'row',
   },
   messageRowMe: {
     justifyContent: 'flex-end',
   },
   messageBubble: {
-    maxWidth: '75%',
-    paddingHorizontal: 14,
+    maxWidth: '78%',
+    paddingHorizontal: 16,
     paddingVertical: 10,
     borderRadius: 18,
+    elevation: 1,
+    shadowColor: '#000',
+    shadowOpacity: 0.06,
+    shadowRadius: 2,
+    shadowOffset: { width: 0, height: 1 },
   },
   bubbleMe: {
     backgroundColor: COLORS.primary,
-    borderBottomRightRadius: 4,
+    borderBottomRightRadius: 6,
   },
   bubbleOther: {
     backgroundColor: COLORS.bgSecondary,
-    borderBottomLeftRadius: 4,
+    borderBottomLeftRadius: 6,
   },
+
   messageText: {
     fontSize: 15,
-    color: COLORS.textPrimary,
     lineHeight: 20,
+    color: COLORS.textPrimary,
   },
   messageTextMe: {
     color: COLORS.textInverse,
   },
+
   messageTime: {
     fontSize: 11,
-    color: COLORS.textMuted,
-    marginTop: 4,
+    marginTop: 6,
     alignSelf: 'flex-end',
+    color: COLORS.textMuted,
   },
   messageTimeMe: {
-    color: 'rgba(249,250,251,0.8)', // based on textInverse
+    color: 'rgba(255,255,255,0.75)',
   },
+
+  /* EMPTY STATE */
   emptyContainer: {
     flex: 1,
-    justifyContent: 'center',
     alignItems: 'center',
-    paddingVertical: 60,
+    paddingVertical: 80,
   },
   emptyText: {
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: 18,
     color: COLORS.textSecondary,
+    fontWeight: '600',
   },
   emptySubtext: {
-    fontSize: 14,
+    marginTop: 6,
     color: COLORS.textMuted,
-    marginTop: 4,
+    fontSize: 14,
   },
-  inputContainer: {
+
+  /* INPUT AREA */
+  inputWrapper: {
     flexDirection: 'row',
     alignItems: 'flex-end',
     paddingHorizontal: 16,
     paddingVertical: 12,
+    backgroundColor: COLORS.bgPrimary,
     borderTopWidth: 1,
     borderTopColor: COLORS.border,
-    backgroundColor: COLORS.bgPrimary,
     gap: 12,
   },
-  input: {
+
+  inputFieldWrapper: {
     flex: 1,
     backgroundColor: COLORS.bgSecondary,
     borderRadius: 24,
-    paddingHorizontal: 18,
-    paddingVertical: 12,
-    fontSize: 15,
-    color: COLORS.textPrimary,
-    maxHeight: 100,
+    paddingHorizontal: 16,
     borderWidth: 1,
     borderColor: COLORS.border,
   },
+
+  input: {
+    fontSize: 15,
+    color: COLORS.textPrimary,
+    paddingVertical: 10,
+    maxHeight: 110,
+  },
+
   sendButton: {
-    width: 46,
-    height: 46,
-    borderRadius: 23,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     backgroundColor: COLORS.primary,
     justifyContent: 'center',
     alignItems: 'center',

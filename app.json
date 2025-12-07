@@ -1,8 +1,8 @@
 {
   "expo": {
     "name": "HostelsHub",
-    "slug": "hostelshub-mobile",
-    "version": "1.0.0",
+    "slug": "hostelshub",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "hostelshub",
@@ -28,9 +28,19 @@
       "bundler": "metro",
       "output": "static"
     },
-    "plugins": ["expo-router", "expo-secure-store"],
+    "plugins": [
+      "expo-router",
+      "expo-secure-store"
+    ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "f6d7012c-524f-4eda-a6e7-1f03d7f5d25a"
+      }
+    },
+    "owner": "hostelshub"
   }
 }

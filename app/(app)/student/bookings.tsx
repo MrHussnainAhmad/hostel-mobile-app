@@ -1,21 +1,23 @@
+// screens/BookingsScreen.tsx
+
+import { COLORS, OPACITY } from '@/constants/colors';
 import { useRouter } from 'expo-router';
 import { ArrowLeft, ChevronRight, Home } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
 import {
-    FlatList,
-    Image,
-    RefreshControl,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  FlatList,
+  Image,
+  Pressable,
+  RefreshControl,
+  StyleSheet,
+  Text,
+  View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
 import { bookingsApi } from '@/api/bookings';
-import { Badge, Button, Card, EmptyState, LoadingScreen } from '@/components/ui';
-import { COLORS } from '@/constants/colors';
+import { Badge, Button, EmptyState, LoadingScreen } from '@/components/ui';
 import { Booking } from '@/types';
 
 export default function BookingsScreen() {
@@ -76,44 +78,50 @@ export default function BookingsScreen() {
   };
 
   const renderBooking = ({ item }: { item: Booking }) => (
-    <TouchableOpacity
-      activeOpacity={0.8}
+    <Pressable
+      style={({ pressed }) => [
+        styles.bookingCard,
+        pressed && { opacity: OPACITY.pressed },
+      ]}
       onPress={() => router.push(`/(app)/student/booking/${item.id}`)}
     >
-      <Card style={styles.bookingCard}>
-        <View style={styles.bookingRow}>
-          {item.hostel.roomImages?.[0] ? (
-            <Image
-              source={{ uri: item.hostel.roomImages[0] }}
-              style={styles.bookingImage}
-            />
-          ) : (
-            <View style={styles.imagePlaceholder}>
-              <Home size={24} color={COLORS.textMuted} />
-            </View>
-          )}
-
-          <View style={styles.bookingContent}>
-            <View style={styles.bookingHeader}>
-              <Text style={styles.hostelName} numberOfLines={1}>
-                {item.hostel.hostelName}
-              </Text>
-              <Badge
-                label={item.status}
-                variant={getStatusVariant(item.status)}
-              />
-            </View>
-
-            <Text style={styles.details}>
-              {item.hostel.city} • {item.roomType.replace('_', ' ')}
-            </Text>
-            <Text style={styles.date}>Booked: {formatDate(item.createdAt)}</Text>
-          </View>
-
-          <ChevronRight size={20} color={COLORS.textMuted} />
+      {/* Image */}
+      {item.hostel.roomImages?.[0] ? (
+        <Image
+          source={{ uri: item.hostel.roomImages[0] }}
+          style={styles.bookingImage}
+        />
+      ) : (
+        <View style={styles.imagePlaceholder}>
+          <Home size={24} color={COLORS.textMuted} strokeWidth={1.5} />
         </View>
-      </Card>
-    </TouchableOpacity>
+      )}
+
+      {/* Content */}
+      <View style={styles.bookingContent}>
+        <View style={styles.bookingHeader}>
+          <Text style={styles.hostelName} numberOfLines={1}>
+            {item.hostel.hostelName}
+          </Text>
+          <Badge
+            label={item.status}
+            variant={getStatusVariant(item.status)}
+            size="sm"
+          />
+        </View>
+
+        <Text style={styles.details}>
+          {item.hostel.city} • {item.roomType.replace('_', ' ')}
+        </Text>
+        
+        <Text style={styles.date}>
+          Booked on {formatDate(item.createdAt)}
+        </Text>
+      </View>
+
+      {/* Arrow */}
+      <ChevronRight size={20} color={COLORS.textMuted} strokeWidth={1.5} />
+    </Pressable>
   );
 
   if (loading) {
@@ -124,16 +132,22 @@ export default function BookingsScreen() {
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity
+        <Pressable
           onPress={() => router.back()}
-          style={styles.backButton}
+          style={({ pressed }) => [
+            styles.backButton,
+            pressed && { opacity: OPACITY.pressed },
+          ]}
         >
-          <ArrowLeft size={24} color={COLORS.textPrimary} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>My bookings</Text>
-        <View style={{ width: 40 }} />
+          <ArrowLeft size={22} color={COLORS.textPrimary} strokeWidth={1.5} />
+        </Pressable>
+        
+        <Text style={styles.headerTitle}>My Bookings</Text>
+        
+        <View style={styles.headerSpacer} />
       </View>
 
+      {/* List */}
       <FlatList
         data={bookings}
         keyExtractor={(item) => item.id}
@@ -145,21 +159,24 @@ export default function BookingsScreen() {
             refreshing={refreshing}
             onRefresh={onRefresh}
             tintColor={COLORS.primary}
+            colors={[COLORS.primary]}
           />
         }
         ListEmptyComponent={
           <EmptyState
-            icon={<Home size={64} color={COLORS.textMuted} />}
-            title="No bookings"
-            description="Your hostel bookings will appear here."
+            icon={<Home size={48} color={COLORS.textMuted} strokeWidth={1.5} />}
+            title="No bookings yet"
+            description="Your hostel bookings will appear here once you make a reservation."
             action={
               <Button
-                title="Find hostels"
+                title="Find Hostels"
                 onPress={() => router.push('/(app)/student/search')}
+                size="md"
               />
             }
           />
         }
+        ItemSeparatorComponent={() => <View style={styles.separator} />}
       />
     </SafeAreaView>
   );
@@ -170,48 +187,66 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.bgPrimary,
   },
+  
+  // Header
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
     backgroundColor: COLORS.bgPrimary,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.borderLight,
   },
   backButton: {
-    width: 40,
-    height: 40,
+    width: 44,
+    height: 44,
+    borderRadius: 14,
+    backgroundColor: COLORS.bgCard,
     justifyContent: 'center',
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: COLORS.borderLight,
   },
   headerTitle: {
-    fontSize: 18,
+    fontSize: 17,
     fontWeight: '600',
     color: COLORS.textPrimary,
+    letterSpacing: -0.2,
   },
+  headerSpacer: {
+    width: 44,
+  },
+  
+  // List
   list: {
-    padding: 24,
+    padding: 20,
     flexGrow: 1,
   },
-  bookingCard: {
-    marginBottom: 16,
-    padding: 12,
+  separator: {
+    height: 12,
   },
-  bookingRow: {
+  
+  // Booking Card
+  bookingCard: {
     flexDirection: 'row',
     alignItems: 'center',
+    backgroundColor: COLORS.bgCard,
+    borderRadius: 16,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: COLORS.borderLight,
   },
   bookingImage: {
-    width: 70,
-    height: 70,
-    borderRadius: 10,
+    width: 72,
+    height: 72,
+    borderRadius: 12,
   },
   imagePlaceholder: {
-    width: 70,
-    height: 70,
-    borderRadius: 10,
+    width: 72,
+    height: 72,
+    borderRadius: 12,
     backgroundColor: COLORS.bgSecondary,
     justifyContent: 'center',
     alignItems: 'center',
@@ -219,27 +254,29 @@ const styles = StyleSheet.create({
   bookingContent: {
     flex: 1,
     marginLeft: 14,
+    marginRight: 8,
   },
   bookingHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 4,
+    marginBottom: 6,
   },
   hostelName: {
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: '600',
     color: COLORS.textPrimary,
     flex: 1,
-    marginRight: 8,
+    marginRight: 10,
+    letterSpacing: -0.2,
   },
   details: {
-    fontSize: 13,
+    fontSize: 14,
     color: COLORS.textSecondary,
-    marginBottom: 2,
+    marginBottom: 4,
   },
   date: {
-    fontSize: 12,
+    fontSize: 13,
     color: COLORS.textMuted,
   },
 });

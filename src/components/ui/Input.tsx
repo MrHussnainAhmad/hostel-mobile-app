@@ -1,30 +1,36 @@
-// components/ui/Input.tsx
+// components/Input.tsx
 
 import { COLORS } from '@/constants/colors';
 import { Eye, EyeOff } from 'lucide-react-native';
 import React, { useState } from 'react';
 import {
+  Platform,
+  Pressable,
   StyleSheet,
   Text,
   TextInput,
   TextInputProps,
-  TouchableOpacity,
   View,
+  ViewStyle,
 } from 'react-native';
 
 interface InputProps extends TextInputProps {
   label?: string;
   error?: string;
+  hint?: string;
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
+  containerStyle?: ViewStyle;
 }
 
 export const Input: React.FC<InputProps> = ({
   label,
   error,
+  hint,
   leftIcon,
   rightIcon,
   secureTextEntry,
+  containerStyle,
   style,
   ...props
 }) => {
@@ -33,19 +39,37 @@ export const Input: React.FC<InputProps> = ({
 
   const getBorderColor = () => {
     if (error) return COLORS.error;
-    if (isFocused) return COLORS.borderFocus;
-    return COLORS.border;
+    if (isFocused) return COLORS.primary;
+    return COLORS.inputBorder;
+  };
+
+  const getBackgroundColor = () => {
+    if (error) return COLORS.errorLight;
+    return COLORS.inputBg;
   };
 
   return (
-    <View style={styles.container}>
-      {label && <Text style={styles.label}>{label}</Text>}
+    <View style={[styles.container, containerStyle]}>
+      {label && (
+        <Text
+          style={[
+            styles.label,
+            isFocused && styles.labelFocused,
+            error && styles.labelError,
+          ]}
+        >
+          {label}
+        </Text>
+      )}
 
       <View
         style={[
           styles.inputWrapper,
-          { borderColor: getBorderColor() },
-          error && styles.inputWrapperError,
+          {
+            borderColor: getBorderColor(),
+            backgroundColor: getBackgroundColor(),
+          },
+          isFocused && styles.inputWrapperFocused,
         ]}
       >
         {leftIcon && <View style={styles.leftIcon}>{leftIcon}</View>}
@@ -54,30 +78,32 @@ export const Input: React.FC<InputProps> = ({
           style={[
             styles.input,
             leftIcon && styles.inputWithLeftIcon,
+            (rightIcon || secureTextEntry) && styles.inputWithRightIcon,
             style,
           ]}
-          placeholderTextColor={COLORS.textMuted}
+          placeholderTextColor={COLORS.inputPlaceholder}
           secureTextEntry={secureTextEntry && !showPassword}
           onFocus={() => setIsFocused(true)}
           onBlur={(e) => {
             setIsFocused(false);
             props.onBlur?.(e);
           }}
+          selectionColor={COLORS.primary}
           {...props}
         />
 
         {secureTextEntry && (
-          <TouchableOpacity
+          <Pressable
             style={styles.rightIcon}
             onPress={() => setShowPassword(!showPassword)}
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
           >
             {showPassword ? (
-              <EyeOff size={18} color={COLORS.textMuted} />
+              <EyeOff size={20} color={COLORS.textMuted} />
             ) : (
-              <Eye size={18} color={COLORS.textMuted} />
+              <Eye size={20} color={COLORS.textMuted} />
             )}
-          </TouchableOpacity>
+          </Pressable>
         )}
 
         {rightIcon && !secureTextEntry && (
@@ -86,53 +112,89 @@ export const Input: React.FC<InputProps> = ({
       </View>
 
       {error && <Text style={styles.errorText}>{error}</Text>}
+
+      {hint && !error && <Text style={styles.hintText}>{hint}</Text>}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 16,
+    marginBottom: 20,
   },
+
   label: {
-    fontSize: 13,
-    fontWeight: '600',
+    fontSize: 14,
+    fontWeight: '500',
     color: COLORS.textSecondary,
-    marginBottom: 6,
+    marginBottom: 8,
     letterSpacing: 0.1,
   },
+  labelFocused: {
+    color: COLORS.primary,
+  },
+  labelError: {
+    color: COLORS.error,
+  },
+
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.bgCard,
-    borderWidth: 1,
-    borderColor: COLORS.border,
+    borderWidth: 1.5,
     borderRadius: 12,
-    paddingHorizontal: 12,
-    minHeight: 48,
+    paddingHorizontal: 16,
+    minHeight: 56,
+    backgroundColor: COLORS.inputBg,
   },
-  inputWrapperError: {
-    backgroundColor: COLORS.errorLight,
+  inputWrapperFocused: {
+    // Only add shadow on iOS; avoid elevation changes on Android
+    ...Platform.select({
+      ios: {
+        shadowColor: COLORS.primary,
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: 0.1,
+        shadowRadius: 8,
+      },
+      android: {
+        // no elevation/shadow – keeps layout stable
+      },
+    }),
   },
+
   leftIcon: {
-    marginRight: 8,
+    marginRight: 12,
   },
   rightIcon: {
-    marginLeft: 8,
+    marginLeft: 12,
   },
+
   input: {
     flex: 1,
-    fontSize: 15,
+    fontSize: 16,
     color: COLORS.textPrimary,
-    paddingVertical: 10,
+    paddingVertical: 12,
+    letterSpacing: 0.1,
   },
   inputWithLeftIcon: {
     paddingLeft: 0,
   },
+  inputWithRightIcon: {
+    paddingRight: 0,
+  },
+
   errorText: {
-    fontSize: 12,
+    fontSize: 13,
     color: COLORS.error,
-    marginTop: 4,
-    marginLeft: 2,
+    marginTop: 6,
+    marginLeft: 4,
+    letterSpacing: 0.1,
+  },
+
+  hintText: {
+    fontSize: 13,
+    color: COLORS.textMuted,
+    marginTop: 6,
+    marginLeft: 4,
+    letterSpacing: 0.1,
   },
 });

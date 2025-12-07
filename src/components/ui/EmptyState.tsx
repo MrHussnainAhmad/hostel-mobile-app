@@ -1,4 +1,4 @@
-// components/ui/EmptyState.tsx
+// components/EmptyState.tsx
 
 import { COLORS } from '@/constants/colors';
 import React from 'react';
@@ -19,11 +19,22 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
 }) => {
   return (
     <View style={styles.container}>
-      <View style={styles.iconContainer}>{icon}</View>
+      {/* Icon with subtle background */}
+      <View style={styles.iconWrapper}>
+        <View style={styles.iconContainer}>
+          {icon}
+        </View>
+      </View>
+
+      {/* Title */}
       <Text style={styles.title}>{title}</Text>
+
+      {/* Description */}
       {description && (
         <Text style={styles.description}>{description}</Text>
       )}
+
+      {/* Action button */}
       {action && <View style={styles.action}>{action}</View>}
     </View>
   );
@@ -32,27 +43,44 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 32,
+    paddingHorizontal: 40,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  iconContainer: {
-    marginBottom: 16,
+  
+  iconWrapper: {
+    marginBottom: 24,
   },
+  
+  iconContainer: {
+    width: 72,
+    height: 72,
+    borderRadius: 20,
+    backgroundColor: COLORS.bgSecondary,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  
   title: {
-    fontSize: 17,
+    fontSize: 20,
     fontWeight: '600',
     color: COLORS.textPrimary,
     textAlign: 'center',
     marginBottom: 8,
+    letterSpacing: -0.3,
   },
+  
   description: {
-    fontSize: 14,
+    fontSize: 15,
     color: COLORS.textSecondary,
     textAlign: 'center',
-    lineHeight: 20,
+    lineHeight: 22,
+    maxWidth: 280,
   },
+  
   action: {
-    marginTop: 20,
+    marginTop: 32,
+    width: '100%',
+    maxWidth: 200,
   },
 });

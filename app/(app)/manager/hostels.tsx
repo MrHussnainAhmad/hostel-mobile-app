@@ -1,27 +1,23 @@
+// app/(app)/manager/hostels.tsx
+
+import { COLORS, OPACITY } from '@/constants/colors';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { Building2, MapPin, Plus, Star, Users } from 'lucide-react-native';
 import React, { useCallback, useState } from 'react';
 import {
   FlatList,
   Image,
+  Pressable,
   RefreshControl,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
 import { hostelsApi } from '@/api/hostels';
-import {
-  Badge,
-  Button,
-  Card,
-  EmptyState,
-  LoadingScreen,
-} from '@/components/ui';
-import { COLORS } from '@/constants/colors';
+import { Badge, Button, EmptyState, LoadingScreen } from '@/components/ui';
 import { Hostel } from '@/types';
 
 export default function HostelsScreen() {
@@ -40,9 +36,7 @@ export default function HostelsScreen() {
       Toast.show({
         type: 'error',
         text1: 'Error',
-        text2:
-          error?.response?.data?.message ||
-          'Failed to fetch hostels',
+        text2: error?.response?.data?.message || 'Failed to fetch hostels',
       });
     } finally {
       setLoading(false);
@@ -62,92 +56,64 @@ export default function HostelsScreen() {
   };
 
   const renderHostel = ({ item }: { item: Hostel }) => {
-    const minPrice = Math.min(
-      ...(item.roomTypes?.map((rt) => rt.price) || [0])
-    );
+    const minPrice = Math.min(...(item.roomTypes?.map((rt) => rt.price) || [0]));
 
     return (
-      <TouchableOpacity
-        activeOpacity={0.8}
-        onPress={() =>
-          router.push(`/(app)/manager/hostel/${item.id}`)
-        }
+      <Pressable
+        style={({ pressed }) => [
+          styles.hostelCard,
+          pressed && { opacity: OPACITY.pressed },
+        ]}
+        onPress={() => router.push(`/(app)/manager/hostel/${item.id}`)}
       >
-        <Card style={styles.hostelCard}>
-          {/* Image */}
-          {item.roomImages && item.roomImages.length > 0 ? (
-            <Image
-              source={{ uri: item.roomImages[0] }}
-              style={styles.hostelImage}
-            />
-          ) : (
-            <View style={styles.imagePlaceholder}>
-              <Building2
-                size={40}
-                color={COLORS.textMuted}
-              />
-            </View>
-          )}
-
-          {/* Content */}
-          <View style={styles.hostelContent}>
-            <View style={styles.hostelHeader}>
-              <Text
-                style={styles.hostelName}
-                numberOfLines={1}
-              >
-                {item.hostelName}
-              </Text>
-              <Badge
-                label={item.isActive ? 'ACTIVE' : 'INACTIVE'}
-                variant={item.isActive ? 'success' : 'error'}
-              />
-            </View>
-
-            <View style={styles.locationRow}>
-              <MapPin
-                size={14}
-                color={COLORS.textMuted}
-              />
-              <Text
-                style={styles.locationText}
-                numberOfLines={1}
-              >
-                {item.city}, {item.address}
-              </Text>
-            </View>
-
-            <View style={styles.hostelFooter}>
-              <View style={styles.footerItem}>
-                <Users
-                  size={14}
-                  color={COLORS.textSecondary}
-                />
-                <Text style={styles.footerText}>
-                  {item.hostelFor}
-                </Text>
-              </View>
-
-              {item.rating > 0 && (
-                <View style={styles.footerItem}>
-                  <Star
-                    size={14}
-                    color={COLORS.warning}
-                    fill={COLORS.warning}
-                  />
-                  <Text style={styles.footerText}>
-                    {item.rating.toFixed(1)}
-                  </Text>
-                </View>
-              )}
-
-              <Text style={styles.priceText}>
-                Rs. {minPrice.toLocaleString()}/mo
-              </Text>
-            </View>
+        {/* Image */}
+        {item.roomImages && item.roomImages.length > 0 ? (
+          <Image source={{ uri: item.roomImages[0] }} style={styles.hostelImage} />
+        ) : (
+          <View style={styles.imagePlaceholder}>
+            <Building2 size={36} color={COLORS.textMuted} strokeWidth={1.5} />
           </View>
-        </Card>
-      </TouchableOpacity>
+        )}
+
+        {/* Content */}
+        <View style={styles.hostelContent}>
+          <View style={styles.hostelHeader}>
+            <Text style={styles.hostelName} numberOfLines={1}>
+              {item.hostelName}
+            </Text>
+            <Badge
+              label={item.isActive ? 'ACTIVE' : 'INACTIVE'}
+              variant={item.isActive ? 'success' : 'error'}
+              size="sm"
+            />
+          </View>
+
+          <View style={styles.locationRow}>
+            <MapPin size={14} color={COLORS.textMuted} strokeWidth={1.5} />
+            <Text style={styles.locationText} numberOfLines={1}>
+              {item.city}, {item.address}
+            </Text>
+          </View>
+
+          <View style={styles.hostelFooter}>
+            <View style={styles.footerItem}>
+              <Users size={14} color={COLORS.textSecondary} strokeWidth={1.5} />
+              <Text style={styles.footerText}>{item.hostelFor}</Text>
+            </View>
+
+            {item.rating > 0 && (
+              <View style={styles.footerItem}>
+                <Star size={14} color={COLORS.warning} fill={COLORS.warning} />
+                <Text style={styles.footerText}>{item.rating.toFixed(1)}</Text>
+              </View>
+            )}
+
+            <Text style={styles.priceText}>
+              Rs. {minPrice.toLocaleString()}<Text style={styles.priceUnit}>/mo</Text>
+            </Text>
+          </View>
+        </View>
+      </Pressable>
     );
   };
 
@@ -156,24 +122,24 @@ export default function HostelsScreen() {
   }
 
   return (
-    <SafeAreaView
-      style={styles.container}
-      edges={['top', 'bottom']}
-    >
+    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.title}>My hostels</Text>
-        <TouchableOpacity
-          style={styles.addButton}
-          onPress={() =>
-            router.push('/(app)/manager/hostel/create')
-          }
+        <View>
+          <Text style={styles.title}>My Hostels</Text>
+          <Text style={styles.subtitle}>
+            {hostels.length} hostel{hostels.length !== 1 ? 's' : ''} registered
+          </Text>
+        </View>
+        <Pressable
+          style={({ pressed }) => [
+            styles.addButton,
+            pressed && { opacity: OPACITY.pressed },
+          ]}
+          onPress={() => router.push('/(app)/manager/hostel/create')}
         >
-          <Plus
-            size={24}
-            color={COLORS.textInverse}
-          />
-        </TouchableOpacity>
+          <Plus size={22} color={COLORS.textInverse} strokeWidth={2} />
+        </Pressable>
       </View>
 
       {/* List */}
@@ -188,34 +154,25 @@ export default function HostelsScreen() {
             refreshing={refreshing}
             onRefresh={onRefresh}
             tintColor={COLORS.primary}
+            colors={[COLORS.primary]}
           />
         }
         ListEmptyComponent={
           <EmptyState
-            icon={
-              <Building2
-                size={64}
-                color={COLORS.textMuted}
-              />
-            }
+            icon={<Building2 size={48} color={COLORS.textMuted} strokeWidth={1.5} />}
             title="No hostels yet"
-            description="Add your first hostel to start receiving bookings."
+            description="Add your first hostel to start receiving bookings from students."
             action={
               <Button
-                title="Add hostel"
-                onPress={() =>
-                  router.push('/(app)/manager/hostel/create')
-                }
-                icon={
-                  <Plus
-                    size={20}
-                    color={COLORS.textInverse}
-                  />
-                }
+                title="Add Hostel"
+                onPress={() => router.push('/(app)/manager/hostel/create')}
+                icon={<Plus size={18} color={COLORS.textInverse} strokeWidth={2} />}
+                size="md"
               />
             }
           />
         }
+        ItemSeparatorComponent={() => <View style={styles.separator} />}
       />
     </SafeAreaView>
   );
@@ -226,36 +183,59 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.bgPrimary,
   },
+
+  // Header
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 24,
-    paddingTop: 16,
+    paddingTop: 20,
     paddingBottom: 16,
   },
   title: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: '700',
     color: COLORS.textPrimary,
+    letterSpacing: -0.5,
+  },
+  subtitle: {
+    fontSize: 14,
+    color: COLORS.textMuted,
+    marginTop: 4,
   },
   addButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 48,
+    height: 48,
+    borderRadius: 16,
     backgroundColor: COLORS.primary,
     justifyContent: 'center',
     alignItems: 'center',
+    // Subtle shadow
+    shadowColor: COLORS.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
   },
+
+  // List
   list: {
-    paddingHorizontal: 24,
+    paddingHorizontal: 20,
     paddingBottom: 24,
     flexGrow: 1,
   },
+  separator: {
+    height: 14,
+  },
+
+  // Hostel Card
   hostelCard: {
-    padding: 0,
+    backgroundColor: COLORS.bgCard,
+    borderRadius: 18,
     overflow: 'hidden',
-    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: COLORS.borderLight,
   },
   hostelImage: {
     width: '100%',
@@ -270,13 +250,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   hostelContent: {
-    padding: 16,
+    padding: 18,
   },
   hostelHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: 10,
   },
   hostelName: {
     fontSize: 18,
@@ -284,12 +264,13 @@ const styles = StyleSheet.create({
     color: COLORS.textPrimary,
     flex: 1,
     marginRight: 12,
+    letterSpacing: -0.2,
   },
   locationRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    marginBottom: 12,
+    marginBottom: 14,
   },
   locationText: {
     fontSize: 14,
@@ -304,16 +285,21 @@ const styles = StyleSheet.create({
   footerItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
+    gap: 5,
   },
   footerText: {
     fontSize: 13,
     color: COLORS.textSecondary,
   },
   priceText: {
-    fontSize: 14,
-    fontWeight: '600',
+    fontSize: 15,
+    fontWeight: '700',
     color: COLORS.primary,
     marginLeft: 'auto',
+  },
+  priceUnit: {
+    fontSize: 12,
+    fontWeight: '500',
+    color: COLORS.textMuted,
   },
 });

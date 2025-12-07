@@ -1,39 +1,43 @@
 // app/(app)/student/book/[id].tsx
 
+import { COLORS, OPACITY } from '@/constants/colors';
 import * as ImagePicker from 'expo-image-picker';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import {
-    ArrowLeft,
-    Calendar,
-    Camera,
-    Check,
-    Clock,
-    CreditCard,
-    X,
+  ArrowLeft,
+  Calendar,
+  Camera,
+  Check,
+  Clock,
+  CreditCard,
+  X,
 } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
 import {
-    Image,
-    KeyboardAvoidingView,
-    Platform,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
 import { bookingsApi } from '@/api/bookings';
 import { hostelsApi } from '@/api/hostels';
-import { Button, Card, Input, LoadingScreen } from '@/components/ui';
-import { COLORS } from '@/constants/colors';
+import { Button, Input, LoadingScreen } from '@/components/ui';
 import { Hostel } from '@/types';
 
 export default function BookHostelScreen() {
   const router = useRouter();
-  const { id, roomType: preselectedRoomType, reservationId } = useLocalSearchParams<{
+  const {
+    id,
+    roomType: preselectedRoomType,
+    reservationId,
+  } = useLocalSearchParams<{
     id: string;
     roomType?: string;
     reservationId?: string;
@@ -47,9 +51,7 @@ export default function BookHostelScreen() {
   const [selectedRoomType, setSelectedRoomType] = useState<string>(
     preselectedRoomType || ''
   );
-  const [transactionImage, setTransactionImage] = useState<string | null>(
-    null
-  );
+  const [transactionImage, setTransactionImage] = useState<string | null>(null);
   const [transactionDate, setTransactionDate] = useState('');
   const [transactionTime, setTransactionTime] = useState('');
   const [fromAccount, setFromAccount] = useState('');
@@ -75,8 +77,7 @@ export default function BookHostelScreen() {
       Toast.show({
         type: 'error',
         text1: 'Error',
-        text2:
-          error?.response?.data?.message || 'Failed to fetch hostel',
+        text2: error?.response?.data?.message || 'Failed to fetch hostel',
       });
       router.back();
     } finally {
@@ -98,51 +99,27 @@ export default function BookHostelScreen() {
 
   const validate = () => {
     if (!selectedRoomType) {
-      Toast.show({
-        type: 'error',
-        text1: 'Error',
-        text2: 'Select a room type',
-      });
+      Toast.show({ type: 'error', text1: 'Error', text2: 'Select a room type' });
       return false;
     }
     if (!transactionImage) {
-      Toast.show({
-        type: 'error',
-        text1: 'Error',
-        text2: 'Upload payment screenshot',
-      });
+      Toast.show({ type: 'error', text1: 'Error', text2: 'Upload payment screenshot' });
       return false;
     }
     if (!transactionDate.trim()) {
-      Toast.show({
-        type: 'error',
-        text1: 'Error',
-        text2: 'Enter transaction date',
-      });
+      Toast.show({ type: 'error', text1: 'Error', text2: 'Enter transaction date' });
       return false;
     }
     if (!transactionTime.trim()) {
-      Toast.show({
-        type: 'error',
-        text1: 'Error',
-        text2: 'Enter transaction time',
-      });
+      Toast.show({ type: 'error', text1: 'Error', text2: 'Enter transaction time' });
       return false;
     }
     if (!fromAccount.trim()) {
-      Toast.show({
-        type: 'error',
-        text1: 'Error',
-        text2: 'Enter sender account',
-      });
+      Toast.show({ type: 'error', text1: 'Error', text2: 'Enter sender account' });
       return false;
     }
     if (!toAccount.trim()) {
-      Toast.show({
-        type: 'error',
-        text1: 'Error',
-        text2: 'Enter receiver account',
-      });
+      Toast.show({ type: 'error', text1: 'Error', text2: 'Enter receiver account' });
       return false;
     }
     return true;
@@ -183,7 +160,7 @@ export default function BookHostelScreen() {
       if (response.success) {
         Toast.show({
           type: 'success',
-          text1: 'Booking submitted!',
+          text1: 'Booking Submitted',
           text2: 'Manager will review your payment',
         });
         router.back();
@@ -193,9 +170,7 @@ export default function BookHostelScreen() {
       Toast.show({
         type: 'error',
         text1: 'Error',
-        text2:
-          error?.response?.data?.message ||
-          'Failed to submit booking',
+        text2: error?.response?.data?.message || 'Failed to submit booking',
       });
     } finally {
       setSubmitting(false);
@@ -210,146 +185,142 @@ export default function BookHostelScreen() {
     return null;
   }
 
-  const selectedRoom = hostel.roomTypes?.find(
-    (rt) => rt.type === selectedRoomType
-  );
+  const selectedRoom = hostel.roomTypes?.find((rt) => rt.type === selectedRoomType);
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity
+        <Pressable
           onPress={() => router.back()}
-          style={styles.backButton}
+          style={({ pressed }) => [
+            styles.backButton,
+            pressed && { opacity: OPACITY.pressed },
+          ]}
         >
-          <ArrowLeft size={24} color={COLORS.textPrimary} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Book hostel</Text>
-        <View style={{ width: 40 }} />
+          <ArrowLeft size={22} color={COLORS.textPrimary} strokeWidth={1.5} />
+        </Pressable>
+        <Text style={styles.headerTitle}>Book Hostel</Text>
+        <View style={styles.headerSpacer} />
       </View>
 
       <KeyboardAvoidingView
         style={styles.keyboardView}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 24 : 0}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
       >
         <ScrollView
           style={styles.content}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
+          contentContainerStyle={styles.scrollContent}
         >
           {/* Hostel Info */}
-          <Card style={styles.hostelCard}>
+          <View style={styles.hostelCard}>
             <Text style={styles.hostelName}>{hostel.hostelName}</Text>
             <Text style={styles.hostelLocation}>
               {hostel.city}, {hostel.address}
             </Text>
-          </Card>
+          </View>
 
           {/* Room Type Selection */}
-          <Text style={styles.sectionTitle}>Select room type</Text>
+          <Text style={styles.sectionTitle}>Select Room Type</Text>
+          
           {hostel.roomTypes?.map((roomType, index) => (
-            <TouchableOpacity
+            <Pressable
               key={roomType.id ?? `${roomType.type}-${index}`}
-              activeOpacity={0.8}
+              style={({ pressed }) => [
+                styles.roomTypeCard,
+                selectedRoomType === roomType.type && styles.roomTypeCardSelected,
+                pressed && { opacity: OPACITY.pressed },
+              ]}
               onPress={() => setSelectedRoomType(roomType.type)}
             >
-              <Card
-                style={[
-                  styles.roomTypeCard,
-                  selectedRoomType === roomType.type &&
-                    styles.roomTypeCardSelected,
-                ]}
-              >
-                <View style={styles.roomTypeHeader}>
-                  <View>
-                    <Text style={styles.roomTypeName}>
-                      {roomType.type.replace('_', ' ')}
-                    </Text>
-                    <Text style={styles.roomTypeDetail}>
-                      {roomType.personsInRoom} person(s) •{' '}
-                      {roomType.availableRooms} available
-                    </Text>
-                  </View>
-                  <View style={styles.roomTypeRight}>
-                    <Text style={styles.roomTypePrice}>
-                      Rs. {roomType.price.toLocaleString()}
-                    </Text>
-                    <Text style={styles.roomTypePriceLabel}>
-                      /month
-                    </Text>
-                  </View>
+              <View style={styles.roomTypeContent}>
+                <View>
+                  <Text style={styles.roomTypeName}>
+                    {roomType.type.replace('_', ' ')}
+                  </Text>
+                  <Text style={styles.roomTypeDetail}>
+                    {roomType.personsInRoom} person(s) • {roomType.availableRooms} available
+                  </Text>
                 </View>
+                <View style={styles.roomTypeRight}>
+                  <Text style={styles.roomTypePrice}>
+                    Rs. {roomType.price.toLocaleString()}
+                  </Text>
+                  <Text style={styles.roomTypePriceLabel}>/month</Text>
+                </View>
+              </View>
 
-                {selectedRoomType === roomType.type && (
-                  <View style={styles.checkIcon}>
-                    <Check size={20} color={COLORS.textInverse} />
-                  </View>
-                )}
-              </Card>
-            </TouchableOpacity>
+              {selectedRoomType === roomType.type && (
+                <View style={styles.checkIcon}>
+                  <Check size={16} color={COLORS.textInverse} strokeWidth={2} />
+                </View>
+              )}
+            </Pressable>
           ))}
 
-          {/* Payment Details */}
-          <Text style={styles.sectionTitle}>Payment details</Text>
-
+          {/* Payment Amount */}
           {selectedRoom && (
-            <Card style={styles.paymentInfoCard}>
-              <Text style={styles.paymentLabel}>Amount to pay</Text>
+            <View style={styles.paymentCard}>
+              <Text style={styles.paymentLabel}>Amount to Pay</Text>
               <Text style={styles.paymentAmount}>
                 Rs. {selectedRoom.price.toLocaleString()}
               </Text>
               <Text style={styles.paymentNote}>
-                Pay to manager&apos;s account and upload screenshot.
+                Transfer to manager's account and upload screenshot
               </Text>
-            </Card>
+            </View>
           )}
 
-          {/* Transaction Image */}
-          <Text style={styles.label}>Payment screenshot *</Text>
+          {/* Payment Screenshot */}
+          <Text style={styles.sectionTitle}>Payment Proof</Text>
+          
           {transactionImage ? (
             <View style={styles.imagePreview}>
-              <Image
-                source={{ uri: transactionImage }}
-                style={styles.previewImage}
-              />
-              <TouchableOpacity
-                style={styles.removeImageBtn}
+              <Image source={{ uri: transactionImage }} style={styles.previewImage} />
+              <Pressable
+                style={({ pressed }) => [
+                  styles.removeImageBtn,
+                  pressed && { opacity: OPACITY.pressed },
+                ]}
                 onPress={() => setTransactionImage(null)}
               >
-                <X size={20} color={COLORS.textInverse} />
-              </TouchableOpacity>
+                <X size={18} color={COLORS.textInverse} strokeWidth={2} />
+              </Pressable>
             </View>
           ) : (
-            <TouchableOpacity
-              style={styles.uploadButton}
+            <Pressable
+              style={({ pressed }) => [
+                styles.uploadButton,
+                pressed && { opacity: OPACITY.pressed },
+              ]}
               onPress={pickImage}
             >
-              <Camera size={32} color={COLORS.textMuted} />
-              <Text style={styles.uploadText}>
-                Upload payment screenshot
-              </Text>
-            </TouchableOpacity>
+              <Camera size={28} color={COLORS.textMuted} strokeWidth={1.5} />
+              <Text style={styles.uploadText}>Upload Payment Screenshot</Text>
+            </Pressable>
           )}
 
           {/* Transaction Details */}
+          <Text style={styles.sectionTitle}>Transaction Details</Text>
+          
           <View style={styles.row}>
             <View style={styles.halfInput}>
               <Input
-                label="Transaction date *"
-                placeholder="e.g., 2024-01-15"
-                leftIcon={
-                  <Calendar size={18} color={COLORS.textMuted} />
-                }
+                label="Date"
+                placeholder="2024-01-15"
+                leftIcon={<Calendar size={18} color={COLORS.textMuted} strokeWidth={1.5} />}
                 value={transactionDate}
                 onChangeText={setTransactionDate}
               />
             </View>
             <View style={styles.halfInput}>
               <Input
-                label="Transaction time *"
-                placeholder="e.g., 14:30"
-                leftIcon={<Clock size={18} color={COLORS.textMuted} />}
+                label="Time"
+                placeholder="14:30"
+                leftIcon={<Clock size={18} color={COLORS.textMuted} strokeWidth={1.5} />}
                 value={transactionTime}
                 onChangeText={setTransactionTime}
               />
@@ -357,21 +328,17 @@ export default function BookHostelScreen() {
           </View>
 
           <Input
-            label="From account (your account) *"
-            placeholder="e.g., 0300-1234567"
-            leftIcon={
-              <CreditCard size={18} color={COLORS.textMuted} />
-            }
+            label="From Account (Your Account)"
+            placeholder="0300-1234567"
+            leftIcon={<CreditCard size={18} color={COLORS.textMuted} strokeWidth={1.5} />}
             value={fromAccount}
             onChangeText={setFromAccount}
           />
 
           <Input
-            label="To account (manager's account) *"
-            placeholder="e.g., 0321-9876543"
-            leftIcon={
-              <CreditCard size={18} color={COLORS.textMuted} />
-            }
+            label="To Account (Manager's Account)"
+            placeholder="0321-9876543"
+            leftIcon={<CreditCard size={18} color={COLORS.textMuted} strokeWidth={1.5} />}
             value={toAccount}
             onChangeText={setToAccount}
           />
@@ -380,13 +347,12 @@ export default function BookHostelScreen() {
         </ScrollView>
       </KeyboardAvoidingView>
 
-      {/* Bottom Actions */}
+      {/* Bottom Action */}
       <View style={styles.bottomBar}>
         <Button
-          title="Submit booking"
+          title="Submit Booking"
           onPress={handleSubmit}
           loading={submitting}
-          style={styles.submitButton}
         />
       </View>
     </SafeAreaView>
@@ -398,70 +364,94 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.bgPrimary,
   },
+
+  // Header
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
     backgroundColor: COLORS.bgPrimary,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.borderLight,
   },
   backButton: {
-    width: 40,
-    height: 40,
+    width: 44,
+    height: 44,
+    borderRadius: 14,
+    backgroundColor: COLORS.bgCard,
     justifyContent: 'center',
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: COLORS.borderLight,
   },
   headerTitle: {
-    fontSize: 18,
+    fontSize: 17,
     fontWeight: '600',
     color: COLORS.textPrimary,
+    letterSpacing: -0.2,
   },
+  headerSpacer: {
+    width: 44,
+  },
+
+  // Content
   keyboardView: {
     flex: 1,
   },
   content: {
     flex: 1,
-    padding: 24,
   },
+  scrollContent: {
+    padding: 20,
+  },
+
+  // Hostel Card
   hostelCard: {
+    backgroundColor: COLORS.bgCard,
+    borderRadius: 16,
+    padding: 18,
     marginBottom: 24,
+    borderWidth: 1,
+    borderColor: COLORS.borderLight,
   },
   hostelName: {
     fontSize: 18,
     fontWeight: '600',
     color: COLORS.textPrimary,
     marginBottom: 4,
+    letterSpacing: -0.2,
   },
   hostelLocation: {
     fontSize: 14,
     color: COLORS.textMuted,
   },
+
+  // Section
   sectionTitle: {
     fontSize: 16,
     fontWeight: '600',
     color: COLORS.textPrimary,
-    marginBottom: 12,
+    marginBottom: 14,
+    letterSpacing: -0.2,
   },
-  label: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: COLORS.textPrimary,
-    marginBottom: 8,
-    marginTop: 8,
-  },
+
+  // Room Type Card
   roomTypeCard: {
-    marginBottom: 12,
+    backgroundColor: COLORS.bgCard,
+    borderRadius: 14,
+    padding: 16,
+    marginBottom: 10,
+    borderWidth: 1.5,
+    borderColor: COLORS.border,
     position: 'relative',
   },
   roomTypeCardSelected: {
     borderColor: COLORS.primary,
-    borderWidth: 2,
-    backgroundColor: COLORS.primary + '10',
+    backgroundColor: COLORS.primaryLight,
   },
-  roomTypeHeader: {
+  roomTypeContent: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -493,64 +483,76 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: -8,
     right: -8,
-    width: 28,
-    height: 28,
-    borderRadius: 14,
+    width: 26,
+    height: 26,
+    borderRadius: 13,
     backgroundColor: COLORS.primary,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  paymentInfoCard: {
-    marginBottom: 24,
+
+  // Payment Card
+  paymentCard: {
+    backgroundColor: COLORS.successLight,
+    borderRadius: 16,
+    padding: 20,
+    marginTop: 14,
+    marginBottom: 28,
     alignItems: 'center',
-    backgroundColor: COLORS.success + '15',
-    borderColor: COLORS.success + '30',
+    borderWidth: 1,
+    borderColor: COLORS.successMuted,
   },
   paymentLabel: {
     fontSize: 14,
     color: COLORS.textSecondary,
-    marginBottom: 4,
+    marginBottom: 6,
   },
   paymentAmount: {
-    fontSize: 28,
+    fontSize: 32,
     fontWeight: '700',
     color: COLORS.success,
     marginBottom: 8,
+    letterSpacing: -0.5,
   },
   paymentNote: {
     fontSize: 13,
     color: COLORS.textMuted,
     textAlign: 'center',
   },
+
+  // Upload
   uploadButton: {
-    height: 150,
-    borderRadius: 12,
-    backgroundColor: COLORS.bgSecondary,
+    height: 140,
+    borderRadius: 16,
+    backgroundColor: COLORS.bgCard,
     borderWidth: 2,
     borderColor: COLORS.border,
     borderStyle: 'dashed',
     justifyContent: 'center',
     alignItems: 'center',
-    gap: 8,
-    marginBottom: 16,
+    gap: 10,
+    marginBottom: 24,
   },
   uploadText: {
     fontSize: 14,
     color: COLORS.textMuted,
+    fontWeight: '500',
   },
+
+  // Image Preview
   imagePreview: {
     position: 'relative',
-    marginBottom: 16,
+    marginBottom: 24,
   },
   previewImage: {
     width: '100%',
     height: 200,
-    borderRadius: 12,
+    borderRadius: 16,
   },
   removeImageBtn: {
     position: 'absolute',
-    top: 10,
-    right: 10,
+    top: 12,
+    right: 12,
     width: 36,
     height: 36,
     borderRadius: 18,
@@ -558,6 +560,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+
+  // Row
   row: {
     flexDirection: 'row',
     gap: 12,
@@ -565,15 +569,14 @@ const styles = StyleSheet.create({
   halfInput: {
     flex: 1,
   },
+
+  // Bottom Bar
   bottomBar: {
-    paddingHorizontal: 24,
+    paddingHorizontal: 20,
     paddingVertical: 16,
     paddingBottom: 32,
-    backgroundColor: COLORS.bgSecondary,
+    backgroundColor: COLORS.bgPrimary,
     borderTopWidth: 1,
-    borderTopColor: COLORS.border,
-  },
-  submitButton: {
-    height: 56,
+    borderTopColor: COLORS.borderLight,
   },
 });

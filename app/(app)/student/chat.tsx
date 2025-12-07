@@ -1,21 +1,33 @@
+// screens/ChatScreen.tsx
+
+import { COLORS, OPACITY } from '@/constants/colors';
 import { useRouter } from 'expo-router';
 import { ChevronRight, MessageCircle } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
 import {
   FlatList,
+  Pressable,
   RefreshControl,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
 import { chatApi } from '@/api/chat';
-import { Card, EmptyState, LoadingScreen } from '@/components/ui';
-import { COLORS } from '@/constants/colors';
+import { EmptyState, LoadingScreen } from '@/components/ui';
 import { Conversation } from '@/types';
+
+// Avatar colors - subtle, professional palette
+const AVATAR_COLORS = [
+  '#5856D6', // Primary
+  '#34C759', // Success
+  '#007AFF', // Info
+  '#FF9500', // Warning
+  '#AF52DE', // Purple
+  '#FF2D55', // Pink
+];
 
 export default function StudentChatScreen() {
   const router = useRouter();
@@ -68,43 +80,51 @@ export default function StudentChatScreen() {
     }
   };
 
-  const renderConversation = ({ item }: { item: Conversation }) => {
+  const getAvatarColor = (name: string) => {
+    const index = name.charCodeAt(0) % AVATAR_COLORS.length;
+    return AVATAR_COLORS[index];
+  };
+
+  const renderConversation = ({ item, index }: { item: Conversation; index: number }) => {
     const managerName =
       item.manager?.fullName || item.manager?.user?.email || 'Manager';
     const initial = managerName.charAt(0).toUpperCase();
+    const avatarColor = getAvatarColor(managerName);
 
     return (
-      <TouchableOpacity
-        activeOpacity={0.8}
-        onPress={() =>
-          router.push(`/(app)/student/conversation/${item.id}`)
-        }
+      <Pressable
+        style={({ pressed }) => [
+          styles.conversationCard,
+          pressed && { opacity: OPACITY.pressed },
+        ]}
+        onPress={() => router.push(`/(app)/student/conversation/${item.id}`)}
       >
-        <Card style={styles.conversationCard}>
-          <View style={styles.avatar}>
-            <Text style={styles.avatarText}>{initial}</Text>
-          </View>
+        {/* Avatar */}
+        <View style={[styles.avatar, { backgroundColor: avatarColor }]}>
+          <Text style={styles.avatarText}>{initial}</Text>
+        </View>
 
-          <View style={styles.conversationContent}>
-            <View style={styles.conversationHeader}>
-              <Text style={styles.conversationName} numberOfLines={1}>
-                {managerName}
-              </Text>
-              {item.lastMessageAt && (
-                <Text style={styles.conversationTime}>
-                  {formatTime(item.lastMessageAt)}
-                </Text>
-              )}
-            </View>
-
-            <Text style={styles.lastMessage} numberOfLines={1}>
-              {item.lastMessage || 'No messages yet'}
+        {/* Content */}
+        <View style={styles.conversationContent}>
+          <View style={styles.conversationHeader}>
+            <Text style={styles.conversationName} numberOfLines={1}>
+              {managerName}
             </Text>
+            {item.lastMessageAt && (
+              <Text style={styles.conversationTime}>
+                {formatTime(item.lastMessageAt)}
+              </Text>
+            )}
           </View>
 
-          <ChevronRight size={20} color={COLORS.textMuted} />
-        </Card>
-      </TouchableOpacity>
+          <Text style={styles.lastMessage} numberOfLines={1}>
+            {item.lastMessage || 'No messages yet'}
+          </Text>
+        </View>
+
+        {/* Arrow */}
+        <ChevronRight size={18} color={COLORS.textMuted} strokeWidth={1.5} />
+      </Pressable>
     );
   };
 
@@ -117,6 +137,9 @@ export default function StudentChatScreen() {
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.title}>Messages</Text>
+        <Text style={styles.subtitle}>
+          {conversations.length} conversation{conversations.length !== 1 ? 's' : ''}
+        </Text>
       </View>
 
       {/* List */}
@@ -131,15 +154,17 @@ export default function StudentChatScreen() {
             refreshing={refreshing}
             onRefresh={onRefresh}
             tintColor={COLORS.primary}
+            colors={[COLORS.primary]}
           />
         }
         ListEmptyComponent={
           <EmptyState
-            icon={<MessageCircle size={64} color={COLORS.textMuted} />}
+            icon={<MessageCircle size={48} color={COLORS.textMuted} strokeWidth={1.5} />}
             title="No messages"
-            description="Start a conversation with a hostel manager from a hostel screen."
+            description="Start a conversation with a hostel manager from any hostel page."
           />
         }
+        ItemSeparatorComponent={() => <View style={styles.separator} />}
       />
     </SafeAreaView>
   );
@@ -150,43 +175,61 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.bgPrimary,
   },
+  
+  // Header
   header: {
     paddingHorizontal: 24,
-    paddingTop: 16,
+    paddingTop: 20,
     paddingBottom: 16,
   },
   title: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: '700',
     color: COLORS.textPrimary,
+    letterSpacing: -0.5,
   },
+  subtitle: {
+    fontSize: 14,
+    color: COLORS.textMuted,
+    marginTop: 4,
+  },
+  
+  // List
   list: {
-    paddingHorizontal: 24,
+    paddingHorizontal: 20,
     paddingBottom: 24,
     flexGrow: 1,
   },
+  separator: {
+    height: 8,
+  },
+  
+  // Conversation Card
   conversationCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 12,
+    backgroundColor: COLORS.bgCard,
+    borderRadius: 16,
     padding: 14,
+    borderWidth: 1,
+    borderColor: COLORS.borderLight,
   },
   avatar: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: COLORS.success,
+    width: 52,
+    height: 52,
+    borderRadius: 16,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 14,
   },
   avatarText: {
     fontSize: 20,
-    fontWeight: '700',
+    fontWeight: '600',
     color: COLORS.textInverse,
   },
   conversationContent: {
     flex: 1,
+    marginRight: 8,
   },
   conversationHeader: {
     flexDirection: 'row',
@@ -199,7 +242,8 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: COLORS.textPrimary,
     flex: 1,
-    marginRight: 8,
+    marginRight: 12,
+    letterSpacing: -0.2,
   },
   conversationTime: {
     fontSize: 12,
@@ -208,5 +252,6 @@ const styles = StyleSheet.create({
   lastMessage: {
     fontSize: 14,
     color: COLORS.textSecondary,
+    lineHeight: 20,
   },
 });

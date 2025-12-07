@@ -1,24 +1,26 @@
+// screens/VerifyScreen.tsx
+
+import { COLORS, OPACITY } from '@/constants/colors';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'expo-router';
 import { ArrowLeft, Building, MapPin, Phone, User } from 'lucide-react-native';
 import React, { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import {
-    KeyboardAvoidingView,
-    Platform,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import { z } from 'zod';
 
 import { usersApi } from '@/api/users';
-import { Button, Card, Input } from '@/components/ui';
-import { COLORS } from '@/constants/colors';
+import { Button, Input } from '@/components/ui';
 import { useAuthStore } from '@/stores/authStore';
 
 const verifySchema = z.object({
@@ -32,6 +34,7 @@ const verifySchema = z.object({
 type VerifyFormData = z.infer<typeof verifySchema>;
 
 export default function VerifyScreen() {
+  const router = useRouter();
   const { setUser, user } = useAuthStore();
   const [loading, setLoading] = useState(false);
 
@@ -78,7 +81,7 @@ export default function VerifyScreen() {
 
         Toast.show({
           type: 'success',
-          text1: 'Verification complete',
+          text1: 'Verification Complete',
           text2: 'You can now book hostels',
         });
 
@@ -87,7 +90,7 @@ export default function VerifyScreen() {
     } catch (error: any) {
       Toast.show({
         type: 'error',
-        text1: 'Verification failed',
+        text1: 'Verification Failed',
         text2: error?.response?.data?.message || 'Something went wrong',
       });
     } finally {
@@ -99,43 +102,52 @@ export default function VerifyScreen() {
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={handleGoBack} style={styles.backButton}>
-          <ArrowLeft size={22} color={COLORS.textPrimary} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Self verification</Text>
-        <View style={{ width: 40 }} />
+        <Pressable
+          onPress={handleGoBack}
+          style={({ pressed }) => [
+            styles.backButton,
+            pressed && { opacity: OPACITY.pressed },
+          ]}
+        >
+          <ArrowLeft size={22} color={COLORS.textPrimary} strokeWidth={1.5} />
+        </Pressable>
+        
+        <Text style={styles.headerTitle}>Verification</Text>
+        
+        <View style={styles.headerSpacer} />
       </View>
 
       <KeyboardAvoidingView
         style={styles.keyboardView}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 24 : 0}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
       >
         <ScrollView
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
+          bounces={false}
         >
-          <Card style={styles.formCard}>
-            <View style={styles.formHeader}>
-              <Text style={styles.formTitle}>Your details</Text>
-              <View style={styles.formDivider} />
-            </View>
-
-            <Text style={styles.description}>
-              Please provide your details to complete verification. This
-              information is shared with hostel managers when you book.
+          {/* Intro Section */}
+          <View style={styles.introSection}>
+            <Text style={styles.introTitle}>Complete Your Profile</Text>
+            <Text style={styles.introDesc}>
+              Please provide your details to verify your account. This information 
+              will be shared with hostel managers when you make a booking.
             </Text>
+          </View>
 
+          {/* Form */}
+          <View style={styles.formSection}>
             {/* Father Name */}
             <Controller
               control={control}
               name="fatherName"
               render={({ field: { onChange, onBlur, value } }) => (
                 <Input
-                  label="Father's name"
+                  label="Father's Name"
                   placeholder="Enter father's name"
-                  leftIcon={<User size={20} color={COLORS.textMuted} />}
+                  leftIcon={<User size={20} color={COLORS.textMuted} strokeWidth={1.5} />}
                   value={value}
                   onChangeText={onChange}
                   onBlur={onBlur}
@@ -150,9 +162,9 @@ export default function VerifyScreen() {
               name="instituteName"
               render={({ field: { onChange, onBlur, value } }) => (
                 <Input
-                  label="Institute / university"
+                  label="Institute / University"
                   placeholder="Enter institute name"
-                  leftIcon={<Building size={20} color={COLORS.textMuted} />}
+                  leftIcon={<Building size={20} color={COLORS.textMuted} strokeWidth={1.5} />}
                   value={value}
                   onChangeText={onChange}
                   onBlur={onBlur}
@@ -167,9 +179,9 @@ export default function VerifyScreen() {
               name="permanentAddress"
               render={({ field: { onChange, onBlur, value } }) => (
                 <Input
-                  label="Permanent address"
+                  label="Permanent Address"
                   placeholder="Enter your permanent address"
-                  leftIcon={<MapPin size={20} color={COLORS.textMuted} />}
+                  leftIcon={<MapPin size={20} color={COLORS.textMuted} strokeWidth={1.5} />}
                   value={value}
                   onChangeText={onChange}
                   onBlur={onBlur}
@@ -185,9 +197,9 @@ export default function VerifyScreen() {
               name="phoneNumber"
               render={({ field: { onChange, onBlur, value } }) => (
                 <Input
-                  label="Phone number"
+                  label="Phone Number"
                   placeholder="03XX XXXXXXX"
-                  leftIcon={<Phone size={20} color={COLORS.textMuted} />}
+                  leftIcon={<Phone size={20} color={COLORS.textMuted} strokeWidth={1.5} />}
                   value={value}
                   onChangeText={onChange}
                   onBlur={onBlur}
@@ -203,9 +215,9 @@ export default function VerifyScreen() {
               name="whatsappNumber"
               render={({ field: { onChange, onBlur, value } }) => (
                 <Input
-                  label="WhatsApp number"
+                  label="WhatsApp Number"
                   placeholder="03XX XXXXXXX"
-                  leftIcon={<Phone size={20} color={COLORS.textMuted} />}
+                  leftIcon={<Phone size={20} color={COLORS.textMuted} strokeWidth={1.5} />}
                   value={value}
                   onChangeText={onChange}
                   onBlur={onBlur}
@@ -215,13 +227,23 @@ export default function VerifyScreen() {
               )}
             />
 
-            <Button
-              title="Complete verification"
-              onPress={handleSubmit(onSubmit)}
-              loading={loading}
-              style={styles.button}
-            />
-          </Card>
+            {/* Submit Button */}
+            <View style={styles.buttonContainer}>
+              <Button
+                title="Complete Verification"
+                onPress={handleSubmit(onSubmit)}
+                loading={loading}
+              />
+            </View>
+
+            {/* Note */}
+            <View style={styles.noteBox}>
+              <Text style={styles.noteText}>
+                Your information is securely stored and only shared with hostel 
+                managers for booking purposes.
+              </Text>
+            </View>
+          </View>
 
           <View style={{ height: 32 }} />
         </ScrollView>
@@ -235,63 +257,84 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.bgPrimary,
   },
+  
+  // Header
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+    paddingVertical: 12,
     backgroundColor: COLORS.bgPrimary,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.borderLight,
   },
   backButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 999,
+    width: 44,
+    height: 44,
+    borderRadius: 14,
+    backgroundColor: COLORS.bgCard,
     justifyContent: 'center',
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: COLORS.borderLight,
   },
   headerTitle: {
     fontSize: 17,
     fontWeight: '600',
     color: COLORS.textPrimary,
+    letterSpacing: -0.2,
   },
+  headerSpacer: {
+    width: 44,
+  },
+  
+  // Content
   keyboardView: {
     flex: 1,
   },
   scrollContent: {
     flexGrow: 1,
-    paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 24,
+    paddingHorizontal: 24,
+    paddingTop: 24,
   },
-  formCard: {
-    padding: 20,
-    borderRadius: 18,
+  
+  // Intro Section
+  introSection: {
+    marginBottom: 28,
   },
-  formHeader: {
-    marginBottom: 14,
-  },
-  formTitle: {
-    fontSize: 16,
-    fontWeight: '600',
+  introTitle: {
+    fontSize: 24,
+    fontWeight: '700',
     color: COLORS.textPrimary,
-    marginBottom: 6,
+    marginBottom: 10,
+    letterSpacing: -0.4,
   },
-  formDivider: {
-    height: 2,
-    width: 36,
-    borderRadius: 999,
-    backgroundColor: COLORS.primary,
-  },
-  description: {
-    fontSize: 14,
+  introDesc: {
+    fontSize: 15,
     color: COLORS.textSecondary,
     lineHeight: 22,
-    marginBottom: 18,
   },
-  button: {
+  
+  // Form Section
+  formSection: {
+    flex: 1,
+  },
+  buttonContainer: {
     marginTop: 8,
+  },
+  
+  // Note Box
+  noteBox: {
+    marginTop: 20,
+    padding: 16,
+    backgroundColor: COLORS.bgSecondary,
+    borderRadius: 12,
+  },
+  noteText: {
+    fontSize: 13,
+    color: COLORS.textMuted,
+    lineHeight: 20,
+    textAlign: 'center',
   },
 });

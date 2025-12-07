@@ -1,23 +1,25 @@
-// components/ui/Button.tsx
+// components/Button.tsx
 
-import { COLORS } from '@/constants/colors';
-import React from 'react';
+import { COLORS, OPACITY } from '@/constants/colors';
+import React, { useCallback } from 'react';
 import {
   ActivityIndicator,
+  Pressable,
+  PressableProps,
   StyleSheet,
   Text,
-  TouchableOpacity,
-  TouchableOpacityProps,
   View,
 } from 'react-native';
 
-interface ButtonProps extends TouchableOpacityProps {
+interface ButtonProps extends Omit<PressableProps, 'style'> {
   title: string;
   variant?: 'primary' | 'secondary' | 'outline' | 'ghost';
   size?: 'sm' | 'md' | 'lg';
   loading?: boolean;
   icon?: React.ReactNode;
   iconPosition?: 'left' | 'right';
+  fullWidth?: boolean;
+  style?: PressableProps['style'];
 }
 
 export const Button: React.FC<ButtonProps> = ({
@@ -27,19 +29,25 @@ export const Button: React.FC<ButtonProps> = ({
   loading = false,
   icon,
   iconPosition = 'right',
+  fullWidth = true,
   disabled,
   style,
   ...props
 }) => {
   const isDisabled = disabled || loading;
 
-  const buttonStyles = [
-    styles.button,
-    styles[`button_${variant}`],
-    styles[`button_${size}`],
-    isDisabled && styles.buttonDisabled,
-    style,
-  ];
+  const getButtonStyle = useCallback(
+    ({ pressed }: { pressed: boolean }) => [
+      styles.button,
+      styles[`button_${variant}`],
+      styles[`button_${size}`],
+      fullWidth && styles.fullWidth,
+      isDisabled && styles.buttonDisabled,
+      pressed && !isDisabled && { opacity: OPACITY.pressed },
+      typeof style === 'function' ? style({ pressed }) : style,
+    ],
+    [variant, size, fullWidth, isDisabled, style]
+  );
 
   const textStyles = [
     styles.text,
@@ -48,18 +56,24 @@ export const Button: React.FC<ButtonProps> = ({
     isDisabled && styles.textDisabled,
   ];
 
+  const getLoaderColor = () => {
+    if (variant === 'primary') return COLORS.textInverse;
+    return COLORS.primary;
+  };
+
   return (
-    <TouchableOpacity
-      style={buttonStyles}
+    <Pressable
+      style={getButtonStyle}
       disabled={isDisabled}
-      activeOpacity={0.7}
       {...props}
     >
       {loading ? (
-        <ActivityIndicator
-          size="small"
-          color={variant === 'primary' ? COLORS.textInverse : COLORS.primary}
-        />
+        <View style={styles.loaderContainer}>
+          <ActivityIndicator
+            size="small"
+            color={getLoaderColor()}
+          />
+        </View>
       ) : (
         <View style={styles.content}>
           {icon && iconPosition === 'left' && (
@@ -71,73 +85,91 @@ export const Button: React.FC<ButtonProps> = ({
           )}
         </View>
       )}
-    </TouchableOpacity>
+    </Pressable>
   );
 };
 
 const styles = StyleSheet.create({
   button: {
-    borderRadius: 999,
+    borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'row',
+  },
+  
+  fullWidth: {
+    width: '100%',
   },
 
   // Variants
   button_primary: {
     backgroundColor: COLORS.primary,
-    shadowColor: COLORS.shadowPrimary,
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.4,
-    shadowRadius: 12,
-    elevation: 2,
+    // Subtle shadow for depth
+    shadowColor: COLORS.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
   },
   button_secondary: {
     backgroundColor: COLORS.bgSecondary,
   },
   button_outline: {
-    backgroundColor: 'transparent',
-    borderWidth: 1,
+    backgroundColor: COLORS.transparent,
+    borderWidth: 1.5,
     borderColor: COLORS.border,
   },
   button_ghost: {
-    backgroundColor: 'transparent',
+    backgroundColor: COLORS.transparent,
   },
 
   // Sizes
   button_sm: {
-    paddingVertical: 8,
-    paddingHorizontal: 14,
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    minHeight: 40,
   },
   button_md: {
-    paddingVertical: 10,
-    paddingHorizontal: 18,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    minHeight: 48,
   },
   button_lg: {
-    paddingVertical: 14,
-    paddingHorizontal: 22,
-    minHeight: 52,
+    paddingVertical: 16,
+    paddingHorizontal: 24,
+    minHeight: 56,
   },
 
   buttonDisabled: {
-    opacity: 0.55,
+    backgroundColor: COLORS.buttonDisabled,
+    shadowOpacity: 0,
+    elevation: 0,
   },
 
+  loaderContainer: {
+    height: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  
   content: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
   },
+  
   iconLeft: {
-    marginRight: 8,
+    marginRight: 10,
   },
   iconRight: {
-    marginLeft: 8,
+    marginLeft: 10,
   },
 
+  // Text styles
   text: {
     fontWeight: '600',
     textAlign: 'center',
+    letterSpacing: 0.2,
   },
   text_primary: {
     color: COLORS.textInverse,
@@ -153,16 +185,16 @@ const styles = StyleSheet.create({
   },
 
   text_sm: {
-    fontSize: 13,
-  },
-  text_md: {
     fontSize: 14,
   },
-  text_lg: {
+  text_md: {
     fontSize: 15,
+  },
+  text_lg: {
+    fontSize: 16,
   },
 
   textDisabled: {
-    opacity: 0.9,
+    color: COLORS.buttonDisabledText,
   },
 });

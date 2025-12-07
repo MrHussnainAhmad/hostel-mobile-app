@@ -1,10 +1,9 @@
-// components/ui/RoleSelector.tsx
+// components/RoleSelector.tsx
 
+import { COLORS, OPACITY } from '@/constants/colors';
 import { Building2, Check, GraduationCap } from 'lucide-react-native';
 import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-
-import { COLORS } from '@/constants/colors';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 interface RoleSelectorProps {
   value: 'STUDENT' | 'MANAGER';
@@ -34,24 +33,28 @@ export const RoleSelector: React.FC<RoleSelectorProps> = ({
 
   return (
     <View style={styles.container}>
+      {/* Label */}
       <Text style={styles.label}>I am a</Text>
 
+      {/* Options */}
       <View style={styles.optionsContainer}>
         {roles.map((role) => {
           const isSelected = value === role.id;
           const IconComponent = role.icon;
 
           return (
-            <TouchableOpacity
+            <Pressable
               key={role.id}
-              style={[
+              style={({ pressed }) => [
                 styles.option,
                 isSelected && styles.optionSelected,
+                pressed && { opacity: OPACITY.pressed },
               ]}
               onPress={() => onChange(role.id)}
-              activeOpacity={0.7}
             >
+              {/* Top row: Check + Icon */}
               <View style={styles.topRow}>
+                {/* Radio/Check indicator */}
                 <View
                   style={[
                     styles.checkContainer,
@@ -67,14 +70,22 @@ export const RoleSelector: React.FC<RoleSelectorProps> = ({
                   )}
                 </View>
 
-                <View style={styles.iconContainer}>
+                {/* Icon */}
+                <View
+                  style={[
+                    styles.iconContainer,
+                    isSelected && styles.iconContainerSelected,
+                  ]}
+                >
                   <IconComponent
-                    size={22}
+                    size={20}
                     color={isSelected ? COLORS.primary : COLORS.textMuted}
+                    strokeWidth={1.5}
                   />
                 </View>
               </View>
 
+              {/* Text content */}
               <View style={styles.textContainer}>
                 <Text
                   style={[
@@ -84,15 +95,21 @@ export const RoleSelector: React.FC<RoleSelectorProps> = ({
                 >
                   {role.label}
                 </Text>
-                <Text style={styles.roleDescription}>
+                <Text 
+                  style={[
+                    styles.roleDescription,
+                    isSelected && styles.roleDescriptionSelected,
+                  ]}
+                >
                   {role.description}
                 </Text>
               </View>
-            </TouchableOpacity>
+            </Pressable>
           );
         })}
       </View>
 
+      {/* Error message */}
       {error && <Text style={styles.errorText}>{error}</Text>}
     </View>
   );
@@ -100,76 +117,110 @@ export const RoleSelector: React.FC<RoleSelectorProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 20,
+    marginBottom: 24,
   },
+  
   label: {
-    fontSize: 13,
-    fontWeight: '600',
+    fontSize: 14,
+    fontWeight: '500',
     color: COLORS.textSecondary,
-    marginBottom: 10,
+    marginBottom: 12,
     letterSpacing: 0.1,
   },
+  
   optionsContainer: {
     flexDirection: 'row',
-    columnGap: 12,
+    gap: 12,
   },
+  
   option: {
     flex: 1,
     backgroundColor: COLORS.bgCard,
-    borderRadius: 14,
-    paddingVertical: 14,
-    paddingHorizontal: 14,
-    borderWidth: 1,
+    borderRadius: 16,
+    paddingVertical: 18,
+    paddingHorizontal: 16,
+    borderWidth: 1.5,
     borderColor: COLORS.border,
   },
+  
   optionSelected: {
-    borderColor: COLORS.borderFocus,
+    borderColor: COLORS.primary,
     backgroundColor: COLORS.primaryLight,
+    // Subtle shadow when selected
+    shadowColor: COLORS.primary,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 2,
   },
+  
   topRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 12,
+    alignItems: 'flex-start',
+    marginBottom: 16,
   },
+  
   checkContainer: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    borderWidth: 1,
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    borderWidth: 1.5,
     borderColor: COLORS.border,
     backgroundColor: COLORS.bgCard,
     justifyContent: 'center',
     alignItems: 'center',
   },
+  
   checkContainerSelected: {
     borderColor: COLORS.primary,
     backgroundColor: COLORS.primary,
   },
+  
   iconContainer: {
-    padding: 6,
-    borderRadius: 10,
-    backgroundColor: COLORS.bgElevated,
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    backgroundColor: COLORS.bgSecondary,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
+  
+  iconContainerSelected: {
+    backgroundColor: COLORS.white,
+  },
+  
   textContainer: {
     alignItems: 'flex-start',
   },
+  
   roleLabel: {
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: '600',
     color: COLORS.textPrimary,
-    marginBottom: 2,
+    marginBottom: 4,
+    letterSpacing: -0.2,
   },
+  
   roleLabelSelected: {
     color: COLORS.primaryDark,
   },
+  
   roleDescription: {
-    fontSize: 12,
+    fontSize: 13,
     color: COLORS.textMuted,
+    letterSpacing: 0.1,
   },
+  
+  roleDescriptionSelected: {
+    color: COLORS.textSecondary,
+  },
+  
   errorText: {
-    fontSize: 12,
+    fontSize: 13,
     color: COLORS.error,
-    marginTop: 6,
-    marginLeft: 2,
+    marginTop: 8,
+    marginLeft: 4,
+    letterSpacing: 0.1,
   },
 });

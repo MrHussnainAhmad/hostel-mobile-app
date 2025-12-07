@@ -1,20 +1,22 @@
+// screens/ReportsScreen.tsx
+
+import { COLORS, OPACITY } from '@/constants/colors';
 import { useRouter } from 'expo-router';
 import { AlertTriangle, ArrowLeft, FileText } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
 import {
-    FlatList,
-    RefreshControl,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  FlatList,
+  Pressable,
+  RefreshControl,
+  StyleSheet,
+  Text,
+  View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
 import { reportsApi } from '@/api/reports';
-import { Badge, Card, EmptyState, LoadingScreen } from '@/components/ui';
-import { COLORS } from '@/constants/colors';
+import { Badge, EmptyState, LoadingScreen } from '@/components/ui';
 import { Report } from '@/types';
 
 export default function ReportsScreen() {
@@ -74,11 +76,13 @@ export default function ReportsScreen() {
   };
 
   const renderReport = ({ item }: { item: Report }) => (
-    <Card style={styles.reportCard}>
+    <View style={styles.reportCard}>
+      {/* Header */}
       <View style={styles.reportHeader}>
         <View style={styles.reportIcon}>
-          <AlertTriangle size={20} color={COLORS.warning} />
+          <AlertTriangle size={18} color={COLORS.warning} strokeWidth={1.5} />
         </View>
+        
         <View style={styles.reportInfo}>
           <Text style={styles.hostelName} numberOfLines={1}>
             {item.booking?.hostel?.hostelName || 'Hostel'}
@@ -87,22 +91,27 @@ export default function ReportsScreen() {
             {formatDate(item.createdAt)}
           </Text>
         </View>
+        
         <Badge
           label={item.status}
           variant={getStatusVariant(item.status)}
+          size="sm"
         />
       </View>
 
+      {/* Description */}
       <Text style={styles.description}>{item.description}</Text>
 
+      {/* Resolution */}
       {item.status === 'RESOLVED' && (
         <View style={styles.resolutionBox}>
           {item.decision && (
             <View style={styles.decisionRow}>
-              <Text style={styles.decisionLabel}>Decision:</Text>
+              <Text style={styles.decisionLabel}>Decision</Text>
               <Badge
                 label={item.decision.replace('_', ' ')}
                 variant={getDecisionVariant(item.decision)}
+                size="sm"
               />
             </View>
           )}
@@ -113,7 +122,7 @@ export default function ReportsScreen() {
           )}
         </View>
       )}
-    </Card>
+    </View>
   );
 
   if (loading) {
@@ -122,17 +131,24 @@ export default function ReportsScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+      {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity
+        <Pressable
           onPress={() => router.back()}
-          style={styles.backButton}
+          style={({ pressed }) => [
+            styles.backButton,
+            pressed && { opacity: OPACITY.pressed },
+          ]}
         >
-          <ArrowLeft size={24} color={COLORS.textPrimary} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>My reports</Text>
-        <View style={{ width: 40 }} />
+          <ArrowLeft size={22} color={COLORS.textPrimary} strokeWidth={1.5} />
+        </Pressable>
+        
+        <Text style={styles.headerTitle}>My Reports</Text>
+        
+        <View style={styles.headerSpacer} />
       </View>
 
+      {/* List */}
       <FlatList
         data={reports}
         keyExtractor={(item) => item.id}
@@ -144,15 +160,17 @@ export default function ReportsScreen() {
             refreshing={refreshing}
             onRefresh={onRefresh}
             tintColor={COLORS.primary}
+            colors={[COLORS.primary]}
           />
         }
         ListEmptyComponent={
           <EmptyState
-            icon={<FileText size={64} color={COLORS.textMuted} />}
-            title="No reports"
-            description="Your complaint reports will appear here."
+            icon={<FileText size={48} color={COLORS.textMuted} strokeWidth={1.5} />}
+            title="No reports yet"
+            description="Your complaint reports will appear here when you submit them."
           />
         }
+        ItemSeparatorComponent={() => <View style={styles.separator} />}
       />
     </SafeAreaView>
   );
@@ -163,80 +181,106 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.bgPrimary,
   },
+  
+  // Header
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
     backgroundColor: COLORS.bgPrimary,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.borderLight,
   },
   backButton: {
-    width: 40,
-    height: 40,
+    width: 44,
+    height: 44,
+    borderRadius: 14,
+    backgroundColor: COLORS.bgCard,
     justifyContent: 'center',
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: COLORS.borderLight,
   },
   headerTitle: {
-    fontSize: 18,
+    fontSize: 17,
     fontWeight: '600',
     color: COLORS.textPrimary,
+    letterSpacing: -0.2,
   },
+  headerSpacer: {
+    width: 44,
+  },
+  
+  // List
   list: {
-    padding: 24,
+    padding: 20,
     flexGrow: 1,
   },
+  separator: {
+    height: 12,
+  },
+  
+  // Report Card
   reportCard: {
-    marginBottom: 16,
+    backgroundColor: COLORS.bgCard,
+    borderRadius: 16,
+    padding: 18,
+    borderWidth: 1,
+    borderColor: COLORS.borderLight,
   },
   reportHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 14,
   },
   reportIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: COLORS.warning + '20',
+    width: 42,
+    height: 42,
+    borderRadius: 12,
+    backgroundColor: COLORS.warningLight,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
   },
   reportInfo: {
     flex: 1,
+    marginRight: 10,
   },
   hostelName: {
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: '600',
     color: COLORS.textPrimary,
+    marginBottom: 2,
+    letterSpacing: -0.2,
   },
   reportDate: {
-    fontSize: 12,
+    fontSize: 13,
     color: COLORS.textMuted,
-    marginTop: 2,
   },
   description: {
-    fontSize: 14,
+    fontSize: 15,
     color: COLORS.textSecondary,
     lineHeight: 22,
-    marginBottom: 12,
   },
+  
+  // Resolution Box
   resolutionBox: {
+    marginTop: 14,
     backgroundColor: COLORS.bgSecondary,
-    borderRadius: 10,
-    padding: 12,
+    borderRadius: 12,
+    padding: 14,
   },
   decisionRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-    marginBottom: 8,
+    justifyContent: 'space-between',
+    marginBottom: 10,
   },
   decisionLabel: {
     fontSize: 13,
+    fontWeight: '500',
     color: COLORS.textMuted,
   },
   resolutionText: {

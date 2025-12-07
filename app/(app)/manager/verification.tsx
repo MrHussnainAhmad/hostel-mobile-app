@@ -1,3 +1,6 @@
+// app/(app)/manager/verification.tsx
+
+import { COLORS, OPACITY } from '@/constants/colors';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
 import {
@@ -13,81 +16,62 @@ import {
 import React, { useState } from 'react';
 import {
   Image,
-  KeyboardAvoidingView,
-  Platform,
+  Pressable,
   ScrollView,
   StyleSheet,
   Switch,
   Text,
   TextInput,
-  TouchableOpacity,
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
 import { verificationApi } from '@/api/verification';
-import { Button, Card, Input } from '@/components/ui';
-import { COLORS } from '@/constants/colors';
+import { Button, Input } from '@/components/ui';
 
 export default function VerificationScreen() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState<1 | 2 | 3>(1);
 
   // Form state
   const [ownerName, setOwnerName] = useState('');
   const [city, setCity] = useState('');
   const [address, setAddress] = useState('');
-  const [hostelFor, setHostelFor] = useState<'BOYS' | 'GIRLS'>(
-    'BOYS'
-  );
-  const [initialHostelNames, setInitialHostelNames] = useState<
-    string[]
-  >(['']);
-  const [buildingImages, setBuildingImages] = useState<string[]>(
-    []
-  );
-  const [easypaisaNumber, setEasypaisaNumber] =
-    useState('');
-  const [jazzcashNumber, setJazzcashNumber] =
-    useState('');
+  const [hostelFor, setHostelFor] = useState<'BOYS' | 'GIRLS'>('BOYS');
+  const [initialHostelNames, setInitialHostelNames] = useState<string[]>(['']);
+  const [buildingImages, setBuildingImages] = useState<string[]>([]);
+  const [easypaisaNumber, setEasypaisaNumber] = useState('');
+  const [jazzcashNumber, setJazzcashNumber] = useState('');
   const [customBanks, setCustomBanks] = useState<
     { bankName: string; accountNumber: string; iban: string }[]
   >([]);
   const [acceptedRules, setAcceptedRules] = useState(false);
 
+  // Image handlers
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes:
-        ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       aspect: [16, 9],
       quality: 0.8,
     });
 
     if (!result.canceled && result.assets[0]) {
-      setBuildingImages([
-        ...buildingImages,
-        result.assets[0].uri,
-      ]);
+      setBuildingImages((prev) => [...prev, result.assets[0].uri]);
     }
   };
 
   const removeImage = (index: number) => {
-    setBuildingImages(
-      buildingImages.filter((_, i) => i !== index)
-    );
+    setBuildingImages((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const addHostelName = () => {
-    setInitialHostelNames([...initialHostelNames, '']);
-  };
+  // Hostel names
+  const addHostelName = () =>
+    setInitialHostelNames((prev) => [...prev, '']);
 
-  const updateHostelName = (
-    index: number,
-    value: string
-  ) => {
+  const updateHostelName = (index: number, value: string) => {
     const updated = [...initialHostelNames];
     updated[index] = value;
     setInitialHostelNames(updated);
@@ -95,119 +79,62 @@ export default function VerificationScreen() {
 
   const removeHostelName = (index: number) => {
     if (initialHostelNames.length > 1) {
-      setInitialHostelNames(
-        initialHostelNames.filter((_, i) => i !== index)
-      );
+      setInitialHostelNames((prev) => prev.filter((_, i) => i !== index));
     }
   };
 
-  const addBank = () => {
-    setCustomBanks([
-      ...customBanks,
-      { bankName: '', accountNumber: '', iban: '' },
-    ]);
-  };
+  // Banks
+  const addBank = () =>
+    setCustomBanks((prev) => [...prev, { bankName: '', accountNumber: '', iban: '' }]);
 
   const updateBank = (
     index: number,
-    field: string,
+    field: keyof (typeof customBanks)[number],
     value: string
   ) => {
     const updated = [...customBanks];
-    (updated[index] as any)[field] = value;
+    updated[index] = {
+      ...updated[index],
+      [field]: value,
+    };
     setCustomBanks(updated);
   };
 
-  const removeBank = (index: number) => {
-    setCustomBanks(
-      customBanks.filter((_, i) => i !== index)
-    );
+  const removeBank = (index: number) =>
+    setCustomBanks((prev) => prev.filter((_, i) => i !== index));
+
+  // Validation
+  const showError = (msg: string) => {
+    Toast.show({ type: 'error', text1: 'Error', text2: msg });
+    return false;
   };
 
   const validateStep1 = () => {
-    if (!ownerName.trim()) {
-      Toast.show({
-        type: 'error',
-        text1: 'Error',
-        text2: 'Owner name is required',
-      });
-      return false;
-    }
-    if (!city.trim()) {
-      Toast.show({
-        type: 'error',
-        text1: 'Error',
-        text2: 'City is required',
-      });
-      return false;
-    }
-    if (!address.trim()) {
-      Toast.show({
-        type: 'error',
-        text1: 'Error',
-        text2: 'Address is required',
-      });
-      return false;
-    }
-    const validNames = initialHostelNames.filter((n) =>
-      n.trim()
-    );
-    if (validNames.length === 0) {
-      Toast.show({
-        type: 'error',
-        text1: 'Error',
-        text2:
-          'At least one hostel name is required',
-      });
-      return false;
-    }
+    if (!ownerName.trim()) return showError('Owner name is required');
+    if (!city.trim()) return showError('City is required');
+    if (!address.trim()) return showError('Address is required');
+    if (!initialHostelNames.filter((n) => n.trim()).length)
+      return showError('At least one hostel name is required');
     return true;
   };
 
   const validateStep2 = () => {
-    if (buildingImages.length === 0) {
-      Toast.show({
-        type: 'error',
-        text1: 'Error',
-        text2:
-          'At least one building image is required',
-      });
-      return false;
-    }
+    if (buildingImages.length === 0)
+      return showError('At least one building image is required');
     return true;
   };
 
   const validateStep3 = () => {
-    if (
-      !easypaisaNumber.trim() &&
-      !jazzcashNumber.trim() &&
-      customBanks.length === 0
-    ) {
-      Toast.show({
-        type: 'error',
-        text1: 'Error',
-        text2:
-          'At least one payment method is required',
-      });
-      return false;
+    if (!easypaisaNumber.trim() && !jazzcashNumber.trim() && !customBanks.length) {
+      return showError('At least one payment method is required');
     }
-    if (!acceptedRules) {
-      Toast.show({
-        type: 'error',
-        text1: 'Error',
-        text2: 'You must accept the rules',
-      });
-      return false;
-    }
+    if (!acceptedRules) return showError('You must accept the rules');
     return true;
   };
 
   const handleNext = () => {
-    if (step === 1 && validateStep1()) {
-      setStep(2);
-    } else if (step === 2 && validateStep2()) {
-      setStep(3);
-    }
+    if (step === 1 && validateStep1()) setStep(2);
+    else if (step === 2 && validateStep2()) setStep(3);
   };
 
   const handleSubmit = async () => {
@@ -215,7 +142,6 @@ export default function VerificationScreen() {
 
     try {
       setLoading(true);
-
       const formData = new FormData();
       formData.append('ownerName', ownerName.trim());
       formData.append('city', city.trim());
@@ -226,30 +152,16 @@ export default function VerificationScreen() {
       initialHostelNames
         .filter((n) => n.trim())
         .forEach((name, index) => {
-          formData.append(
-            `initialHostelNames[${index}]`,
-            name.trim()
-          );
+          formData.append(`initialHostelNames[${index}]`, name.trim());
         });
 
-      if (easypaisaNumber.trim()) {
-        formData.append(
-          'easypaisaNumber',
-          easypaisaNumber.trim()
-        );
-      }
-      if (jazzcashNumber.trim()) {
-        formData.append(
-          'jazzcashNumber',
-          jazzcashNumber.trim()
-        );
-      }
+      if (easypaisaNumber.trim())
+        formData.append('easypaisaNumber', easypaisaNumber.trim());
+      if (jazzcashNumber.trim())
+        formData.append('jazzcashNumber', jazzcashNumber.trim());
 
       customBanks.forEach((bank, index) => {
-        if (
-          bank.bankName.trim() &&
-          bank.accountNumber.trim()
-        ) {
+        if (bank.bankName.trim() && bank.accountNumber.trim()) {
           formData.append(
             `customBanks[${index}][bankName]`,
             bank.bankName.trim()
@@ -258,37 +170,26 @@ export default function VerificationScreen() {
             `customBanks[${index}][accountNumber]`,
             bank.accountNumber.trim()
           );
-          if (bank.iban.trim()) {
-            formData.append(
-              `customBanks[${index}][iban]`,
-              bank.iban.trim()
-            );
-          }
+          if (bank.iban.trim())
+            formData.append(`customBanks[${index}][iban]`, bank.iban.trim());
         }
       });
 
       buildingImages.forEach((uri, index) => {
-        const filename =
-          uri.split('/').pop() || `image${index}.jpg`;
+        const filename = uri.split('/').pop() || `image${index}.jpg`;
         const match = /\.(\w+)$/.exec(filename);
-        const type = match
-          ? `image/${match[1]}`
-          : 'image/jpeg';
-        formData.append('buildingImages', {
-          uri,
-          name: filename,
-          type,
-        } as any);
+        const type = match ? `image/${match[1]}` : 'image/jpeg';
+        formData.append(
+          'buildingImages',
+          { uri, name: filename, type } as any
+        );
       });
 
-      const response = await verificationApi.submit(
-        formData
-      );
-
+      const response = await verificationApi.submit(formData);
       if (response.success) {
         Toast.show({
           type: 'success',
-          text1: 'Verification submitted!',
+          text1: 'Submitted',
           text2: 'Your verification is under review',
         });
         router.back();
@@ -297,33 +198,28 @@ export default function VerificationScreen() {
       Toast.show({
         type: 'error',
         text1: 'Error',
-        text2:
-          error?.response?.data?.message ||
-          'Failed to submit verification',
+        text2: error?.response?.data?.message || 'Failed to submit verification',
       });
     } finally {
       setLoading(false);
     }
   };
 
+  const handleBack = () => {
+    if (step > 1) setStep((prev) => (prev - 1) as 1 | 2 | 3);
+    else router.back();
+  };
+
+  // Step renderers (UI only)
   const renderStep1 = () => (
     <>
-      <Text style={styles.stepTitle}>
-        Basic information
-      </Text>
-      <Text style={styles.stepDesc}>
-        Provide your hostel ownership details.
-      </Text>
+      <Text style={styles.stepTitle}>Basic Information</Text>
+      <Text style={styles.stepDesc}>Provide your hostel ownership details.</Text>
 
       <Input
-        label="Owner name"
+        label="Owner Name"
         placeholder="Enter owner's full name"
-        leftIcon={
-          <Building2
-            size={20}
-            color={COLORS.textMuted}
-          />
-        }
+        leftIcon={<Building2 size={20} color={COLORS.textMuted} strokeWidth={1.5} />}
         value={ownerName}
         onChangeText={setOwnerName}
       />
@@ -331,9 +227,7 @@ export default function VerificationScreen() {
       <Input
         label="City"
         placeholder="Enter city"
-        leftIcon={
-          <MapPin size={20} color={COLORS.textMuted} />
-        }
+        leftIcon={<MapPin size={20} color={COLORS.textMuted} strokeWidth={1.5} />}
         value={city}
         onChangeText={setCity}
       />
@@ -341,269 +235,192 @@ export default function VerificationScreen() {
       <Input
         label="Address"
         placeholder="Enter complete address"
-        leftIcon={
-          <MapPin size={20} color={COLORS.textMuted} />
-        }
+        leftIcon={<MapPin size={20} color={COLORS.textMuted} strokeWidth={1.5} />}
         value={address}
         onChangeText={setAddress}
         multiline
       />
 
-      {/* Hostel For */}
-      <Text style={styles.label}>Hostel for</Text>
+      <Text style={styles.label}>Hostel For</Text>
       <View style={styles.genderRow}>
-        <TouchableOpacity
-          style={[
-            styles.genderOption,
-            hostelFor === 'BOYS' &&
-              styles.genderOptionActive,
-          ]}
-          onPress={() => setHostelFor('BOYS')}
-        >
-          <Text
-            style={[
-              styles.genderText,
-              hostelFor === 'BOYS' &&
-                styles.genderTextActive,
+        {(['BOYS', 'GIRLS'] as const).map((type) => (
+          <Pressable
+            key={type}
+            style={({ pressed }) => [
+              styles.genderOption,
+              hostelFor === type && styles.genderOptionActive,
+              pressed && { opacity: OPACITY.pressed },
             ]}
+            onPress={() => setHostelFor(type)}
           >
-            Boys
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[
-            styles.genderOption,
-            hostelFor === 'GIRLS' &&
-              styles.genderOptionActive,
-          ]}
-          onPress={() => setHostelFor('GIRLS')}
-        >
-          <Text
-            style={[
-              styles.genderText,
-              hostelFor === 'GIRLS' &&
-                styles.genderTextActive,
-            ]}
-          >
-            Girls
-          </Text>
-        </TouchableOpacity>
+            <Text
+              style={[
+                styles.genderText,
+                hostelFor === type && styles.genderTextActive,
+              ]}
+            >
+              {type === 'BOYS' ? 'Boys' : 'Girls'}
+            </Text>
+          </Pressable>
+        ))}
       </View>
 
-      {/* Initial Hostel Names */}
-      <Text style={styles.label}>Hostel name(s)</Text>
+      <Text style={styles.label}>Hostel Name(s)</Text>
       {initialHostelNames.map((name, index) => (
-        <View
-          key={index}
-          style={styles.hostelNameRow}
-        >
+        <View key={index} style={styles.hostelNameRow}>
           <TextInput
             style={styles.hostelNameInput}
             placeholder={`Hostel name ${index + 1}`}
             placeholderTextColor={COLORS.textMuted}
             value={name}
-            onChangeText={(v) =>
-              updateHostelName(index, v)
-            }
+            onChangeText={(v) => updateHostelName(index, v)}
           />
           {initialHostelNames.length > 1 && (
-            <TouchableOpacity
-              style={styles.removeButton}
+            <Pressable
+              style={({ pressed }) => [
+                styles.removeButton,
+                pressed && { opacity: OPACITY.pressed },
+              ]}
               onPress={() => removeHostelName(index)}
             >
-              <X
-                size={18}
-                color={COLORS.error}
-              />
-            </TouchableOpacity>
+              <X size={18} color={COLORS.error} strokeWidth={1.5} />
+            </Pressable>
           )}
         </View>
       ))}
-      <TouchableOpacity
-        style={styles.addButton}
+      <Pressable
+        style={({ pressed }) => [
+          styles.addButton,
+          pressed && { opacity: OPACITY.pressed },
+        ]}
         onPress={addHostelName}
       >
-        <Plus
-          size={18}
-          color={COLORS.primary}
-        />
-        <Text style={styles.addButtonText}>
-          Add another hostel
-        </Text>
-      </TouchableOpacity>
+        <Plus size={18} color={COLORS.primary} strokeWidth={1.5} />
+        <Text style={styles.addButtonText}>Add another hostel</Text>
+      </Pressable>
     </>
   );
 
   const renderStep2 = () => (
     <>
-      <Text style={styles.stepTitle}>
-        Building images
-      </Text>
+      <Text style={styles.stepTitle}>Building Images</Text>
       <Text style={styles.stepDesc}>
-        Upload photos of your hostel building.
+        Upload photos of your hostel building exterior.
       </Text>
 
       <View style={styles.imagesGrid}>
         {buildingImages.map((uri, index) => (
-          <View
-            key={index}
-            style={styles.imageContainer}
-          >
-            <Image
-              source={{ uri }}
-              style={styles.uploadedImage}
-            />
-            <TouchableOpacity
-              style={styles.removeImageButton}
+          <View key={index} style={styles.imageContainer}>
+            <Image source={{ uri }} style={styles.uploadedImage} />
+            <Pressable
+              style={({ pressed }) => [
+                styles.removeImageButton,
+                pressed && { opacity: OPACITY.pressed },
+              ]}
               onPress={() => removeImage(index)}
             >
-              <X
-                size={16}
-                color={COLORS.textInverse}
-              />
-            </TouchableOpacity>
+              <X size={14} color={COLORS.textInverse} strokeWidth={2} />
+            </Pressable>
           </View>
         ))}
 
         {buildingImages.length < 5 && (
-          <TouchableOpacity
-            style={styles.addImageButton}
+          <Pressable
+            style={({ pressed }) => [
+              styles.addImageButton,
+              pressed && { opacity: OPACITY.pressed },
+            ]}
             onPress={pickImage}
           >
-            <Camera
-              size={32}
-              color={COLORS.textMuted}
-            />
-            <Text style={styles.addImageText}>
-              Add photo
-            </Text>
-          </TouchableOpacity>
+            <Camera size={28} color={COLORS.textMuted} strokeWidth={1.5} />
+            <Text style={styles.addImageText}>Add Photo</Text>
+          </Pressable>
         )}
       </View>
 
       <Text style={styles.imageHint}>
-        Upload 1–5 images of your building
-        exterior.
+        Upload 1–5 images of your building exterior.
       </Text>
     </>
   );
 
   const renderStep3 = () => (
     <>
-      <Text style={styles.stepTitle}>
-        Payment methods
-      </Text>
+      <Text style={styles.stepTitle}>Payment Methods</Text>
       <Text style={styles.stepDesc}>
-        Add at least one payment method.
+        Add at least one payment method for receiving payments.
       </Text>
 
       <Input
-        label="Easypaisa number (optional)"
+        label="Easypaisa Number (optional)"
         placeholder="03XX XXXXXXX"
-        leftIcon={
-          <CreditCard
-            size={20}
-            color={COLORS.textMuted}
-          />
-        }
+        leftIcon={<CreditCard size={20} color={COLORS.textMuted} strokeWidth={1.5} />}
         value={easypaisaNumber}
         onChangeText={setEasypaisaNumber}
         keyboardType="phone-pad"
       />
 
       <Input
-        label="JazzCash number (optional)"
+        label="JazzCash Number (optional)"
         placeholder="03XX XXXXXXX"
-        leftIcon={
-          <CreditCard
-            size={20}
-            color={COLORS.textMuted}
-          />
-        }
+        leftIcon={<CreditCard size={20} color={COLORS.textMuted} strokeWidth={1.5} />}
         value={jazzcashNumber}
         onChangeText={setJazzcashNumber}
         keyboardType="phone-pad"
       />
 
-      {/* Custom Banks */}
-      <Text style={styles.label}>
-        Bank accounts (optional)
-      </Text>
+      <Text style={styles.label}>Bank Accounts (optional)</Text>
       {customBanks.map((bank, index) => (
-        <Card
-          key={index}
-          style={styles.bankCard}
-        >
+        <View key={index} style={styles.bankCard}>
           <View style={styles.bankHeader}>
-            <Text style={styles.bankTitle}>
-              Bank {index + 1}
-            </Text>
-            <TouchableOpacity
-              onPress={() => removeBank(index)}
-            >
-              <X
-                size={18}
-                color={COLORS.error}
-              />
-            </TouchableOpacity>
+            <Text style={styles.bankTitle}>Bank {index + 1}</Text>
+            <Pressable onPress={() => removeBank(index)}>
+              <X size={18} color={COLORS.error} strokeWidth={1.5} />
+            </Pressable>
           </View>
           <TextInput
             style={styles.bankInput}
             placeholder="Bank name"
             placeholderTextColor={COLORS.textMuted}
             value={bank.bankName}
-            onChangeText={(v) =>
-              updateBank(index, 'bankName', v)
-            }
+            onChangeText={(v) => updateBank(index, 'bankName', v)}
           />
           <TextInput
             style={styles.bankInput}
             placeholder="Account number"
             placeholderTextColor={COLORS.textMuted}
             value={bank.accountNumber}
-            onChangeText={(v) =>
-              updateBank(index, 'accountNumber', v)
-            }
+            onChangeText={(v) => updateBank(index, 'accountNumber', v)}
             keyboardType="numeric"
           />
           <TextInput
-            style={styles.bankInput}
+            style={[styles.bankInput, { marginBottom: 0 }]}
             placeholder="IBAN (optional)"
             placeholderTextColor={COLORS.textMuted}
             value={bank.iban}
-            onChangeText={(v) =>
-              updateBank(index, 'iban', v)
-            }
+            onChangeText={(v) => updateBank(index, 'iban', v)}
           />
-        </Card>
+        </View>
       ))}
-      <TouchableOpacity
-        style={styles.addButton}
+      <Pressable
+        style={({ pressed }) => [
+          styles.addButton,
+          pressed && { opacity: OPACITY.pressed },
+        ]}
         onPress={addBank}
       >
-        <Plus
-          size={18}
-          color={COLORS.primary}
-        />
-        <Text style={styles.addButtonText}>
-          Add bank account
-        </Text>
-      </TouchableOpacity>
+        <Plus size={18} color={COLORS.primary} strokeWidth={1.5} />
+        <Text style={styles.addButtonText}>Add bank account</Text>
+      </Pressable>
 
       {/* Rules */}
-      <Card style={styles.rulesCard}>
-        <Text style={styles.rulesTitle}>
-          Platform rules
-        </Text>
+      <View style={styles.rulesCard}>
+        <Text style={styles.rulesTitle}>Platform Rules</Text>
         <Text style={styles.rulesText}>
-          • You agree to provide accurate
-          information{'\n'}
-          • You will respond to bookings within 24
-          hours{'\n'}
-          • You will maintain hostel
-          standards{'\n'}
-          • Platform fee of 5% applies on each
-          booking{'\n'}
+          • You agree to provide accurate information{'\n'}
+          • You will respond to bookings within 24 hours{'\n'}
+          • You will maintain hostel standards{'\n'}
+          • Platform fee applies on each booking{'\n'}
           • You agree to our terms and conditions
         </Text>
 
@@ -611,121 +428,97 @@ export default function VerificationScreen() {
           <Switch
             value={acceptedRules}
             onValueChange={setAcceptedRules}
-            trackColor={{
-              false: COLORS.border,
-              true: COLORS.primary + '50',
-            }}
-            thumbColor={
-              acceptedRules
-                ? COLORS.primary
-                : COLORS.textMuted
-            }
+            trackColor={{ false: COLORS.border, true: COLORS.primary + '55' }}
+            thumbColor={acceptedRules ? COLORS.primary : COLORS.textMuted}
           />
-          <Text style={styles.acceptText}>
-            I accept all rules and terms
-          </Text>
+          <Text style={styles.acceptText}>I accept all rules and terms</Text>
         </View>
-      </Card>
+      </View>
     </>
   );
 
   return (
-    <SafeAreaView
-      style={styles.container}
-      edges={['top', 'bottom']}
-    >
+    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() =>
-            step > 1 ? setStep(step - 1) : router.back()
-          }
-          style={styles.backButton}
+        <Pressable
+          onPress={handleBack}
+          style={({ pressed }) => [
+            styles.backButton,
+            pressed && { opacity: OPACITY.pressed },
+          ]}
         >
-          <ArrowLeft size={24} color={COLORS.textPrimary} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>
-          Verification
-        </Text>
-        <View style={{ width: 40 }} />
+          <ArrowLeft size={22} color={COLORS.textPrimary} strokeWidth={1.5} />
+        </Pressable>
+        <Text style={styles.headerTitle}>Verification</Text>
+        <View style={styles.headerSpacer} />
       </View>
 
       {/* Progress */}
       <View style={styles.progressContainer}>
-        {[1, 2, 3].map((s) => (
-          <View
-            key={s}
-            style={[
-              styles.progressStep,
-              s <= step &&
-                styles.progressStepActive,
-              s < step &&
-                styles.progressStepComplete,
-            ]}
-          >
-            {s < step ? (
-              <Check
-                size={16}
-                color={COLORS.textInverse}
-              />
-            ) : (
-              <Text
-                style={[
-                  styles.progressText,
-                  s <= step &&
-                    styles.progressTextActive,
-                ]}
-              >
-                {s}
-              </Text>
-            )}
-          </View>
-        ))}
         <View style={styles.progressLine}>
           <View
             style={[
               styles.progressLineFill,
-              {
-                width: `${((step - 1) / 2) * 100}%`,
-              },
+              { width: `${((step - 1) / 2) * 100}%` },
             ]}
           />
         </View>
+        {[1, 2, 3].map((s) => {
+          const isComplete = s < step;
+          const isActive = s === step;
+          return (
+            <View
+              key={s}
+              style={[
+                styles.progressStep,
+                isActive && styles.progressStepActive,
+                isComplete && styles.progressStepComplete,
+              ]}
+            >
+              {isComplete ? (
+                <Check
+                  size={14}
+                  color={COLORS.textInverse}
+                  strokeWidth={2.5}
+                />
+              ) : (
+                <Text
+                  style={[
+                    styles.progressText,
+                    (isActive || isComplete) && styles.progressTextActive,
+                  ]}
+                >
+                  {s}
+                </Text>
+              )}
+            </View>
+          );
+        })}
       </View>
 
-      <KeyboardAvoidingView
-        style={styles.keyboardView}
-        behavior={
-          Platform.OS === 'ios' ? 'padding' : 'height'
-        }
+      {/* Content: plain ScrollView, no KeyboardAvoidingView, no Animated */}
+      <ScrollView
+        style={styles.content}
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 120 }}
       >
-        <ScrollView
-          style={styles.content}
-          showsVerticalScrollIndicator={false}
-          keyboardShouldPersistTaps="handled"
-        >
-          {step === 1 && renderStep1()}
-          {step === 2 && renderStep2()}
-          {step === 3 && renderStep3()}
-
-          <View style={{ height: 100 }} />
-        </ScrollView>
-      </KeyboardAvoidingView>
+        {step === 1 && renderStep1()}
+        {step === 2 && renderStep2()}
+        {step === 3 && renderStep3()}
+      </ScrollView>
 
       {/* Bottom Actions */}
       <View style={styles.bottomBar}>
         {step < 3 ? (
-          <Button
-            title="Next"
-            onPress={handleNext}
-            style={styles.nextButton}
-          />
+          <Button title="Continue" onPress={handleNext} />
         ) : (
           <Button
-            title="Submit verification"
+            title="Submit Verification"
             onPress={handleSubmit}
             loading={loading}
-            style={styles.nextButton}
           />
         )}
       </View>
@@ -734,53 +527,85 @@ export default function VerificationScreen() {
 }
 
 const styles = StyleSheet.create({
+  // Layout
   container: {
     flex: 1,
     backgroundColor: COLORS.bgPrimary,
   },
+  content: {
+    flex: 1,
+    paddingHorizontal: 24,
+  },
+
+  // Header
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
     paddingVertical: 12,
+    backgroundColor: COLORS.bgPrimary,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+    borderBottomColor: COLORS.borderLight,
   },
   backButton: {
-    width: 40,
-    height: 40,
+    width: 44,
+    height: 44,
+    borderRadius: 14,
+    backgroundColor: COLORS.bgCard,
     justifyContent: 'center',
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: COLORS.borderLight,
   },
   headerTitle: {
-    fontSize: 18,
+    fontSize: 17,
     fontWeight: '600',
     color: COLORS.textPrimary,
+    letterSpacing: -0.2,
   },
+  headerSpacer: {
+    width: 44,
+  },
+
+  // Progress
   progressContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 20,
-    paddingHorizontal: 40,
+    paddingVertical: 24,
+    paddingHorizontal: 50,
     position: 'relative',
+  },
+  progressLine: {
+    position: 'absolute',
+    left: 80,
+    right: 80,
+    height: 3,
+    backgroundColor: COLORS.borderLight,
+    top: '50%',
+    marginTop: -1.5,
+  },
+  progressLineFill: {
+    height: '100%',
+    backgroundColor: COLORS.primary,
+    borderRadius: 2,
   },
   progressStep: {
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: COLORS.bgSecondary,
+    backgroundColor: COLORS.bgCard,
     borderWidth: 2,
     borderColor: COLORS.border,
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 1,
-    marginHorizontal: 30,
+    marginHorizontal: 28,
   },
   progressStepActive: {
     borderColor: COLORS.primary,
-    backgroundColor: COLORS.primary + '20',
+    backgroundColor: COLORS.primaryLight,
   },
   progressStepComplete: {
     backgroundColor: COLORS.primary,
@@ -792,63 +617,49 @@ const styles = StyleSheet.create({
     color: COLORS.textMuted,
   },
   progressTextActive: {
-    color: COLORS.primary,
+    color: COLORS.textInverse,
   },
-  progressLine: {
-    position: 'absolute',
-    left: 70,
-    right: 70,
-    height: 3,
-    backgroundColor: COLORS.border,
-    top: '50%',
-    marginTop: -1.5,
-  },
-  progressLineFill: {
-    height: '100%',
-    backgroundColor: COLORS.primary,
-  },
-  keyboardView: {
-    flex: 1,
-  },
-  content: {
-    flex: 1,
-    padding: 24,
-  },
+
+  // Step titles
   stepTitle: {
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: '700',
     color: COLORS.textPrimary,
     marginBottom: 8,
+    letterSpacing: -0.4,
   },
   stepDesc: {
-    fontSize: 14,
+    fontSize: 15,
     color: COLORS.textSecondary,
-    marginBottom: 24,
+    marginBottom: 28,
+    lineHeight: 22,
   },
   label: {
     fontSize: 14,
-    fontWeight: '600',
-    color: COLORS.textPrimary,
-    marginBottom: 8,
+    fontWeight: '500',
+    color: COLORS.textSecondary,
+    marginBottom: 10,
     marginTop: 8,
   },
+
+  // Gender Selection
   genderRow: {
     flexDirection: 'row',
     gap: 12,
-    marginBottom: 16,
+    marginBottom: 20,
   },
   genderOption: {
     flex: 1,
-    paddingVertical: 14,
-    backgroundColor: COLORS.bgSecondary,
-    borderRadius: 12,
-    borderWidth: 2,
+    paddingVertical: 16,
+    backgroundColor: COLORS.bgCard,
+    borderRadius: 14,
+    borderWidth: 1.5,
     borderColor: COLORS.border,
     alignItems: 'center',
   },
   genderOptionActive: {
     borderColor: COLORS.primary,
-    backgroundColor: COLORS.primary + '15',
+    backgroundColor: COLORS.primaryLight,
   },
   genderText: {
     fontSize: 15,
@@ -858,6 +669,8 @@ const styles = StyleSheet.create({
   genderTextActive: {
     color: COLORS.primary,
   },
+
+  // Hostel Names
   hostelNameRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -866,41 +679,43 @@ const styles = StyleSheet.create({
   },
   hostelNameInput: {
     flex: 1,
-    backgroundColor: COLORS.bgSecondary,
+    backgroundColor: COLORS.bgCard,
     borderRadius: 12,
-    padding: 14,
+    padding: 16,
     fontSize: 15,
     color: COLORS.textPrimary,
-    borderWidth: 1,
-    borderColor: COLORS.border,
+    borderWidth: 1.5,
+    borderColor: COLORS.inputBorder,
   },
   removeButton: {
-    width: 40,
-    height: 40,
+    width: 44,
+    height: 44,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: COLORS.error + '15',
-    borderRadius: 10,
+    backgroundColor: COLORS.errorLight,
+    borderRadius: 12,
   },
   addButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    paddingVertical: 14,
-    backgroundColor: COLORS.primary + '15',
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: COLORS.primary + '30',
+    paddingVertical: 16,
+    backgroundColor: COLORS.primaryLight,
+    borderRadius: 14,
+    borderWidth: 1.5,
+    borderColor: COLORS.primary,
     borderStyle: 'dashed',
     marginTop: 8,
-    marginBottom: 16,
+    marginBottom: 20,
   },
   addButtonText: {
     fontSize: 14,
     fontWeight: '600',
     color: COLORS.primary,
   },
+
+  // Images
   imagesGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -911,7 +726,7 @@ const styles = StyleSheet.create({
     position: 'relative',
     width: 100,
     height: 100,
-    borderRadius: 12,
+    borderRadius: 14,
     overflow: 'hidden',
   },
   uploadedImage: {
@@ -932,8 +747,8 @@ const styles = StyleSheet.create({
   addImageButton: {
     width: 100,
     height: 100,
-    borderRadius: 12,
-    backgroundColor: COLORS.bgSecondary,
+    borderRadius: 14,
+    backgroundColor: COLORS.bgCard,
     borderWidth: 2,
     borderColor: COLORS.border,
     borderStyle: 'dashed',
@@ -944,74 +759,89 @@ const styles = StyleSheet.create({
   addImageText: {
     fontSize: 12,
     color: COLORS.textMuted,
+    fontWeight: '500',
   },
   imageHint: {
     fontSize: 13,
     color: COLORS.textMuted,
     marginBottom: 24,
   },
+
+  // Banks
   bankCard: {
+    backgroundColor: COLORS.bgCard,
+    borderRadius: 16,
+    padding: 16,
     marginBottom: 12,
+    borderWidth: 1,
+    borderColor: COLORS.borderLight,
   },
   bankHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 14,
   },
   bankTitle: {
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: '600',
     color: COLORS.textPrimary,
   },
   bankInput: {
     backgroundColor: COLORS.bgSecondary,
-    borderRadius: 10,
-    padding: 12,
+    borderRadius: 12,
+    padding: 14,
     fontSize: 14,
     color: COLORS.textPrimary,
     marginBottom: 10,
-    borderWidth: 1,
-    borderColor: COLORS.border,
+    borderWidth: 1.5,
+    borderColor: COLORS.inputBorder,
   },
+
+  // Rules
   rulesCard: {
-    marginTop: 16,
-    marginBottom: 24,
+    marginTop: 20,
+    backgroundColor: COLORS.bgCard,
+    borderRadius: 16,
+    padding: 20,
+    borderWidth: 1,
+    borderColor: COLORS.borderLight,
   },
   rulesTitle: {
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: '600',
     color: COLORS.textPrimary,
-    marginBottom: 12,
+    marginBottom: 14,
+    letterSpacing: -0.2,
   },
   rulesText: {
     fontSize: 14,
     color: COLORS.textSecondary,
-    lineHeight: 24,
-    marginBottom: 16,
+    lineHeight: 26,
+    marginBottom: 18,
   },
   acceptRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
-    paddingTop: 12,
+    gap: 14,
+    paddingTop: 16,
     borderTopWidth: 1,
-    borderTopColor: COLORS.border,
+    borderTopColor: COLORS.borderLight,
   },
   acceptText: {
     fontSize: 14,
     color: COLORS.textPrimary,
     flex: 1,
+    fontWeight: '500',
   },
+
+  // Bottom Bar
   bottomBar: {
     paddingHorizontal: 24,
     paddingVertical: 16,
     paddingBottom: 32,
-    backgroundColor: COLORS.bgSecondary,
+    backgroundColor: COLORS.bgPrimary,
     borderTopWidth: 1,
-    borderTopColor: COLORS.border,
-  },
-  nextButton: {
-    height: 56,
+    borderTopColor: COLORS.borderLight,
   },
 });

@@ -1,3 +1,5 @@
+// screens/SplashScreen.tsx
+
 import { COLORS } from '@/constants/colors';
 import { useAuthStore } from '@/stores/authStore';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
@@ -17,15 +19,14 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 const { width, height } = Dimensions.get('window');
 
+// Simplified icon set - fewer icons for cleaner look
 const ICONS = [
-  { name: 'bed-outline', lib: 'ion', x: 0.1, y: 0.12 },
-  { name: 'home-outline', lib: 'ion', x: 0.88, y: 0.08 },
-  { name: 'key-outline', lib: 'ion', x: 0.06, y: 0.38 },
-  { name: 'door', lib: 'mci', x: 0.92, y: 0.32 },
-  { name: 'wifi-outline', lib: 'ion', x: 0.1, y: 0.62 },
-  { name: 'shield-checkmark-outline', lib: 'ion', x: 0.9, y: 0.58 },
-  { name: 'location-outline', lib: 'ion', x: 0.08, y: 0.85 },
-  { name: 'office-building', lib: 'mci', x: 0.92, y: 0.82 },
+  { name: 'bed-outline', lib: 'ion', x: 0.12, y: 0.15 },
+  { name: 'home-outline', lib: 'ion', x: 0.88, y: 0.12 },
+  { name: 'key-outline', lib: 'ion', x: 0.08, y: 0.45 },
+  { name: 'wifi-outline', lib: 'ion', x: 0.92, y: 0.42 },
+  { name: 'location-outline', lib: 'ion', x: 0.1, y: 0.75 },
+  { name: 'shield-checkmark-outline', lib: 'ion', x: 0.9, y: 0.72 },
 ];
 
 export default function SplashScreen() {
@@ -33,14 +34,13 @@ export default function SplashScreen() {
   const { isAuthenticated, isLoading, user, checkAuth } = useAuthStore();
   const [ready, setReady] = useState(false);
 
-  const logoScale = useRef(new Animated.Value(0.8)).current;
-  const logoY = useRef(new Animated.Value(20)).current;
+  // Animation values - simplified
+  const logoScale = useRef(new Animated.Value(0.9)).current;
+  const logoOpacity = useRef(new Animated.Value(0)).current;
   const textOpacity = useRef(new Animated.Value(0)).current;
-  const textY = useRef(new Animated.Value(15)).current;
+  const textY = useRef(new Animated.Value(10)).current;
   const progress = useRef(new Animated.Value(0)).current;
   const iconsOpacity = useRef(new Animated.Value(0)).current;
-  const iconFloat = useRef(new Animated.Value(0)).current;
-  const pulse = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
     startAnimations();
@@ -53,89 +53,55 @@ export default function SplashScreen() {
   };
 
   const startAnimations = () => {
-    // Icons fade in
+    // Icons fade in gently
     Animated.timing(iconsOpacity, {
       toValue: 1,
-      duration: 800,
+      duration: 1000,
+      easing: Easing.out(Easing.ease),
       useNativeDriver: true,
     }).start();
 
-    // Icons floating
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(iconFloat, {
-          toValue: 1,
-          duration: 2500,
-          easing: Easing.inOut(Easing.sin),
-          useNativeDriver: true,
-        }),
-        Animated.timing(iconFloat, {
-          toValue: 0,
-          duration: 2500,
-          easing: Easing.inOut(Easing.sin),
-          useNativeDriver: true,
-        }),
-      ])
-    ).start();
-
-    // Logo entrance
+    // Logo entrance - simple fade and scale
     Animated.parallel([
-      Animated.spring(logoScale, {
+      Animated.timing(logoOpacity, {
         toValue: 1,
-        tension: 50,
-        friction: 8,
+        duration: 600,
+        easing: Easing.out(Easing.ease),
         useNativeDriver: true,
       }),
-      Animated.spring(logoY, {
-        toValue: 0,
-        tension: 50,
+      Animated.spring(logoScale, {
+        toValue: 1,
+        tension: 40,
         friction: 8,
         useNativeDriver: true,
       }),
     ]).start();
 
-    // Subtle pulse
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(pulse, {
-          toValue: 1.03,
-          duration: 1500,
-          easing: Easing.inOut(Easing.sin),
-          useNativeDriver: true,
-        }),
-        Animated.timing(pulse, {
-          toValue: 1,
-          duration: 1500,
-          easing: Easing.inOut(Easing.sin),
-          useNativeDriver: true,
-        }),
-      ])
-    ).start();
-
-    // Text animation
+    // Text animation - delayed entry
     Animated.sequence([
-      Animated.delay(300),
+      Animated.delay(400),
       Animated.parallel([
         Animated.timing(textOpacity, {
           toValue: 1,
           duration: 500,
+          easing: Easing.out(Easing.ease),
           useNativeDriver: true,
         }),
-        Animated.spring(textY, {
+        Animated.timing(textY, {
           toValue: 0,
-          tension: 50,
-          friction: 8,
+          duration: 500,
+          easing: Easing.out(Easing.ease),
           useNativeDriver: true,
         }),
       ]),
     ]).start();
 
-    // Progress bar
+    // Progress bar - smooth linear progress
     Animated.sequence([
-      Animated.delay(500),
+      Animated.delay(600),
       Animated.timing(progress, {
         toValue: 1,
-        duration: 1800,
+        duration: 1600,
         easing: Easing.inOut(Easing.ease),
         useNativeDriver: false,
       }),
@@ -156,16 +122,11 @@ export default function SplashScreen() {
         } else {
           router.replace('/(auth)/login');
         }
-      }, 2300);
+      }, 2200);
 
       return () => clearTimeout(timer);
     }
   }, [ready, isLoading, isAuthenticated, user]);
-
-  const floatY = iconFloat.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, -8],
-  });
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
@@ -176,12 +137,9 @@ export default function SplashScreen() {
       />
 
       <View style={styles.container}>
-        {/* Background Icons */}
+        {/* Background Icons - Static, subtle */}
         <Animated.View
-          style={[
-            styles.iconsContainer,
-            { opacity: iconsOpacity, transform: [{ translateY: floatY }] },
-          ]}
+          style={[styles.iconsContainer, { opacity: iconsOpacity }]}
         >
           {ICONS.map((icon, index) => (
             <View
@@ -189,38 +147,39 @@ export default function SplashScreen() {
               style={[
                 styles.iconWrapper,
                 {
-                  left: width * icon.x - 12,
-                  top: height * icon.y - 12,
+                  left: width * icon.x - 14,
+                  top: height * icon.y - 14,
                 },
               ]}
             >
               {icon.lib === 'ion' ? (
                 <Ionicons
                   name={icon.name as any}
-                  size={24}
-                  color={COLORS.border} // #E5E7EB-ish
+                  size={28}
+                  color={COLORS.watermarkIcon}
                 />
               ) : (
                 <MaterialCommunityIcons
                   name={icon.name as any}
-                  size={24}
-                  color={COLORS.border}
+                  size={28}
+                  color={COLORS.watermarkIcon}
                 />
               )}
             </View>
           ))}
         </Animated.View>
 
-        {/* Content */}
+        {/* Main Content */}
         <View style={styles.content}>
           {/* Logo */}
           <Animated.View
-            style={{
-              transform: [
-                { scale: Animated.multiply(logoScale, pulse) },
-                { translateY: logoY },
-              ],
-            }}
+            style={[
+              styles.logoContainer,
+              {
+                opacity: logoOpacity,
+                transform: [{ scale: logoScale }],
+              },
+            ]}
           >
             <Image
               source={require('../assets/images/logo.png')}
@@ -229,11 +188,14 @@ export default function SplashScreen() {
             />
           </Animated.View>
 
-          {/* Text */}
+          {/* Tagline */}
           <Animated.View
             style={[
               styles.textContainer,
-              { opacity: textOpacity, transform: [{ translateY: textY }] },
+              {
+                opacity: textOpacity,
+                transform: [{ translateY: textY }],
+              },
             ]}
           >
             <View style={styles.divider} />
@@ -241,7 +203,7 @@ export default function SplashScreen() {
           </Animated.View>
         </View>
 
-        {/* Progress */}
+        {/* Progress Bar */}
         <Animated.View style={[styles.bottom, { opacity: textOpacity }]}>
           <View style={styles.track}>
             <Animated.View
@@ -256,6 +218,7 @@ export default function SplashScreen() {
               ]}
             />
           </View>
+          <Text style={styles.loadingText}>Loading...</Text>
         </Animated.View>
       </View>
     </SafeAreaView>
@@ -270,58 +233,72 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  
+  // Background icons
   iconsContainer: {
     ...StyleSheet.absoluteFillObject,
   },
   iconWrapper: {
     position: 'absolute',
   },
+  
+  // Main content
   content: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    paddingHorizontal: 40,
+  },
+  
+  logoContainer: {
+    marginBottom: 16,
   },
   logo: {
-    width: 110,
-    height: 110,
-    marginBottom: 28,
+    width: 140,
+    height: 60,
   },
+  
   textContainer: {
     alignItems: 'center',
   },
-  title: {
-    fontSize: 30,
-    fontWeight: '700',
-    color: COLORS.textPrimary,
-    letterSpacing: 0.5,
-  },
   divider: {
-    width: 40,
-    height: 3,
+    width: 32,
+    height: 2,
     backgroundColor: COLORS.primary,
-    borderRadius: 2,
-    marginVertical: 14,
+    borderRadius: 1,
+    marginBottom: 16,
   },
   tagline: {
-    fontSize: 14,
+    fontSize: 15,
     color: COLORS.textSecondary,
     fontWeight: '500',
+    letterSpacing: 0.3,
   },
+  
+  // Bottom progress
   bottom: {
     position: 'absolute',
-    bottom: 60,
+    bottom: 80,
     left: 60,
     right: 60,
+    alignItems: 'center',
   },
   track: {
-    height: 3,
-    backgroundColor: COLORS.border,
-    borderRadius: 2,
+    width: '100%',
+    height: 2,
+    backgroundColor: COLORS.borderLight,
+    borderRadius: 1,
     overflow: 'hidden',
   },
   bar: {
     height: '100%',
     backgroundColor: COLORS.primary,
-    borderRadius: 2,
+    borderRadius: 1,
+  },
+  loadingText: {
+    marginTop: 12,
+    fontSize: 12,
+    color: COLORS.textMuted,
+    letterSpacing: 0.5,
   },
 });

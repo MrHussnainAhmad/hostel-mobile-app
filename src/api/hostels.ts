@@ -2,6 +2,10 @@ import { Hostel } from '@/types';
 import apiClient from './client';
 
 export const hostelsApi = {
+  // =========================
+  // MANAGER ENDPOINTS
+  // =========================
+
   // Manager: Get my hostels
   getMyHostels: async (): Promise<{ success: boolean; data: Hostel[] }> => {
     const response = await apiClient.get('/hostels/manager/my');
@@ -9,6 +13,7 @@ export const hostelsApi = {
   },
 
   // Manager: Create hostel
+  // Backend already supports roomTypes with urgentBookingPrice, facilities, etc.
   createHostel: async (formData: FormData): Promise<{ success: boolean; data: Hostel }> => {
     const response = await apiClient.post('/hostels', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
@@ -17,7 +22,10 @@ export const hostelsApi = {
   },
 
   // Manager: Update hostel
-  updateHostel: async (id: string, formData: FormData): Promise<{ success: boolean; data: Hostel }> => {
+  updateHostel: async (
+    id: string,
+    formData: FormData
+  ): Promise<{ success: boolean; data: Hostel }> => {
     const response = await apiClient.patch(`/hostels/${id}`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
@@ -30,11 +38,17 @@ export const hostelsApi = {
     return response.data;
   },
 
-  // Manager: Get hostel students
-  getHostelStudents: async (hostelId: string): Promise<{ success: boolean; data: any[] }> => {
+  // Manager: Get hostel students (active APPROVED bookings)
+  getHostelStudents: async (
+    hostelId: string
+  ): Promise<{ success: boolean; data: any[] }> => {
     const response = await apiClient.get(`/hostels/${hostelId}/students`);
     return response.data;
   },
+
+  // =========================
+  // PUBLIC ENDPOINTS
+  // =========================
 
   // Public: Get hostel by ID
   getById: async (id: string): Promise<{ success: boolean; data: Hostel }> => {
@@ -42,7 +56,7 @@ export const hostelsApi = {
     return response.data;
   },
 
-  // Public: Search hostels
+  // Public: Search hostels (backend handles roomTypes + price range)
   search: async (params: {
     city?: string;
     hostelFor?: 'BOYS' | 'GIRLS';

@@ -1,22 +1,24 @@
+// app/(app)/student/conversation/[id].tsx
+
+import { COLORS, OPACITY } from '@/constants/colors';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { ArrowLeft, Send } from 'lucide-react-native';
 import React, { useEffect, useRef, useState } from 'react';
 import {
-    FlatList,
-    KeyboardAvoidingView,
-    Platform,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  FlatList,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
 import { chatApi } from '@/api/chat';
 import { LoadingScreen } from '@/components/ui';
-import { COLORS } from '@/constants/colors';
 import { useAuthStore } from '@/stores/authStore';
 import { Message } from '@/types';
 
@@ -50,7 +52,6 @@ export default function StudentConversationScreen() {
 
   useEffect(() => {
     fetchMessages();
-
     const interval = setInterval(fetchMessages, 5000);
     return () => clearInterval(interval);
   }, [id]);
@@ -85,10 +86,7 @@ export default function StudentConversationScreen() {
 
   const formatTime = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleTimeString([], {
-      hour: '2-digit',
-      minute: '2-digit',
-    });
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
   const renderMessage = ({ item }: { item: Message }) => {
@@ -96,20 +94,11 @@ export default function StudentConversationScreen() {
 
     return (
       <View style={[styles.messageRow, isMe && styles.messageRowMe]}>
-        <View
-          style={[
-            styles.messageBubble,
-            isMe ? styles.bubbleMe : styles.bubbleOther,
-          ]}
-        >
-          <Text
-            style={[styles.messageText, isMe && styles.messageTextMe]}
-          >
+        <View style={[styles.messageBubble, isMe ? styles.bubbleMe : styles.bubbleOther]}>
+          <Text style={[styles.messageText, isMe && styles.messageTextMe]}>
             {item.text}
           </Text>
-          <Text
-            style={[styles.messageTime, isMe && styles.messageTimeMe]}
-          >
+          <Text style={[styles.messageTime, isMe && styles.messageTimeMe]}>
             {formatTime(item.createdAt)}
           </Text>
         </View>
@@ -125,21 +114,21 @@ export default function StudentConversationScreen() {
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity
+        <Pressable
           onPress={() => router.back()}
-          style={styles.backButton}
+          style={({ pressed }) => [styles.backButton, pressed && { opacity: OPACITY.pressed }]}
         >
-          <ArrowLeft size={24} color={COLORS.textPrimary} />
-        </TouchableOpacity>
+          <ArrowLeft size={22} color={COLORS.textPrimary} strokeWidth={1.5} />
+        </Pressable>
         <Text style={styles.headerTitle}>Conversation</Text>
-        <View style={{ width: 40 }} />
+        <View style={styles.headerSpacer} />
       </View>
 
       {/* Messages */}
       <KeyboardAvoidingView
-        style={styles.content}
+        style={styles.keyboardView}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        keyboardVerticalOffset={90}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
       >
         <FlatList
           ref={flatListRef}
@@ -152,9 +141,7 @@ export default function StudentConversationScreen() {
           ListEmptyComponent={
             <View style={styles.emptyContainer}>
               <Text style={styles.emptyText}>No messages yet</Text>
-              <Text style={styles.emptySubtext}>
-                Start the conversation!
-              </Text>
+              <Text style={styles.emptySubtext}>Start the conversation!</Text>
             </View>
           }
         />
@@ -164,29 +151,27 @@ export default function StudentConversationScreen() {
           <TextInput
             style={styles.input}
             placeholder="Type a message..."
-            placeholderTextColor={COLORS.textMuted}
+            placeholderTextColor={COLORS.inputPlaceholder}
             value={newMessage}
             onChangeText={setNewMessage}
             multiline
             maxLength={500}
           />
-          <TouchableOpacity
-            style={[
+          <Pressable
+            style={({ pressed }) => [
               styles.sendButton,
               !newMessage.trim() && styles.sendButtonDisabled,
+              pressed && newMessage.trim() && { opacity: OPACITY.pressed },
             ]}
             onPress={handleSend}
             disabled={!newMessage.trim() || sending}
           >
             <Send
-              size={22}
-              color={
-                newMessage.trim()
-                  ? COLORS.textInverse
-                  : COLORS.textMuted
-              }
+              size={20}
+              color={newMessage.trim() ? COLORS.textInverse : COLORS.textMuted}
+              strokeWidth={1.5}
             />
-          </TouchableOpacity>
+          </Pressable>
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -198,35 +183,49 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.bgPrimary,
   },
+
+  // Header
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
     backgroundColor: COLORS.bgPrimary,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.borderLight,
   },
   backButton: {
-    width: 40,
-    height: 40,
+    width: 44,
+    height: 44,
+    borderRadius: 14,
+    backgroundColor: COLORS.bgCard,
     justifyContent: 'center',
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: COLORS.borderLight,
   },
   headerTitle: {
-    fontSize: 18,
+    fontSize: 17,
     fontWeight: '600',
     color: COLORS.textPrimary,
+    letterSpacing: -0.2,
   },
-  content: {
+  headerSpacer: {
+    width: 44,
+  },
+
+  // Content
+  keyboardView: {
     flex: 1,
   },
   messagesList: {
-    paddingHorizontal: 16,
-    paddingVertical: 16,
+    paddingHorizontal: 20,
+    paddingVertical: 20,
     flexGrow: 1,
   },
+
+  // Message Bubble
   messageRow: {
     marginBottom: 12,
     flexDirection: 'row',
@@ -235,23 +234,25 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   messageBubble: {
-    maxWidth: '75%',
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    borderRadius: 18,
+    maxWidth: '78%',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 20,
   },
   bubbleMe: {
     backgroundColor: COLORS.primary,
-    borderBottomRightRadius: 4,
+    borderBottomRightRadius: 6,
   },
   bubbleOther: {
-    backgroundColor: COLORS.bgSecondary,
-    borderBottomLeftRadius: 4,
+    backgroundColor: COLORS.bgCard,
+    borderBottomLeftRadius: 6,
+    borderWidth: 1,
+    borderColor: COLORS.borderLight,
   },
   messageText: {
     fontSize: 15,
     color: COLORS.textPrimary,
-    lineHeight: 20,
+    lineHeight: 21,
   },
   messageTextMe: {
     color: COLORS.textInverse,
@@ -259,54 +260,58 @@ const styles = StyleSheet.create({
   messageTime: {
     fontSize: 11,
     color: COLORS.textMuted,
-    marginTop: 4,
+    marginTop: 6,
     alignSelf: 'flex-end',
   },
   messageTimeMe: {
-    color: 'rgba(249, 250, 251, 0.8)', // based on textInverse
+    color: 'rgba(255, 255, 255, 0.7)',
   },
+
+  // Empty
   emptyContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingVertical: 60,
+    paddingVertical: 80,
   },
   emptyText: {
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: '600',
     color: COLORS.textSecondary,
   },
   emptySubtext: {
     fontSize: 14,
     color: COLORS.textMuted,
-    marginTop: 4,
+    marginTop: 6,
   },
+
+  // Input
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'flex-end',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderTopWidth: 1,
-    borderTopColor: COLORS.border,
+    paddingHorizontal: 20,
+    paddingVertical: 14,
     backgroundColor: COLORS.bgPrimary,
+    borderTopWidth: 1,
+    borderTopColor: COLORS.borderLight,
     gap: 12,
   },
   input: {
     flex: 1,
-    backgroundColor: COLORS.bgSecondary,
+    backgroundColor: COLORS.bgCard,
     borderRadius: 24,
-    paddingHorizontal: 18,
-    paddingVertical: 12,
+    paddingHorizontal: 20,
+    paddingVertical: 14,
     fontSize: 15,
     color: COLORS.textPrimary,
     maxHeight: 100,
-    borderWidth: 1,
-    borderColor: COLORS.border,
+    borderWidth: 1.5,
+    borderColor: COLORS.inputBorder,
   },
   sendButton: {
-    width: 46,
-    height: 46,
-    borderRadius: 23,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     backgroundColor: COLORS.primary,
     justifyContent: 'center',
     alignItems: 'center',

@@ -1,31 +1,32 @@
 // app/(app)/student/hostel/[id].tsx
 
+import { COLORS, OPACITY } from '@/constants/colors';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import {
-    ArrowLeft,
-    Building2,
-    Calendar,
-    Check,
-    CreditCard,
-    Droplets,
-    Heart,
-    MapPin,
-    MessageCircle,
-    Share2,
-    Star,
-    Users,
-    Wifi,
-    Zap,
+  ArrowLeft,
+  Building2,
+  Calendar,
+  Check,
+  CreditCard,
+  Droplets,
+  Heart,
+  MapPin,
+  MessageCircle,
+  Share2,
+  Star,
+  Users,
+  Wifi,
+  Zap,
 } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
 import {
-    Dimensions,
-    Image,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Dimensions,
+  Image,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
@@ -33,7 +34,6 @@ import Toast from 'react-native-toast-message';
 import { chatApi } from '@/api/chat';
 import { hostelsApi } from '@/api/hostels';
 import { LoadingScreen } from '@/components/ui';
-import { COLORS } from '@/constants/colors';
 import { Hostel } from '@/types';
 
 const { width } = Dimensions.get('window');
@@ -61,8 +61,7 @@ export default function HostelDetailScreen() {
       Toast.show({
         type: 'error',
         text1: 'Error',
-        text2:
-          error?.response?.data?.message || 'Failed to fetch hostel',
+        text2: error?.response?.data?.message || 'Failed to fetch hostel',
       });
       handleGoBack();
     } finally {
@@ -80,42 +79,25 @@ export default function HostelDetailScreen() {
 
   const handleStartChat = async () => {
     if (!hostel?.manager?.id) {
-      Toast.show({
-        type: 'error',
-        text1: 'Error',
-        text2: 'Manager not available for chat',
-      });
+      Toast.show({ type: 'error', text1: 'Error', text2: 'Manager not available for chat' });
       return;
     }
 
     try {
       setStartingChat(true);
-      const response = await chatApi.startConversation(
-        hostel.manager.id
-      );
+      const response = await chatApi.startConversation(hostel.manager.id);
       if (response.success) {
-        router.push(
-          `/(app)/student/conversation/${response.data.id}`
-        );
+        router.push(`/(app)/student/conversation/${response.data.id}`);
       }
     } catch (error: any) {
       Toast.show({
         type: 'error',
         text1: 'Error',
-        text2:
-          error?.response?.data?.message || 'Failed to start chat',
+        text2: error?.response?.data?.message || 'Failed to start chat',
       });
     } finally {
       setStartingChat(false);
     }
-  };
-
-  const handleReserve = () => {
-    router.push(`/(app)/student/reserve/${id}`);
-  };
-
-  const handleBook = () => {
-    router.push(`/(app)/student/book/${id}`);
   };
 
   if (loading) {
@@ -127,14 +109,8 @@ export default function HostelDetailScreen() {
   }
 
   const facilities = hostel.facilities;
-  const minPrice = Math.min(
-    ...(hostel.roomTypes?.map((rt) => rt.price) || [0])
-  );
-  const totalRooms =
-    hostel.roomTypes?.reduce(
-      (acc, rt) => acc + rt.availableRooms,
-      0
-    ) || 0;
+  const minPrice = Math.min(...(hostel.roomTypes?.map((rt) => rt.price) || [0]));
+  const totalRooms = hostel.roomTypes?.reduce((acc, rt) => acc + rt.availableRooms, 0) || 0;
 
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>
@@ -142,7 +118,7 @@ export default function HostelDetailScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
-        {/* Hero Image Section */}
+        {/* Hero Image */}
         <View style={styles.heroSection}>
           {hostel.roomImages && hostel.roomImages.length > 0 ? (
             <>
@@ -151,9 +127,7 @@ export default function HostelDetailScreen() {
                 pagingEnabled
                 showsHorizontalScrollIndicator={false}
                 onScroll={(e) => {
-                  const index = Math.round(
-                    e.nativeEvent.contentOffset.x / width
-                  );
+                  const index = Math.round(e.nativeEvent.contentOffset.x / width);
                   setActiveImageIndex(index);
                 }}
                 scrollEventThrottle={16}
@@ -181,8 +155,7 @@ export default function HostelDetailScreen() {
                     key={`indicator-${index}`}
                     style={[
                       styles.indicator,
-                      activeImageIndex === index &&
-                        styles.indicatorActive,
+                      activeImageIndex === index && styles.indicatorActive,
                     ]}
                   />
                 ))}
@@ -190,44 +163,43 @@ export default function HostelDetailScreen() {
             </>
           ) : (
             <View style={styles.heroPlaceholder}>
-              <Building2 size={80} color={COLORS.textMuted} />
-              <Text style={styles.placeholderText}>
-                No images available
-              </Text>
+              <Building2 size={64} color={COLORS.textMuted} strokeWidth={1} />
+              <Text style={styles.placeholderText}>No images available</Text>
             </View>
           )}
 
           {/* Header Buttons */}
           <View style={styles.headerButtons}>
-            <TouchableOpacity
-              style={styles.headerBtn}
+            <Pressable
+              style={({ pressed }) => [styles.headerBtn, pressed && { opacity: OPACITY.pressed }]}
               onPress={handleGoBack}
             >
-              <ArrowLeft size={22} color={COLORS.textInverse} />
-            </TouchableOpacity>
+              <ArrowLeft size={22} color={COLORS.textInverse} strokeWidth={1.5} />
+            </Pressable>
 
             <View style={styles.headerRight}>
-              <TouchableOpacity style={styles.headerBtn}>
-                <Share2 size={20} color={COLORS.textInverse} />
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.headerBtn}
+              <Pressable
+                style={({ pressed }) => [styles.headerBtn, pressed && { opacity: OPACITY.pressed }]}
+              >
+                <Share2 size={20} color={COLORS.textInverse} strokeWidth={1.5} />
+              </Pressable>
+              <Pressable
+                style={({ pressed }) => [styles.headerBtn, pressed && { opacity: OPACITY.pressed }]}
                 onPress={() => setLiked(!liked)}
               >
                 <Heart
                   size={20}
                   color={liked ? COLORS.error : COLORS.textInverse}
                   fill={liked ? COLORS.error : 'transparent'}
+                  strokeWidth={1.5}
                 />
-              </TouchableOpacity>
+              </Pressable>
             </View>
           </View>
 
-          {/* Hostel Type Badge (moved to bottom-left) */}
+          {/* Badge */}
           <View style={styles.heroBadge}>
-            <Text style={styles.heroBadgeText}>
-              {hostel.hostelFor}
-            </Text>
+            <Text style={styles.heroBadgeText}>{hostel.hostelFor}</Text>
           </View>
         </View>
 
@@ -236,263 +208,142 @@ export default function HostelDetailScreen() {
           {/* Title Section */}
           <View style={styles.titleSection}>
             <View style={styles.titleRow}>
-              <Text style={styles.hostelName}>
-                {hostel.hostelName}
-              </Text>
+              <Text style={styles.hostelName}>{hostel.hostelName}</Text>
               {hostel.rating > 0 && (
                 <View style={styles.ratingBadge}>
-                  <Star
-                    size={14}
-                    color={COLORS.warning}
-                    fill={COLORS.warning}
-                  />
-                  <Text style={styles.ratingText}>
-                    {hostel.rating.toFixed(1)}
-                  </Text>
+                  <Star size={14} color={COLORS.warning} fill={COLORS.warning} />
+                  <Text style={styles.ratingText}>{hostel.rating.toFixed(1)}</Text>
                 </View>
               )}
             </View>
 
             <View style={styles.locationRow}>
-              <MapPin size={16} color={COLORS.primary} />
+              <MapPin size={16} color={COLORS.primary} strokeWidth={1.5} />
               <Text style={styles.locationText}>
                 {hostel.city}, {hostel.address}
               </Text>
             </View>
 
             {hostel.reviewCount > 0 && (
-              <Text style={styles.reviewCount}>
-                {hostel.reviewCount} reviews
-              </Text>
+              <Text style={styles.reviewCount}>{hostel.reviewCount} reviews</Text>
             )}
           </View>
 
-          {/* Stats Cards */}
+          {/* Stats */}
           <View style={styles.statsRow}>
-            <View style={styles.statCard}>
-              <Text style={styles.statValue}>
-                Rs. {minPrice.toLocaleString()}
-              </Text>
-              <Text style={styles.statLabel}>Starting price</Text>
-            </View>
+            <StatCard value={`Rs. ${minPrice.toLocaleString()}`} label="Starting price" />
             <View style={styles.statDivider} />
-            <View style={styles.statCard}>
-              <Text style={styles.statValue}>{totalRooms}</Text>
-              <Text style={styles.statLabel}>Rooms available</Text>
-            </View>
+            <StatCard value={totalRooms.toString()} label="Available" />
             <View style={styles.statDivider} />
-            <View style={styles.statCard}>
-              <Text style={styles.statValue}>
-                {hostel.roomTypes?.length || 0}
-              </Text>
-              <Text style={styles.statLabel}>Room types</Text>
-            </View>
+            <StatCard value={(hostel.roomTypes?.length || 0).toString()} label="Room types" />
           </View>
 
-          {/* Action Buttons (keep these) */}
+          {/* Action Buttons */}
           <View style={styles.actionButtons}>
-            <TouchableOpacity
-              style={styles.actionBtn}
+            <ActionButton
+              icon={<MessageCircle size={22} color={COLORS.info} strokeWidth={1.5} />}
+              label="Chat"
+              color={COLORS.infoLight}
               onPress={handleStartChat}
               disabled={startingChat}
-            >
-              <View
-                style={[
-                  styles.actionIconBox,
-                  { backgroundColor: COLORS.info + '20' },
-                ]}
-              >
-                <MessageCircle size={24} color={COLORS.info} />
-              </View>
-              <Text style={styles.actionBtnText}>
-                Chat with manager
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.actionBtn}
-              onPress={handleReserve}
-            >
-              <View
-                style={[
-                  styles.actionIconBox,
-                  { backgroundColor: COLORS.warning + '20' },
-                ]}
-              >
-                <Calendar size={24} color={COLORS.warning} />
-              </View>
-              <Text style={styles.actionBtnText}>Reserve first</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.actionBtn}
-              onPress={handleBook}
-            >
-              <View
-                style={[
-                  styles.actionIconBox,
-                  { backgroundColor: COLORS.success + '20' },
-                ]}
-              >
-                <CreditCard size={24} color={COLORS.success} />
-              </View>
-              <Text style={styles.actionBtnText}>
-                Direct booking
-              </Text>
-            </TouchableOpacity>
+            />
+            <ActionButton
+              icon={<Calendar size={22} color={COLORS.warning} strokeWidth={1.5} />}
+              label="Reserve"
+              color={COLORS.warningLight}
+              onPress={() => router.push(`/(app)/student/reserve/${id}`)}
+            />
+            <ActionButton
+              icon={<CreditCard size={22} color={COLORS.success} strokeWidth={1.5} />}
+              label="Book"
+              color={COLORS.successLight}
+              onPress={() => router.push(`/(app)/student/book/${id}`)}
+            />
           </View>
 
           {/* Room Types */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Available rooms</Text>
-
+          <Section title="Available Rooms">
             {hostel.roomTypes?.map((roomType, index) => (
-              <View
-                key={roomType.id ?? `room-${index}`}
-                style={styles.roomCard}
-              >
+              <View key={roomType.id ?? `room-${index}`} style={styles.roomCard}>
                 <View style={styles.roomCardLeft}>
                   <View style={styles.roomIconBox}>
-                    <Users size={20} color={COLORS.primary} />
+                    <Users size={20} color={COLORS.primary} strokeWidth={1.5} />
                   </View>
                   <View style={styles.roomInfo}>
-                    <Text style={styles.roomName}>
-                      {roomType.type.replace('_', ' ')}
-                    </Text>
+                    <Text style={styles.roomName}>{roomType.type.replace('_', ' ')}</Text>
                     <Text style={styles.roomDetail}>
-                      {roomType.personsInRoom}{' '}
-                      {roomType.personsInRoom > 1
-                        ? 'persons'
-                        : 'person'}{' '}
-                      per room
+                      {roomType.personsInRoom} {roomType.personsInRoom > 1 ? 'persons' : 'person'} per room
                     </Text>
                     <View style={styles.roomAvailability}>
                       <View
                         style={[
                           styles.availabilityDot,
-                          {
-                            backgroundColor:
-                              roomType.availableRooms > 0
-                                ? COLORS.success
-                                : COLORS.error,
-                          },
+                          { backgroundColor: roomType.availableRooms > 0 ? COLORS.success : COLORS.error },
                         ]}
                       />
                       <Text style={styles.availabilityText}>
-                        {roomType.availableRooms > 0
-                          ? `${roomType.availableRooms} available`
-                          : 'Not available'}
+                        {roomType.availableRooms > 0 ? `${roomType.availableRooms} available` : 'Not available'}
                       </Text>
                     </View>
                   </View>
                 </View>
                 <View style={styles.roomCardRight}>
-                  <Text style={styles.roomPrice}>
-                    Rs. {roomType.price.toLocaleString()}
-                  </Text>
+                  <Text style={styles.roomPrice}>Rs. {roomType.price.toLocaleString()}</Text>
                   <Text style={styles.roomPriceUnit}>/month</Text>
                 </View>
               </View>
             ))}
-          </View>
+          </Section>
 
           {/* Facilities */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>
-              Facilities & amenities
-            </Text>
-
+          <Section title="Facilities & Amenities">
             <View style={styles.facilitiesGrid}>
               {facilities?.hotColdWaterBath && (
-                <View style={styles.facilityChip}>
-                  <Droplets size={16} color={COLORS.info} />
-                  <Text style={styles.facilityChipText}>
-                    Hot/Cold water
-                  </Text>
-                </View>
+                <FacilityChip icon={<Droplets size={16} color={COLORS.info} strokeWidth={1.5} />} label="Hot/Cold water" />
               )}
               {facilities?.drinkingWater && (
-                <View style={styles.facilityChip}>
-                  <Droplets size={16} color={COLORS.info} />
-                  <Text style={styles.facilityChipText}>
-                    Drinking water
-                  </Text>
-                </View>
+                <FacilityChip icon={<Droplets size={16} color={COLORS.info} strokeWidth={1.5} />} label="Drinking water" />
               )}
               {facilities?.electricityBackup && (
-                <View style={styles.facilityChip}>
-                  <Zap size={16} color={COLORS.warning} />
-                  <Text style={styles.facilityChipText}>
-                    Power backup
-                  </Text>
-                </View>
+                <FacilityChip icon={<Zap size={16} color={COLORS.warning} strokeWidth={1.5} />} label="Power backup" />
               )}
               {facilities?.wifiEnabled && (
-                <View style={styles.facilityChip}>
-                  <Wifi size={16} color={COLORS.success} />
-                  <Text style={styles.facilityChipText}>
-                    Free WiFi
-                  </Text>
-                </View>
+                <FacilityChip icon={<Wifi size={16} color={COLORS.success} strokeWidth={1.5} />} label="Free WiFi" />
               )}
-              {facilities?.customFacilities?.map(
-                (facility, index) => (
-                  <View
-                    key={`facility-${index}`}
-                    style={styles.facilityChip}
-                  >
-                    <Check size={16} color={COLORS.primary} />
-                    <Text style={styles.facilityChipText}>
-                      {facility}
-                    </Text>
-                  </View>
-                )
-              )}
+              {facilities?.customFacilities?.map((facility, index) => (
+                <FacilityChip key={`facility-${index}`} icon={<Check size={16} color={COLORS.primary} strokeWidth={1.5} />} label={facility} />
+              ))}
             </View>
-          </View>
+          </Section>
 
           {/* Rules */}
           {hostel.rules && (
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>House rules</Text>
+            <Section title="House Rules">
               <View style={styles.rulesBox}>
                 <Text style={styles.rulesText}>{hostel.rules}</Text>
               </View>
-            </View>
+            </Section>
           )}
 
           {/* Nearby */}
-          {hostel.nearbyLocations &&
-            hostel.nearbyLocations.length > 0 && (
-              <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Nearby places</Text>
-                <View style={styles.nearbyContainer}>
-                  {hostel.nearbyLocations.map(
-                    (location, index) => (
-                      <View
-                        key={`location-${index}`}
-                        style={styles.nearbyChip}
-                      >
-                        <MapPin
-                          size={14}
-                          color={COLORS.primary}
-                        />
-                        <Text style={styles.nearbyText}>
-                          {location}
-                        </Text>
-                      </View>
-                    )
-                  )}
-                </View>
+          {hostel.nearbyLocations && hostel.nearbyLocations.length > 0 && (
+            <Section title="Nearby Places">
+              <View style={styles.nearbyContainer}>
+                {hostel.nearbyLocations.map((location, index) => (
+                  <View key={`location-${index}`} style={styles.nearbyChip}>
+                    <MapPin size={14} color={COLORS.primary} strokeWidth={1.5} />
+                    <Text style={styles.nearbyText}>{location}</Text>
+                  </View>
+                ))}
               </View>
-            )}
+            </Section>
+          )}
 
-          {/* Manager Info */}
+          {/* Manager */}
           {hostel.manager && (
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Manager</Text>
-              <TouchableOpacity
-                style={styles.managerCard}
+            <Section title="Manager">
+              <Pressable
+                style={({ pressed }) => [styles.managerCard, pressed && { opacity: OPACITY.pressed }]}
                 onPress={handleStartChat}
               >
                 <View style={styles.managerAvatar}>
@@ -502,18 +353,13 @@ export default function HostelDetailScreen() {
                 </View>
                 <View style={styles.managerInfo}>
                   <Text style={styles.managerName}>
-                    {hostel.manager.fullName || 'Hostel manager'}
+                    {hostel.manager.fullName || 'Hostel Manager'}
                   </Text>
-                  <Text style={styles.managerSubtext}>
-                    Tap to chat
-                  </Text>
+                  <Text style={styles.managerSubtext}>Tap to chat</Text>
                 </View>
-                <MessageCircle
-                  size={24}
-                  color={COLORS.primary}
-                />
-              </TouchableOpacity>
-            </View>
+                <MessageCircle size={22} color={COLORS.primary} strokeWidth={1.5} />
+              </Pressable>
+            </Section>
           )}
 
           <View style={{ height: 40 }} />
@@ -522,6 +368,47 @@ export default function HostelDetailScreen() {
     </SafeAreaView>
   );
 }
+
+// Helper Components
+const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
+  <View style={styles.section}>
+    <Text style={styles.sectionTitle}>{title}</Text>
+    {children}
+  </View>
+);
+
+const StatCard = ({ value, label }: { value: string; label: string }) => (
+  <View style={styles.statCard}>
+    <Text style={styles.statValue}>{value}</Text>
+    <Text style={styles.statLabel}>{label}</Text>
+  </View>
+);
+
+interface ActionButtonProps {
+  icon: React.ReactNode;
+  label: string;
+  color: string;
+  onPress: () => void;
+  disabled?: boolean;
+}
+
+const ActionButton: React.FC<ActionButtonProps> = ({ icon, label, color, onPress, disabled }) => (
+  <Pressable
+    style={({ pressed }) => [styles.actionBtn, pressed && { opacity: OPACITY.pressed }]}
+    onPress={onPress}
+    disabled={disabled}
+  >
+    <View style={[styles.actionIconBox, { backgroundColor: color }]}>{icon}</View>
+    <Text style={styles.actionBtnText}>{label}</Text>
+  </Pressable>
+);
+
+const FacilityChip = ({ icon, label }: { icon: React.ReactNode; label: string }) => (
+  <View style={styles.facilityChip}>
+    {icon}
+    <Text style={styles.facilityChipText}>{label}</Text>
+  </View>
+);
 
 const styles = StyleSheet.create({
   container: {
@@ -532,45 +419,45 @@ const styles = StyleSheet.create({
     paddingBottom: 0,
   },
 
-  // Hero Section
+  // Hero
   heroSection: {
     position: 'relative',
-    height: 320,
+    height: 300,
   },
   heroImage: {
-    width: width,
-    height: 320,
+    width,
+    height: 300,
     resizeMode: 'cover',
   },
   heroPlaceholder: {
-    width: width,
-    height: 320,
+    width,
+    height: 300,
     backgroundColor: COLORS.bgSecondary,
     justifyContent: 'center',
     alignItems: 'center',
-    gap: 16,
+    gap: 12,
   },
   placeholderText: {
-    fontSize: 16,
+    fontSize: 15,
     color: COLORS.textMuted,
   },
   imageCounter: {
     position: 'absolute',
-    bottom: 30,
+    bottom: 50,
     right: 20,
-    backgroundColor: 'rgba(0,0,0,0.6)',
+    backgroundColor: 'rgba(0,0,0,0.5)',
     paddingHorizontal: 12,
     paddingVertical: 6,
-    borderRadius: 20,
+    borderRadius: 16,
   },
   imageCounterText: {
     color: COLORS.textInverse,
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: '600',
   },
   indicators: {
     position: 'absolute',
-    bottom: 20,
+    bottom: 24,
     left: 0,
     right: 0,
     flexDirection: 'row',
@@ -584,7 +471,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.4)',
   },
   indicatorActive: {
-    width: 24,
+    width: 20,
     backgroundColor: COLORS.textInverse,
   },
   headerButtons: {
@@ -599,8 +486,8 @@ const styles = StyleSheet.create({
   headerBtn: {
     width: 44,
     height: 44,
-    borderRadius: 22,
-    backgroundColor: 'rgba(0,0,0,0.4)',
+    borderRadius: 14,
+    backgroundColor: 'rgba(0,0,0,0.35)',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -608,33 +495,33 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 10,
   },
-  // moved badge to bottom-left so it doesn't overlap header buttons
   heroBadge: {
     position: 'absolute',
-    bottom: 30,
+    bottom: 50,
     left: 20,
     backgroundColor: COLORS.primary,
     paddingHorizontal: 14,
-    paddingVertical: 6,
-    borderRadius: 20,
+    paddingVertical: 7,
+    borderRadius: 10,
   },
   heroBadgeText: {
     color: COLORS.textInverse,
     fontSize: 12,
-    fontWeight: '700',
+    fontWeight: '600',
+    letterSpacing: 0.5,
   },
 
   // Main Content
   mainContent: {
-    marginTop: -30,
+    marginTop: -24,
     backgroundColor: COLORS.bgPrimary,
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
-    paddingTop: 30,
-    paddingHorizontal: 24,
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
+    paddingTop: 28,
+    paddingHorizontal: 20,
   },
 
-  // Title Section
+  // Title
   titleSection: {
     marginBottom: 20,
   },
@@ -646,20 +533,21 @@ const styles = StyleSheet.create({
   },
   hostelName: {
     flex: 1,
-    fontSize: 26,
+    fontSize: 24,
     fontWeight: '700',
     color: COLORS.textPrimary,
     marginRight: 12,
-    lineHeight: 32,
+    letterSpacing: -0.4,
+    lineHeight: 30,
   },
   ratingBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
-    backgroundColor: COLORS.warning + '20',
+    gap: 5,
+    backgroundColor: COLORS.warningLight,
     paddingHorizontal: 10,
     paddingVertical: 6,
-    borderRadius: 20,
+    borderRadius: 10,
   },
   ratingText: {
     fontSize: 14,
@@ -682,13 +570,15 @@ const styles = StyleSheet.create({
     color: COLORS.textMuted,
   },
 
-  // Stats Row
+  // Stats
   statsRow: {
     flexDirection: 'row',
-    backgroundColor: COLORS.bgSecondary,
+    backgroundColor: COLORS.bgCard,
     borderRadius: 16,
-    padding: 16,
+    padding: 18,
     marginBottom: 24,
+    borderWidth: 1,
+    borderColor: COLORS.borderLight,
   },
   statCard: {
     flex: 1,
@@ -703,18 +593,17 @@ const styles = StyleSheet.create({
   statLabel: {
     fontSize: 11,
     color: COLORS.textMuted,
-    textAlign: 'center',
   },
   statDivider: {
     width: 1,
-    backgroundColor: COLORS.border,
+    backgroundColor: COLORS.borderLight,
     marginHorizontal: 8,
   },
 
-  // Action Buttons
+  // Actions
   actionButtons: {
     flexDirection: 'row',
-    gap: 12,
+    gap: 14,
     marginBottom: 28,
   },
   actionBtn: {
@@ -730,34 +619,34 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   actionBtnText: {
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: '600',
     color: COLORS.textSecondary,
-    textAlign: 'center',
   },
 
-  // Sections
+  // Section
   section: {
     marginBottom: 28,
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: '700',
+    fontWeight: '600',
     color: COLORS.textPrimary,
     marginBottom: 16,
+    letterSpacing: -0.2,
   },
 
-  // Room Cards
+  // Room Card
   roomCard: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: COLORS.bgSecondary,
+    backgroundColor: COLORS.bgCard,
     borderRadius: 16,
     padding: 16,
-    marginBottom: 12,
+    marginBottom: 10,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: COLORS.borderLight,
   },
   roomCardLeft: {
     flexDirection: 'row',
@@ -768,7 +657,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 14,
-    backgroundColor: COLORS.primary + '15',
+    backgroundColor: COLORS.primaryLight,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 14,
@@ -806,7 +695,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   roomPrice: {
-    fontSize: 18,
+    fontSize: 17,
     fontWeight: '700',
     color: COLORS.primary,
   },
@@ -825,12 +714,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    backgroundColor: COLORS.bgSecondary,
+    backgroundColor: COLORS.bgCard,
     paddingHorizontal: 14,
     paddingVertical: 10,
-    borderRadius: 25,
+    borderRadius: 12,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: COLORS.borderLight,
   },
   facilityChipText: {
     fontSize: 13,
@@ -840,16 +729,16 @@ const styles = StyleSheet.create({
 
   // Rules
   rulesBox: {
-    backgroundColor: COLORS.bgSecondary,
+    backgroundColor: COLORS.bgCard,
     borderRadius: 16,
     padding: 18,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: COLORS.borderLight,
   },
   rulesText: {
     fontSize: 14,
     color: COLORS.textSecondary,
-    lineHeight: 24,
+    lineHeight: 22,
   },
 
   // Nearby
@@ -862,10 +751,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: COLORS.primary + '10',
+    backgroundColor: COLORS.primaryLight,
     paddingHorizontal: 14,
     paddingVertical: 10,
-    borderRadius: 25,
+    borderRadius: 12,
   },
   nearbyText: {
     fontSize: 13,
@@ -873,20 +762,20 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
 
-  // Manager Card
+  // Manager
   managerCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.bgSecondary,
+    backgroundColor: COLORS.bgCard,
     borderRadius: 16,
     padding: 16,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: COLORS.borderLight,
   },
   managerAvatar: {
     width: 52,
     height: 52,
-    borderRadius: 26,
+    borderRadius: 16,
     backgroundColor: COLORS.primary,
     justifyContent: 'center',
     alignItems: 'center',
@@ -894,7 +783,7 @@ const styles = StyleSheet.create({
   },
   managerAvatarText: {
     fontSize: 22,
-    fontWeight: '700',
+    fontWeight: '600',
     color: COLORS.textInverse,
     textTransform: 'uppercase',
   },
@@ -905,7 +794,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: COLORS.textPrimary,
-    marginBottom: 2,
+    marginBottom: 3,
   },
   managerSubtext: {
     fontSize: 13,
