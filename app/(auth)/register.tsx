@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "expo-router";
 import { ArrowRight, ChevronLeft, Lock, Mail, User } from "lucide-react-native";
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
   Image,
@@ -34,6 +34,7 @@ export default function RegisterScreen() {
   const router = useRouter();
   const { setAuth } = useAuthStore();
   const [loading, setLoading] = useState(false);
+  const slowServerTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const {
     control,
@@ -52,9 +53,28 @@ export default function RegisterScreen() {
 
   const selectedRole = watch("role");
 
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (slowServerTimeoutRef.current) {
+        clearTimeout(slowServerTimeoutRef.current);
+      }
+    };
+  }, []);
+
   const onSubmit = async (data: RegisterFormData) => {
     try {
       setLoading(true);
+
+      // Start 10-second timer for slow server notification
+      slowServerTimeoutRef.current = setTimeout(() => {
+        Toast.show({
+          type: "info",
+          text1: "Ahhh, Here we go slow server",
+          text2: "Just few more seconds. Sorry, we're working to change server but it costs 🥴",
+          visibilityTime: 5000,
+        });
+      }, 10000);
 
       const payload = {
         email: data.email,
@@ -64,6 +84,12 @@ export default function RegisterScreen() {
       };
 
       const response = await authApi.register(payload);
+
+      // Clear the slow server timeout
+      if (slowServerTimeoutRef.current) {
+        clearTimeout(slowServerTimeoutRef.current);
+        slowServerTimeoutRef.current = null;
+      }
 
       if (response.success && response.data) {
         const { user, token } = response.data;
@@ -82,6 +108,12 @@ export default function RegisterScreen() {
         }
       }
     } catch (error: any) {
+      // Clear the slow server timeout
+      if (slowServerTimeoutRef.current) {
+        clearTimeout(slowServerTimeoutRef.current);
+        slowServerTimeoutRef.current = null;
+      }
+
       Toast.show({
         type: "error",
         text1: "Registration Failed",
