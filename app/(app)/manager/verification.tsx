@@ -125,9 +125,22 @@ export default function VerificationScreen() {
   };
 
   const validateStep3 = () => {
-    if (!easypaisaNumber.trim() && !jazzcashNumber.trim() && !customBanks.length) {
-      return showError('At least one payment method is required');
+    // Check if Easypaisa number is provided
+    const hasEasypaisa = easypaisaNumber.trim().length > 0;
+    
+    // Check if JazzCash number is provided
+    const hasJazzcash = jazzcashNumber.trim().length > 0;
+    
+    // Check if at least one valid bank account is provided (must have bankName AND accountNumber)
+    const hasValidBank = customBanks.some(
+      (bank) => bank.bankName.trim() && bank.accountNumber.trim()
+    );
+
+    // If none of the payment methods are provided, show error
+    if (!hasEasypaisa && !hasJazzcash && !hasValidBank) {
+      return showError('Need to add atleast one Bank Detail');
     }
+    
     if (!acceptedRules) return showError('You must accept the rules');
     return true;
   };
@@ -352,7 +365,7 @@ export default function VerificationScreen() {
       </Text>
 
       <Input
-        label="Easypaisa Number (optional)"
+        label="Easypaisa Number"
         placeholder="03XX XXXXXXX"
         leftIcon={<CreditCard size={20} color={COLORS.textMuted} strokeWidth={1.5} />}
         value={easypaisaNumber}
@@ -361,7 +374,7 @@ export default function VerificationScreen() {
       />
 
       <Input
-        label="JazzCash Number (optional)"
+        label="JazzCash Number"
         placeholder="03XX XXXXXXX"
         leftIcon={<CreditCard size={20} color={COLORS.textMuted} strokeWidth={1.5} />}
         value={jazzcashNumber}
@@ -369,7 +382,7 @@ export default function VerificationScreen() {
         keyboardType="phone-pad"
       />
 
-      <Text style={styles.label}>Bank Accounts (optional)</Text>
+      <Text style={styles.label}>Bank Accounts</Text>
       {customBanks.map((bank, index) => (
         <View key={index} style={styles.bankCard}>
           <View style={styles.bankHeader}>
@@ -412,6 +425,11 @@ export default function VerificationScreen() {
         <Plus size={18} color={COLORS.primary} strokeWidth={1.5} />
         <Text style={styles.addButtonText}>Add bank account</Text>
       </Pressable>
+
+      {/* Info hint about required payment method */}
+      <Text style={styles.paymentHint}>
+        * At least one payment method (Easypaisa, JazzCash, or Bank Account) is required
+      </Text>
 
       {/* Rules */}
       <View style={styles.rulesCard}>
@@ -798,9 +816,17 @@ const styles = StyleSheet.create({
     borderColor: COLORS.inputBorder,
   },
 
+  // Payment hint
+  paymentHint: {
+    fontSize: 13,
+    color: COLORS.warning,
+    fontStyle: 'italic',
+    marginBottom: 16,
+  },
+
   // Rules
   rulesCard: {
-    marginTop: 20,
+    marginTop: 4,
     backgroundColor: COLORS.bgCard,
     borderRadius: 16,
     padding: 20,
