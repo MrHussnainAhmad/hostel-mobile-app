@@ -7,9 +7,9 @@ import {
   Pressable,
   PressableProps,
   StyleSheet,
-  Text,
   View,
 } from 'react-native';
+import AppText from '../common/AppText';
 
 interface ButtonProps extends Omit<PressableProps, 'style'> {
   title: string;
@@ -79,7 +79,7 @@ export const Button: React.FC<ButtonProps> = ({
           {icon && iconPosition === 'left' && (
             <View style={styles.iconLeft}>{icon}</View>
           )}
-          <Text style={textStyles}>{title}</Text>
+          <AppText style={textStyles}>{title}</AppText>
           {icon && iconPosition === 'right' && (
             <View style={styles.iconRight}>{icon}</View>
           )}

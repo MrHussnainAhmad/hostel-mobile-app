@@ -1,27 +1,31 @@
 // screens/BookingsScreen.tsx
 
-import { COLORS, OPACITY } from '@/constants/colors';
-import { useRouter } from 'expo-router';
-import { ArrowLeft, ChevronRight, Home } from 'lucide-react-native';
-import React, { useEffect, useState } from 'react';
+import { COLORS, OPACITY } from "@/constants/colors";
+import { useRouter } from "expo-router";
+import { ArrowLeft, ChevronRight, Home } from "lucide-react-native";
+import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   FlatList,
   Image,
   Pressable,
   RefreshControl,
   StyleSheet,
-  Text,
   View,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import Toast from 'react-native-toast-message';
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import Toast from "react-native-toast-message";
 
-import { bookingsApi } from '@/api/bookings';
-import { Badge, Button, EmptyState, LoadingScreen } from '@/components/ui';
-import { Booking } from '@/types';
+import { bookingsApi } from "@/api/bookings";
+import AppText from "@/components/common/AppText";
+import { Badge, Button, EmptyState, LoadingScreen } from "@/components/ui";
+import { Booking } from "@/types";
+
 
 export default function BookingsScreen() {
+  const { t } = useTranslation();
   const router = useRouter();
+
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [bookings, setBookings] = useState<Booking[]>([]);
@@ -33,10 +37,12 @@ export default function BookingsScreen() {
         setBookings(response.data);
       }
     } catch (error: any) {
+      // FIXED: Added "student." prefix
       Toast.show({
-        type: 'error',
-        text1: 'Error',
-        text2: error?.response?.data?.message || 'Failed to fetch bookings',
+        type: "error",
+        text1: t("student.bookings.toast_error_title"),
+        text2:
+          error?.response?.data?.message || t("student.bookings.toast_error_message"),
       });
     } finally {
       setLoading(false);
@@ -55,25 +61,25 @@ export default function BookingsScreen() {
 
   const getStatusVariant = (status: string) => {
     switch (status) {
-      case 'APPROVED':
-        return 'success';
-      case 'DISAPPROVED':
-        return 'error';
-      case 'PENDING':
-        return 'warning';
-      case 'LEFT':
-      case 'KICKED':
-        return 'default';
+      case "APPROVED":
+        return "success";
+      case "DISAPPROVED":
+        return "error";
+      case "PENDING":
+        return "warning";
+      case "LEFT":
+      case "KICKED":
+        return "default";
       default:
-        return 'default';
+        return "default";
     }
   };
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString([], {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
+      month: "short",
+      day: "numeric",
+      year: "numeric",
     });
   };
 
@@ -100,36 +106,36 @@ export default function BookingsScreen() {
       {/* Content */}
       <View style={styles.bookingContent}>
         <View style={styles.bookingHeader}>
-          <Text style={styles.hostelName} numberOfLines={1}>
+          <AppText style={styles.hostelName} numberOfLines={1}>
             {item.hostel.hostelName}
-          </Text>
+          </AppText>
+
+          {/* FIXED: Added "student." prefix */}
           <Badge
-            label={item.status}
+            label={t(`student.bookings.status.${item.status.toLowerCase()}`)}
             variant={getStatusVariant(item.status)}
             size="sm"
           />
         </View>
 
-        <Text style={styles.details}>
-          {item.hostel.city} • {item.roomType.replace('_', ' ')}
-        </Text>
-        
-        <Text style={styles.date}>
-          Booked on {formatDate(item.createdAt)}
-        </Text>
+        <AppText style={styles.details}>
+          {item.hostel.city} • {item.roomType.replace("_", " ")}
+        </AppText>
+
+        {/* FIXED: Added "student." prefix */}
+        <AppText style={styles.date}>
+          {t("student.bookings.booked_on")} {formatDate(item.createdAt)}
+        </AppText>
       </View>
 
-      {/* Arrow */}
       <ChevronRight size={20} color={COLORS.textMuted} strokeWidth={1.5} />
     </Pressable>
   );
 
-  if (loading) {
-    return <LoadingScreen />;
-  }
+  if (loading) return <LoadingScreen />;
 
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+    <SafeAreaView style={styles.container} edges={["top", "bottom"]}>
       {/* Header */}
       <View style={styles.header}>
         <Pressable
@@ -141,9 +147,10 @@ export default function BookingsScreen() {
         >
           <ArrowLeft size={22} color={COLORS.textPrimary} strokeWidth={1.5} />
         </Pressable>
-        
-        <Text style={styles.headerTitle}>My Bookings</Text>
-        
+
+        {/* FIXED: Added "student." prefix */}
+        <AppText style={styles.headerTitle}>{t("student.bookings.header_title")}</AppText>
+
         <View style={styles.headerSpacer} />
       </View>
 
@@ -165,12 +172,13 @@ export default function BookingsScreen() {
         ListEmptyComponent={
           <EmptyState
             icon={<Home size={48} color={COLORS.textMuted} strokeWidth={1.5} />}
-            title="No bookings yet"
-            description="Your hostel bookings will appear here once you make a reservation."
+            // FIXED: Added "student." prefix
+            title={t("student.bookings.empty_title")}
+            description={t("student.bookings.empty_description")}
             action={
               <Button
-                title="Find Hostels"
-                onPress={() => router.push('/(app)/student/search')}
+                title={t("student.bookings.empty_action")}
+                onPress={() => router.push("/(app)/student/search")}
                 size="md"
               />
             }
@@ -187,12 +195,12 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.bgPrimary,
   },
-  
+
   // Header
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: 16,
     paddingVertical: 12,
     backgroundColor: COLORS.bgPrimary,
@@ -204,21 +212,21 @@ const styles = StyleSheet.create({
     height: 44,
     borderRadius: 14,
     backgroundColor: COLORS.bgCard,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     borderWidth: 1,
     borderColor: COLORS.borderLight,
   },
   headerTitle: {
     fontSize: 17,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.textPrimary,
     letterSpacing: -0.2,
   },
   headerSpacer: {
     width: 44,
   },
-  
+
   // List
   list: {
     padding: 20,
@@ -227,11 +235,11 @@ const styles = StyleSheet.create({
   separator: {
     height: 12,
   },
-  
+
   // Booking Card
   bookingCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     backgroundColor: COLORS.bgCard,
     borderRadius: 16,
     padding: 14,
@@ -248,8 +256,8 @@ const styles = StyleSheet.create({
     height: 72,
     borderRadius: 12,
     backgroundColor: COLORS.bgSecondary,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   bookingContent: {
     flex: 1,
@@ -257,14 +265,14 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   bookingHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 6,
   },
   hostelName: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.textPrimary,
     flex: 1,
     marginRight: 10,

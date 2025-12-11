@@ -2,7 +2,8 @@
 
 import { COLORS } from '@/constants/colors';
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import AppText from '../common/AppText';
 
 interface EmptyStateProps {
   icon: React.ReactNode;
@@ -27,11 +28,11 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
       </View>
 
       {/* Title */}
-      <Text style={styles.title}>{title}</Text>
+      <AppText style={styles.title}>{title}</AppText>
 
       {/* Description */}
       {description && (
-        <Text style={styles.description}>{description}</Text>
+        <AppText style={styles.description}>{description}</AppText>
       )}
 
       {/* Action button */}

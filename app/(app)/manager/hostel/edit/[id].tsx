@@ -1,5 +1,5 @@
-import * as ImagePicker from 'expo-image-picker';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import * as ImagePicker from "expo-image-picker";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import {
   ArrowLeft,
   Camera,
@@ -9,8 +9,9 @@ import {
   Wifi,
   X,
   Zap,
-} from 'lucide-react-native';
-import React, { useEffect, useRef, useState } from 'react';
+} from "lucide-react-native";
+import React, { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Animated,
   Image,
@@ -19,21 +20,22 @@ import {
   ScrollView,
   StyleSheet,
   Switch,
-  Text,
   TextInput,
   TouchableOpacity,
   View,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import Toast from 'react-native-toast-message';
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import Toast from "react-native-toast-message";
 
-import { hostelsApi } from '@/api/hostels';
-import { Button, Card, Input, LoadingScreen } from '@/components/ui';
-import { COLORS } from '@/constants/colors';
+import { hostelsApi } from "@/api/hostels";
+import AppText from "@/components/common/AppText";
+import { Button, Card, Input, LoadingScreen } from "@/components/ui";
+import { COLORS } from "@/constants/colors";
+
 
 type RoomTypeConfig = {
   id?: string;
-  type: 'SHARED' | 'PRIVATE' | 'SHARED_FULLROOM';
+  type: "SHARED" | "PRIVATE" | "SHARED_FULLROOM";
   totalRooms: string;
   personsInRoom: string;
   price: string;
@@ -42,6 +44,7 @@ type RoomTypeConfig = {
 };
 
 export default function EditHostelScreen() {
+  const { t } = useTranslation();
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
 
@@ -50,13 +53,13 @@ export default function EditHostelScreen() {
   const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
 
   // Step 1: Basic Info
-  const [hostelName, setHostelName] = useState('');
-  const [city, setCity] = useState('');
-  const [address, setAddress] = useState('');
-  const [hostelFor, setHostelFor] = useState<'BOYS' | 'GIRLS'>('BOYS');
-  const [nearbyLocations, setNearbyLocations] = useState<string[]>(['']);
-  const [rules, setRules] = useState('');
-  const [seoKeywords, setSeoKeywords] = useState<string[]>(['']);
+  const [hostelName, setHostelName] = useState("");
+  const [city, setCity] = useState("");
+  const [address, setAddress] = useState("");
+  const [hostelFor, setHostelFor] = useState<"BOYS" | "GIRLS">("BOYS");
+  const [nearbyLocations, setNearbyLocations] = useState<string[]>([""]);
+  const [rules, setRules] = useState("");
+  const [seoKeywords, setSeoKeywords] = useState<string[]>([""]);
 
   // Step 2: Room Types
   const [roomTypes, setRoomTypes] = useState<RoomTypeConfig[]>([]);
@@ -66,13 +69,13 @@ export default function EditHostelScreen() {
     hotColdWaterBath: false,
     drinkingWater: false,
     electricityBackup: false,
-    electricityType: 'INCLUDED' as 'INCLUDED' | 'SELF',
-    electricityRatePerUnit: '',
+    electricityType: "INCLUDED" as "INCLUDED" | "SELF",
+    electricityRatePerUnit: "",
     wifiEnabled: false,
-    wifiPlan: '',
-    wifiMaxUsers: '',
-    wifiAvgSpeed: '',
-    customFacilities: [''],
+    wifiPlan: "",
+    wifiMaxUsers: "",
+    wifiAvgSpeed: "",
+    customFacilities: [""],
   });
 
   // Step 4: Images
@@ -107,10 +110,10 @@ export default function EditHostelScreen() {
         setAddress(hostel.address);
         setHostelFor(hostel.hostelFor);
         setNearbyLocations(
-          hostel.nearbyLocations?.length ? hostel.nearbyLocations : ['']
+          hostel.nearbyLocations?.length ? hostel.nearbyLocations : [""]
         );
-        setRules(hostel.rules || '');
-        setSeoKeywords(hostel.seoKeywords?.length ? hostel.seoKeywords : ['']);
+        setRules(hostel.rules || "");
+        setSeoKeywords(hostel.seoKeywords?.length ? hostel.seoKeywords : [""]);
 
         // Room types (with urgentBookingPrice)
         if (hostel.roomTypes?.length) {
@@ -123,10 +126,10 @@ export default function EditHostelScreen() {
               price: String(rt.price),
               fullRoomPriceDiscounted: rt.fullRoomPriceDiscounted
                 ? String(rt.fullRoomPriceDiscounted)
-                : '',
+                : "",
               urgentBookingPrice: rt.urgentBookingPrice
                 ? String(rt.urgentBookingPrice)
-                : '',
+                : "",
             }))
           );
         }
@@ -137,19 +140,19 @@ export default function EditHostelScreen() {
             hotColdWaterBath: hostel.facilities.hotColdWaterBath || false,
             drinkingWater: hostel.facilities.drinkingWater || false,
             electricityBackup: hostel.facilities.electricityBackup || false,
-            electricityType: hostel.facilities.electricityType || 'INCLUDED',
+            electricityType: hostel.facilities.electricityType || "INCLUDED",
             electricityRatePerUnit: hostel.facilities.electricityRatePerUnit
               ? String(hostel.facilities.electricityRatePerUnit)
-              : '',
+              : "",
             wifiEnabled: hostel.facilities.wifiEnabled || false,
-            wifiPlan: hostel.facilities.wifiPlan || '',
+            wifiPlan: hostel.facilities.wifiPlan || "",
             wifiMaxUsers: hostel.facilities.wifiMaxUsers
               ? String(hostel.facilities.wifiMaxUsers)
-              : '',
-            wifiAvgSpeed: hostel.facilities.wifiAvgSpeed || '',
+              : "",
+            wifiAvgSpeed: hostel.facilities.wifiAvgSpeed || "",
             customFacilities: hostel.facilities.customFacilities?.length
               ? hostel.facilities.customFacilities
-              : [''],
+              : [""],
           });
         }
 
@@ -158,9 +161,11 @@ export default function EditHostelScreen() {
       }
     } catch (error: any) {
       Toast.show({
-        type: 'error',
-        text1: 'Error',
-        text2: error?.response?.data?.message || 'Failed to fetch hostel',
+        type: "error",
+        text1: t("manager.edit_hostel.fetch_error_title"),
+        text2:
+          error?.response?.data?.message ||
+          t("manager.edit_hostel.fetch_error_message"),
       });
       router.back();
     } finally {
@@ -192,7 +197,7 @@ export default function EditHostelScreen() {
 
   // Nearby locations
   const addNearbyLocation = () => {
-    setNearbyLocations((prev) => [...prev, '']);
+    setNearbyLocations((prev) => [...prev, ""]);
   };
 
   const updateNearbyLocation = (index: number, value: string) => {
@@ -209,7 +214,7 @@ export default function EditHostelScreen() {
 
   // SEO keywords
   const addSeoKeyword = () => {
-    setSeoKeywords((prev) => [...prev, '']);
+    setSeoKeywords((prev) => [...prev, ""]);
   };
 
   const updateSeoKeyword = (index: number, value: string) => {
@@ -227,10 +232,10 @@ export default function EditHostelScreen() {
   // Room types (with urgentBookingPrice)
   const addRoomType = () => {
     const usedTypes = roomTypes.map((rt) => rt.type);
-    const availableTypes: RoomTypeConfig['type'][] = [
-      'SHARED',
-      'PRIVATE',
-      'SHARED_FULLROOM',
+    const availableTypes: RoomTypeConfig["type"][] = [
+      "SHARED",
+      "PRIVATE",
+      "SHARED_FULLROOM",
     ];
     const nextType = availableTypes.find((t) => !usedTypes.includes(t));
 
@@ -239,18 +244,18 @@ export default function EditHostelScreen() {
         ...prev,
         {
           type: nextType,
-          totalRooms: '',
-          personsInRoom: '',
-          price: '',
-          fullRoomPriceDiscounted: '',
-          urgentBookingPrice: '',
+          totalRooms: "",
+          personsInRoom: "",
+          price: "",
+          fullRoomPriceDiscounted: "",
+          urgentBookingPrice: "",
         },
       ]);
     } else {
       Toast.show({
-        type: 'info',
-        text1: 'Info',
-        text2: 'All room types already added',
+        type: "info",
+        text1: t("manager.edit_hostel.toast.info_title"),
+        text2: t("manager.edit_hostel.toast.all_room_types_added"),
       });
     }
   };
@@ -278,7 +283,7 @@ export default function EditHostelScreen() {
   const addCustomFacility = () => {
     setFacilities((prev) => ({
       ...prev,
-      customFacilities: [...prev.customFacilities, ''],
+      customFacilities: [...prev.customFacilities, ""],
     }));
   };
 
@@ -304,25 +309,25 @@ export default function EditHostelScreen() {
   const validateStep1 = () => {
     if (!hostelName.trim()) {
       Toast.show({
-        type: 'error',
-        text1: 'Error',
-        text2: 'Hostel name is required',
+        type: "error",
+        text1: t("common.error"),
+        text2: t("manager.edit_hostel.toast.error_hostel_name_required"),
       });
       return false;
     }
     if (!city.trim()) {
       Toast.show({
-        type: 'error',
-        text1: 'Error',
-        text2: 'City is required',
+        type: "error",
+        text1: t("common.error"),
+        text2: t("manager.edit_hostel.toast.error_city_required"),
       });
       return false;
     }
     if (!address.trim()) {
       Toast.show({
-        type: 'error',
-        text1: 'Error',
-        text2: 'Address is required',
+        type: "error",
+        text1: t("common.error"),
+        text2: t("manager.edit_hostel.toast.error_address_required"),
       });
       return false;
     }
@@ -332,18 +337,18 @@ export default function EditHostelScreen() {
   const validateStep2 = () => {
     if (roomTypes.length === 0) {
       Toast.show({
-        type: 'error',
-        text1: 'Error',
-        text2: 'At least one room type is required',
+        type: "error",
+        text1: t("common.error"),
+        text2: t("manager.edit_hostel.toast.error_room_type_required"),
       });
       return false;
     }
     for (const rt of roomTypes) {
       if (!rt.totalRooms || !rt.personsInRoom || !rt.price) {
         Toast.show({
-          type: 'error',
-          text1: 'Error',
-          text2: 'All room type fields are required',
+          type: "error",
+          text1: t("common.error"),
+          text2: t("manager.edit_hostel.toast.error_room_fields_required"),
         });
         return false;
       }
@@ -356,9 +361,9 @@ export default function EditHostelScreen() {
   const validateStep4 = () => {
     if (existingImages.length === 0 && newImages.length === 0) {
       Toast.show({
-        type: 'error',
-        text1: 'Error',
-        text2: 'At least one image is required',
+        type: "error",
+        text1: t("common.error"),
+        text2: t("manager.edit_hostel.toast.error_image_required"),
       });
       return false;
     }
@@ -387,13 +392,13 @@ export default function EditHostelScreen() {
       setSaving(true);
 
       const formData = new FormData();
-      formData.append('hostelName', hostelName.trim());
-      formData.append('city', city.trim());
-      formData.append('address', address.trim());
-      formData.append('hostelFor', hostelFor);
+      formData.append("hostelName", hostelName.trim());
+      formData.append("city", city.trim());
+      formData.append("address", address.trim());
+      formData.append("hostelFor", hostelFor);
 
       if (rules.trim()) {
-        formData.append('rules', rules.trim());
+        formData.append("rules", rules.trim());
       }
 
       // Nearby locations
@@ -424,7 +429,7 @@ export default function EditHostelScreen() {
           );
         }
 
-        if (rt.type === 'SHARED_FULLROOM' && rt.fullRoomPriceDiscounted) {
+        if (rt.type === "SHARED_FULLROOM" && rt.fullRoomPriceDiscounted) {
           formData.append(
             `roomTypes[${index}][fullRoomPriceDiscounted]`,
             rt.fullRoomPriceDiscounted
@@ -434,40 +439,46 @@ export default function EditHostelScreen() {
 
       // Facilities
       formData.append(
-        'facilities[hotColdWaterBath]',
+        "facilities[hotColdWaterBath]",
         String(facilities.hotColdWaterBath)
       );
       formData.append(
-        'facilities[drinkingWater]',
+        "facilities[drinkingWater]",
         String(facilities.drinkingWater)
       );
       formData.append(
-        'facilities[electricityBackup]',
+        "facilities[electricityBackup]",
         String(facilities.electricityBackup)
       );
-      formData.append('facilities[electricityType]', facilities.electricityType);
+      formData.append(
+        "facilities[electricityType]",
+        facilities.electricityType
+      );
 
       if (
-        facilities.electricityType === 'SELF' &&
+        facilities.electricityType === "SELF" &&
         facilities.electricityRatePerUnit
       ) {
         formData.append(
-          'facilities[electricityRatePerUnit]',
+          "facilities[electricityRatePerUnit]",
           facilities.electricityRatePerUnit
         );
       }
 
-      formData.append('facilities[wifiEnabled]', String(facilities.wifiEnabled));
+      formData.append(
+        "facilities[wifiEnabled]",
+        String(facilities.wifiEnabled)
+      );
 
       if (facilities.wifiEnabled) {
         if (facilities.wifiPlan) {
-          formData.append('facilities[wifiPlan]', facilities.wifiPlan);
+          formData.append("facilities[wifiPlan]", facilities.wifiPlan);
         }
         if (facilities.wifiMaxUsers) {
-          formData.append('facilities[wifiMaxUsers]', facilities.wifiMaxUsers);
+          formData.append("facilities[wifiMaxUsers]", facilities.wifiMaxUsers);
         }
         if (facilities.wifiAvgSpeed) {
-          formData.append('facilities[wifiAvgSpeed]', facilities.wifiAvgSpeed);
+          formData.append("facilities[wifiAvgSpeed]", facilities.wifiAvgSpeed);
         }
       }
 
@@ -487,35 +498,34 @@ export default function EditHostelScreen() {
 
       // New images
       newImages.forEach((uri, index) => {
-        const filename = uri.split('/').pop() || `image${index}.jpg`;
+        const filename = uri.split("/").pop() || `image${index}.jpg`;
         const match = /\.(\w+)$/.exec(filename);
-        const type = match ? `image/${match[1]}` : 'image/jpeg';
+        const type = match ? `image/${match[1]}` : "image/jpeg";
 
-        formData.append(
-          'roomImages',
-          {
-            uri,
-            name: filename,
-            type,
-          } as any
-        );
+        formData.append("roomImages", {
+          uri,
+          name: filename,
+          type,
+        } as any);
       });
 
       const response = await hostelsApi.updateHostel(id, formData);
 
       if (response.success) {
         Toast.show({
-          type: 'success',
-          text1: 'Hostel updated',
-          text2: 'Changes saved successfully',
+          type: "success",
+          text1: t("manager.edit_hostel.toast.success_title"),
+          text2: t("manager.edit_hostel.toast.success_message"),
         });
         router.back();
       }
     } catch (error: any) {
       Toast.show({
-        type: 'error',
-        text1: 'Error',
-        text2: error?.response?.data?.message || 'Failed to update hostel',
+        type: "error",
+        text1: t("common.error"),
+        text2:
+          error?.response?.data?.message ||
+          t("manager.edit_hostel.toast.error_update_failed"),
       });
     } finally {
       setSaving(false);
@@ -529,73 +539,84 @@ export default function EditHostelScreen() {
   // Step renderers
   const renderStep1 = () => (
     <>
-      <Text style={styles.stepTitle}>Basic information</Text>
-      <Text style={styles.stepDesc}>Update your hostel details.</Text>
+      <AppText style={styles.stepTitle}>
+        {t("manager.edit_hostel.step1.title")}
+      </AppText>
+      <AppText style={styles.stepDesc}>
+        {t("manager.edit_hostel.step1.description")}
+      </AppText>
 
       <Input
-        label="Hostel name"
-        placeholder="Enter hostel name"
+        label={t("manager.edit_hostel.step1.hostel_name_label")}
+        placeholder={t("manager.edit_hostel.step1.hostel_name_placeholder")}
         value={hostelName}
         onChangeText={setHostelName}
       />
 
       <Input
-        label="City"
-        placeholder="Enter city"
+        label={t("manager.edit_hostel.step1.city_label")}
+        placeholder={t("manager.edit_hostel.step1.city_placeholder")}
         value={city}
         onChangeText={setCity}
       />
 
       <Input
-        label="Address"
-        placeholder="Enter complete address"
+        label={t("manager.edit_hostel.step1.address_label")}
+        placeholder={t("manager.edit_hostel.step1.address_placeholder")}
         value={address}
         onChangeText={setAddress}
         multiline
       />
 
-      <Text style={styles.label}>Hostel for</Text>
+      <AppText style={styles.label}>
+        {t("manager.edit_hostel.step1.hostel_for_label")}
+      </AppText>
       <View style={styles.segmentRow}>
         <TouchableOpacity
           style={[
             styles.segmentOption,
-            hostelFor === 'BOYS' && styles.segmentOptionActive,
+            hostelFor === "BOYS" && styles.segmentOptionActive,
           ]}
-          onPress={() => setHostelFor('BOYS')}
+          onPress={() => setHostelFor("BOYS")}
         >
-          <Text
+          <AppText
             style={[
               styles.segmentText,
-              hostelFor === 'BOYS' && styles.segmentTextActive,
+              hostelFor === "BOYS" && styles.segmentTextActive,
             ]}
           >
-            Boys
-          </Text>
+            {t("manager.edit_hostel.step1.boys")}
+          </AppText>
         </TouchableOpacity>
         <TouchableOpacity
           style={[
             styles.segmentOption,
-            hostelFor === 'GIRLS' && styles.segmentOptionActive,
+            hostelFor === "GIRLS" && styles.segmentOptionActive,
           ]}
-          onPress={() => setHostelFor('GIRLS')}
+          onPress={() => setHostelFor("GIRLS")}
         >
-          <Text
+          <AppText
             style={[
               styles.segmentText,
-              hostelFor === 'GIRLS' && styles.segmentTextActive,
+              hostelFor === "GIRLS" && styles.segmentTextActive,
             ]}
           >
-            Girls
-          </Text>
+            {t("manager.edit_hostel.step1.girls")}
+          </AppText>
         </TouchableOpacity>
       </View>
 
-      <Text style={styles.label}>Nearby locations (optional)</Text>
+      <AppText style={styles.label}>
+        {t("manager.edit_hostel.step1.nearby_locations_label")}
+      </AppText>
       {nearbyLocations.map((location, index) => (
         <View key={index} style={styles.inputRow}>
           <TextInput
             style={styles.rowInput}
-            placeholder={`Location ${index + 1} (e.g., University, Market)`}
+            placeholder={t(
+              "manager.edit_hostel.step1.nearby_location_placeholder",
+              { index: index + 1 }
+            )}
             placeholderTextColor={COLORS.textMuted}
             value={location}
             onChangeText={(v) => updateNearbyLocation(index, v)}
@@ -612,15 +633,22 @@ export default function EditHostelScreen() {
       ))}
       <TouchableOpacity style={styles.addBtn} onPress={addNearbyLocation}>
         <Plus size={18} color={COLORS.primary} />
-        <Text style={styles.addBtnText}>Add location</Text>
+        <AppText style={styles.addBtnText}>
+          {t("manager.edit_hostel.step1.add_location")}
+        </AppText>
       </TouchableOpacity>
 
-      <Text style={styles.label}>SEO keywords (optional)</Text>
+      <AppText style={styles.label}>
+        {t("manager.edit_hostel.step1.seo_keywords_label")}
+      </AppText>
       {seoKeywords.map((keyword, index) => (
         <View key={index} style={styles.inputRow}>
           <TextInput
             style={styles.rowInput}
-            placeholder={`Keyword ${index + 1} (e.g., boys hostel Lahore)`}
+            placeholder={t(
+              "manager.edit_hostel.step1.seo_keyword_placeholder",
+              { index: index + 1 }
+            )}
             placeholderTextColor={COLORS.textMuted}
             value={keyword}
             onChangeText={(v) => updateSeoKeyword(index, v)}
@@ -637,13 +665,17 @@ export default function EditHostelScreen() {
       ))}
       <TouchableOpacity style={styles.addBtn} onPress={addSeoKeyword}>
         <Plus size={18} color={COLORS.primary} />
-        <Text style={styles.addBtnText}>Add keyword</Text>
+        <AppText style={styles.addBtnText}>
+          {t("manager.edit_hostel.step1.add_keyword")}
+        </AppText>
       </TouchableOpacity>
 
-      <Text style={styles.label}>Hostel rules (optional)</Text>
+      <AppText style={styles.label}>
+        {t("manager.edit_hostel.step1.rules_label")}
+      </AppText>
       <TextInput
         style={styles.textArea}
-        placeholder="Enter hostel rules..."
+        placeholder={t("manager.edit_hostel.step1.rules_placeholder")}
         placeholderTextColor={COLORS.textMuted}
         value={rules}
         onChangeText={setRules}
@@ -656,13 +688,19 @@ export default function EditHostelScreen() {
 
   const renderStep2 = () => (
     <>
-      <Text style={styles.stepTitle}>Room types</Text>
-      <Text style={styles.stepDesc}>Update room types and pricing.</Text>
+      <AppText style={styles.stepTitle}>
+        {t("manager.edit_hostel.step2.title")}
+      </AppText>
+      <AppText style={styles.stepDesc}>
+        {t("manager.edit_hostel.step2.description")}
+      </AppText>
 
       {roomTypes.map((rt, index) => (
         <Card key={rt.id || index} style={styles.roomTypeCard}>
           <View style={styles.roomTypeHeader}>
-            <Text style={styles.roomTypeTitle}>{rt.type.replace('_', ' ')}</Text>
+            <AppText style={styles.roomTypeTitle}>
+              {rt.type.replace("_", " ")}
+            </AppText>
             {roomTypes.length > 1 && (
               <TouchableOpacity onPress={() => removeRoomType(index)}>
                 <X size={20} color={COLORS.error} />
@@ -670,9 +708,11 @@ export default function EditHostelScreen() {
             )}
           </View>
 
-          <Text style={styles.inputLabel}>Room type</Text>
+          <AppText style={styles.inputLabel}>
+            {t("manager.edit_hostel.step2.room_type_label")}
+          </AppText>
           <View style={styles.typeRow}>
-            {(['SHARED', 'PRIVATE', 'SHARED_FULLROOM'] as const).map((type) => {
+            {(["SHARED", "PRIVATE", "SHARED_FULLROOM"] as const).map((type) => {
               const isUsed = roomTypes.some(
                 (r, i) => r.type === type && i !== index
               );
@@ -687,17 +727,21 @@ export default function EditHostelScreen() {
                     isUsed && styles.typeChipDisabled,
                   ]}
                   disabled={isUsed}
-                  onPress={() => !isUsed && updateRoomType(index, 'type', type)}
+                  onPress={() => !isUsed && updateRoomType(index, "type", type)}
                 >
-                  <Text
+                  <AppText
                     style={[
                       styles.typeChipText,
                       isActive && styles.typeChipTextActive,
                       isUsed && styles.typeChipTextDisabled,
                     ]}
                   >
-                    {type.replace('_', ' ')}
-                  </Text>
+                    {type === "SHARED"
+                      ? t("manager.edit_hostel.step2.type_shared")
+                      : type === "PRIVATE"
+                      ? t("manager.edit_hostel.step2.type_private")
+                      : t("manager.edit_hostel.step2.type_shared_fullroom")}
+                  </AppText>
                 </TouchableOpacity>
               );
             })}
@@ -705,61 +749,77 @@ export default function EditHostelScreen() {
 
           <View style={styles.row}>
             <View style={styles.halfInput}>
-              <Text style={styles.inputLabel}>Total rooms</Text>
+              <AppText style={styles.inputLabel}>
+                {t("manager.edit_hostel.step2.total_rooms_label")}
+              </AppText>
               <TextInput
                 style={styles.input}
-                placeholder="e.g., 10"
+                placeholder={t(
+                  "manager.edit_hostel.step2.total_rooms_placeholder"
+                )}
                 placeholderTextColor={COLORS.textMuted}
                 value={rt.totalRooms}
-                onChangeText={(v) => updateRoomType(index, 'totalRooms', v)}
+                onChangeText={(v) => updateRoomType(index, "totalRooms", v)}
                 keyboardType="numeric"
               />
             </View>
             <View style={styles.halfInput}>
-              <Text style={styles.inputLabel}>Persons / room</Text>
+              <AppText style={styles.inputLabel}>
+                {t("manager.edit_hostel.step2.persons_per_room_label")}
+              </AppText>
               <TextInput
                 style={styles.input}
-                placeholder="e.g., 4"
+                placeholder={t(
+                  "manager.edit_hostel.step2.persons_per_room_placeholder"
+                )}
                 placeholderTextColor={COLORS.textMuted}
                 value={rt.personsInRoom}
-                onChangeText={(v) => updateRoomType(index, 'personsInRoom', v)}
+                onChangeText={(v) => updateRoomType(index, "personsInRoom", v)}
                 keyboardType="numeric"
               />
             </View>
           </View>
 
-          <Text style={styles.inputLabel}>Price per month (Rs.)</Text>
+          <AppText style={styles.inputLabel}>
+            {t("manager.edit_hostel.step2.price_label")}
+          </AppText>
           <TextInput
             style={styles.input}
-            placeholder="e.g., 8000"
+            placeholder={t("manager.edit_hostel.step2.price_placeholder")}
             placeholderTextColor={COLORS.textMuted}
             value={rt.price}
-            onChangeText={(v) => updateRoomType(index, 'price', v)}
+            onChangeText={(v) => updateRoomType(index, "price", v)}
             keyboardType="numeric"
           />
 
-          <Text style={styles.inputLabel}>Urgent booking price (optional)</Text>
+          <AppText style={styles.inputLabel}>
+            {t("manager.edit_hostel.step2.urgent_price_label")}
+          </AppText>
           <TextInput
             style={styles.input}
-            placeholder="e.g., 25000"
+            placeholder={t(
+              "manager.edit_hostel.step2.urgent_price_placeholder"
+            )}
             placeholderTextColor={COLORS.textMuted}
             value={rt.urgentBookingPrice}
-            onChangeText={(v) => updateRoomType(index, 'urgentBookingPrice', v)}
+            onChangeText={(v) => updateRoomType(index, "urgentBookingPrice", v)}
             keyboardType="numeric"
           />
 
-          {rt.type === 'SHARED_FULLROOM' && (
+          {rt.type === "SHARED_FULLROOM" && (
             <>
-              <Text style={styles.inputLabel}>
-                Full room discounted price (optional)
-              </Text>
+              <AppText style={styles.inputLabel}>
+                {t("manager.edit_hostel.step2.fullroom_discount_label")}
+              </AppText>
               <TextInput
                 style={styles.input}
-                placeholder="e.g., 28000"
+                placeholder={t(
+                  "manager.edit_hostel.step2.fullroom_discount_placeholder"
+                )}
                 placeholderTextColor={COLORS.textMuted}
                 value={rt.fullRoomPriceDiscounted}
                 onChangeText={(v) =>
-                  updateRoomType(index, 'fullRoomPriceDiscounted', v)
+                  updateRoomType(index, "fullRoomPriceDiscounted", v)
                 }
                 keyboardType="numeric"
               />
@@ -771,7 +831,9 @@ export default function EditHostelScreen() {
       {roomTypes.length < 3 && (
         <TouchableOpacity style={styles.addBtn} onPress={addRoomType}>
           <Plus size={18} color={COLORS.primary} />
-          <Text style={styles.addBtnText}>Add room type</Text>
+          <AppText style={styles.addBtnText}>
+            {t("manager.edit_hostel.step2.add_room_type")}
+          </AppText>
         </TouchableOpacity>
       )}
     </>
@@ -779,21 +841,27 @@ export default function EditHostelScreen() {
 
   const renderStep3 = () => (
     <>
-      <Text style={styles.stepTitle}>Facilities</Text>
-      <Text style={styles.stepDesc}>Update available facilities.</Text>
+      <AppText style={styles.stepTitle}>
+        {t("manager.edit_hostel.step3.title")}
+      </AppText>
+      <AppText style={styles.stepDesc}>
+        {t("manager.edit_hostel.step3.description")}
+      </AppText>
 
       <Card style={styles.facilityCard}>
         <View style={styles.facilityRow}>
           <View style={styles.facilityInfo}>
             <Droplets size={20} color={COLORS.info} />
-            <Text style={styles.facilityText}>Hot/Cold water bath</Text>
+            <AppText style={styles.facilityText}>
+              {t("manager.edit_hostel.step3.hot_cold_water")}
+            </AppText>
           </View>
           <Switch
             value={facilities.hotColdWaterBath}
             onValueChange={(v) =>
               setFacilities((prev) => ({ ...prev, hotColdWaterBath: v }))
             }
-            trackColor={{ false: COLORS.border, true: COLORS.primary + '50' }}
+            trackColor={{ false: COLORS.border, true: COLORS.primary + "50" }}
             thumbColor={
               facilities.hotColdWaterBath ? COLORS.primary : COLORS.textMuted
             }
@@ -805,14 +873,16 @@ export default function EditHostelScreen() {
         <View style={styles.facilityRow}>
           <View style={styles.facilityInfo}>
             <Droplets size={20} color={COLORS.info} />
-            <Text style={styles.facilityText}>Drinking water</Text>
+            <AppText style={styles.facilityText}>
+              {t("manager.edit_hostel.step3.drinking_water")}
+            </AppText>
           </View>
           <Switch
             value={facilities.drinkingWater}
             onValueChange={(v) =>
               setFacilities((prev) => ({ ...prev, drinkingWater: v }))
             }
-            trackColor={{ false: COLORS.border, true: COLORS.primary + '50' }}
+            trackColor={{ false: COLORS.border, true: COLORS.primary + "50" }}
             thumbColor={
               facilities.drinkingWater ? COLORS.primary : COLORS.textMuted
             }
@@ -824,14 +894,16 @@ export default function EditHostelScreen() {
         <View style={styles.facilityRow}>
           <View style={styles.facilityInfo}>
             <Zap size={20} color={COLORS.warning} />
-            <Text style={styles.facilityText}>Electricity backup</Text>
+            <AppText style={styles.facilityText}>
+              {t("manager.edit_hostel.step3.electricity_backup")}
+            </AppText>
           </View>
           <Switch
             value={facilities.electricityBackup}
             onValueChange={(v) =>
               setFacilities((prev) => ({ ...prev, electricityBackup: v }))
             }
-            trackColor={{ false: COLORS.border, true: COLORS.primary + '50' }}
+            trackColor={{ false: COLORS.border, true: COLORS.primary + "50" }}
             thumbColor={
               facilities.electricityBackup ? COLORS.primary : COLORS.textMuted
             }
@@ -839,56 +911,60 @@ export default function EditHostelScreen() {
         </View>
       </Card>
 
-      <Text style={styles.label}>Electricity billing</Text>
+      <AppText style={styles.label}>
+        {t("manager.edit_hostel.step3.electricity_billing_label")}
+      </AppText>
       <View style={styles.segmentRow}>
         <TouchableOpacity
           style={[
             styles.segmentOption,
-            facilities.electricityType === 'INCLUDED' &&
+            facilities.electricityType === "INCLUDED" &&
               styles.segmentOptionActive,
           ]}
           onPress={() =>
-            setFacilities((prev) => ({ ...prev, electricityType: 'INCLUDED' }))
+            setFacilities((prev) => ({ ...prev, electricityType: "INCLUDED" }))
           }
         >
-          <Text
+          <AppText
             style={[
               styles.segmentText,
-              facilities.electricityType === 'INCLUDED' &&
+              facilities.electricityType === "INCLUDED" &&
                 styles.segmentTextActive,
             ]}
           >
-            Included
-          </Text>
+            {t("manager.edit_hostel.step3.electricity_included")}
+          </AppText>
         </TouchableOpacity>
         <TouchableOpacity
           style={[
             styles.segmentOption,
-            facilities.electricityType === 'SELF' &&
-              styles.segmentOptionActive,
+            facilities.electricityType === "SELF" && styles.segmentOptionActive,
           ]}
           onPress={() =>
-            setFacilities((prev) => ({ ...prev, electricityType: 'SELF' }))
+            setFacilities((prev) => ({ ...prev, electricityType: "SELF" }))
           }
         >
-          <Text
+          <AppText
             style={[
               styles.segmentText,
-              facilities.electricityType === 'SELF' &&
-                styles.segmentTextActive,
+              facilities.electricityType === "SELF" && styles.segmentTextActive,
             ]}
           >
-            Self (per unit)
-          </Text>
+            {t("manager.edit_hostel.step3.electricity_self")}
+          </AppText>
         </TouchableOpacity>
       </View>
 
-      {facilities.electricityType === 'SELF' && (
+      {facilities.electricityType === "SELF" && (
         <>
-          <Text style={styles.inputLabel}>Rate per unit (Rs.)</Text>
+          <AppText style={styles.inputLabel}>
+            {t("manager.edit_hostel.step3.rate_per_unit_label")}
+          </AppText>
           <TextInput
             style={styles.input}
-            placeholder="e.g., 35"
+            placeholder={t(
+              "manager.edit_hostel.step3.rate_per_unit_placeholder"
+            )}
             placeholderTextColor={COLORS.textMuted}
             value={facilities.electricityRatePerUnit}
             onChangeText={(v) =>
@@ -903,14 +979,16 @@ export default function EditHostelScreen() {
         <View style={styles.facilityRow}>
           <View style={styles.facilityInfo}>
             <Wifi size={20} color={COLORS.success} />
-            <Text style={styles.facilityText}>WiFi available</Text>
+            <AppText style={styles.facilityText}>
+              {t("manager.edit_hostel.step3.wifi_available")}
+            </AppText>
           </View>
           <Switch
             value={facilities.wifiEnabled}
             onValueChange={(v) =>
               setFacilities((prev) => ({ ...prev, wifiEnabled: v }))
             }
-            trackColor={{ false: COLORS.border, true: COLORS.primary + '50' }}
+            trackColor={{ false: COLORS.border, true: COLORS.primary + "50" }}
             thumbColor={
               facilities.wifiEnabled ? COLORS.primary : COLORS.textMuted
             }
@@ -922,7 +1000,7 @@ export default function EditHostelScreen() {
             <View style={styles.divider} />
             <TextInput
               style={styles.input}
-              placeholder="WiFi plan (e.g., 50 Mbps Unlimited)"
+              placeholder={t("manager.edit_hostel.step3.wifi_plan_placeholder")}
               placeholderTextColor={COLORS.textMuted}
               value={facilities.wifiPlan}
               onChangeText={(v) =>
@@ -932,7 +1010,9 @@ export default function EditHostelScreen() {
             <View style={styles.row}>
               <TextInput
                 style={[styles.input, styles.halfInput]}
-                placeholder="Max users"
+                placeholder={t(
+                  "manager.edit_hostel.step3.wifi_max_users_placeholder"
+                )}
                 placeholderTextColor={COLORS.textMuted}
                 value={facilities.wifiMaxUsers}
                 onChangeText={(v) =>
@@ -942,7 +1022,9 @@ export default function EditHostelScreen() {
               />
               <TextInput
                 style={[styles.input, styles.halfInput]}
-                placeholder="Avg speed"
+                placeholder={t(
+                  "manager.edit_hostel.step3.wifi_avg_speed_placeholder"
+                )}
                 placeholderTextColor={COLORS.textMuted}
                 value={facilities.wifiAvgSpeed}
                 onChangeText={(v) =>
@@ -954,12 +1036,17 @@ export default function EditHostelScreen() {
         )}
       </Card>
 
-      <Text style={styles.label}>Custom facilities</Text>
+      <AppText style={styles.label}>
+        {t("manager.edit_hostel.step3.custom_facilities_label")}
+      </AppText>
       {facilities.customFacilities.map((facility, index) => (
         <View key={index} style={styles.inputRow}>
           <TextInput
             style={styles.rowInput}
-            placeholder={`Facility ${index + 1} (e.g., Laundry, Gym)`}
+            placeholder={t(
+              "manager.edit_hostel.step3.custom_facility_placeholder",
+              { index: index + 1 }
+            )}
             placeholderTextColor={COLORS.textMuted}
             value={facility}
             onChangeText={(v) => updateCustomFacility(index, v)}
@@ -976,19 +1063,27 @@ export default function EditHostelScreen() {
       ))}
       <TouchableOpacity style={styles.addBtn} onPress={addCustomFacility}>
         <Plus size={18} color={COLORS.primary} />
-        <Text style={styles.addBtnText}>Add facility</Text>
+        <AppText style={styles.addBtnText}>
+          {t("manager.edit_hostel.step3.add_facility")}
+        </AppText>
       </TouchableOpacity>
     </>
   );
 
   const renderStep4 = () => (
     <>
-      <Text style={styles.stepTitle}>Room images</Text>
-      <Text style={styles.stepDesc}>Update hostel photos.</Text>
+      <AppText style={styles.stepTitle}>
+        {t("manager.edit_hostel.step4.title")}
+      </AppText>
+      <AppText style={styles.stepDesc}>
+        {t("manager.edit_hostel.step4.description")}
+      </AppText>
 
       {existingImages.length > 0 && (
         <>
-          <Text style={styles.label}>Current images</Text>
+          <AppText style={styles.label}>
+            {t("manager.edit_hostel.step4.current_images")}
+          </AppText>
           <View style={styles.imagesGrid}>
             {existingImages.map((uri, index) => (
               <View key={`existing-${index}`} style={styles.imageContainer}>
@@ -1005,7 +1100,9 @@ export default function EditHostelScreen() {
         </>
       )}
 
-      <Text style={styles.label}>Add new images</Text>
+      <AppText style={styles.label}>
+        {t("manager.edit_hostel.step4.add_new_images")}
+      </AppText>
       <View style={styles.imagesGrid}>
         {newImages.map((uri, index) => (
           <View key={`new-${index}`} style={styles.imageContainer}>
@@ -1022,25 +1119,31 @@ export default function EditHostelScreen() {
         {existingImages.length + newImages.length < 10 && (
           <TouchableOpacity style={styles.addImageBtn} onPress={pickImage}>
             <Camera size={32} color={COLORS.textMuted} />
-            <Text style={styles.addImageText}>Add photo</Text>
+            <AppText style={styles.addImageText}>
+              {t("manager.edit_hostel.step4.add_photo")}
+            </AppText>
           </TouchableOpacity>
         )}
       </View>
 
-      <Text style={styles.imageHint}>
-        Total: {existingImages.length + newImages.length}/10 images
-      </Text>
+      <AppText style={styles.imageHint}>
+        {t("manager.edit_hostel.step4.image_count", {
+          count: existingImages.length + newImages.length,
+        })}
+      </AppText>
     </>
   );
 
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+    <SafeAreaView style={styles.container} edges={["top", "bottom"]}>
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={handleBack} style={styles.backButton}>
           <ArrowLeft size={24} color={COLORS.textPrimary} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Edit hostel</Text>
+        <AppText style={styles.headerTitle}>
+          {t("manager.edit_hostel.header_title")}
+        </AppText>
         <View style={{ width: 40 }} />
       </View>
 
@@ -1061,14 +1164,14 @@ export default function EditHostelScreen() {
                 {isComplete ? (
                   <Check size={14} color={COLORS.textInverse} />
                 ) : (
-                  <Text
+                  <AppText
                     style={[
                       styles.progressText,
                       (isActive || isComplete) && styles.progressTextActive,
                     ]}
                   >
                     {s}
-                  </Text>
+                  </AppText>
                 )}
               </View>
               {s < 4 && <View style={styles.progressSpacer} />}
@@ -1088,7 +1191,7 @@ export default function EditHostelScreen() {
       {/* Content */}
       <KeyboardAvoidingView
         style={styles.keyboardView}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
         <Animated.View
           style={[
@@ -1124,7 +1227,11 @@ export default function EditHostelScreen() {
       {/* Bottom actions */}
       <View style={styles.bottomBar}>
         <Button
-          title={step < 4 ? 'Next' : 'Save changes'}
+          title={
+            step < 4
+              ? t("manager.edit_hostel.button_next")
+              : t("manager.edit_hostel.button_save")
+          }
           onPress={step < 4 ? handleNext : handleSubmit}
           loading={step === 4 && saving}
           style={styles.nextButton}
@@ -1153,9 +1260,9 @@ const styles = StyleSheet.create({
 
   // Header
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
@@ -1165,12 +1272,12 @@ const styles = StyleSheet.create({
   backButton: {
     width: 40,
     height: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   headerTitle: {
     fontSize: 18,
-    fontWeight: '700',
+    fontWeight: "700",
     color: COLORS.textPrimary,
   },
 
@@ -1178,13 +1285,13 @@ const styles = StyleSheet.create({
   progressContainer: {
     paddingHorizontal: 32,
     paddingVertical: 18,
-    position: 'relative',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    position: "relative",
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
   progressItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   progressStep: {
     width: 30,
@@ -1193,13 +1300,13 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: COLORS.border,
     backgroundColor: COLORS.bgSecondary,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     zIndex: 1,
   },
   progressStepActive: {
     borderColor: COLORS.primary,
-    backgroundColor: COLORS.primary + '15',
+    backgroundColor: COLORS.primary + "15",
   },
   progressStepComplete: {
     borderColor: COLORS.primary,
@@ -1207,7 +1314,7 @@ const styles = StyleSheet.create({
   },
   progressText: {
     fontSize: 13,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.textMuted,
   },
   progressTextActive: {
@@ -1217,22 +1324,22 @@ const styles = StyleSheet.create({
     width: 32,
   },
   progressLine: {
-    position: 'absolute',
+    position: "absolute",
     left: 48,
     right: 48,
-    top: '50%',
+    top: "50%",
     height: 2,
     backgroundColor: COLORS.border,
   },
   progressLineFill: {
-    height: '100%',
+    height: "100%",
     backgroundColor: COLORS.primary,
   },
 
   // Step titles
   stepTitle: {
     fontSize: 22,
-    fontWeight: '700',
+    fontWeight: "700",
     color: COLORS.textPrimary,
     marginTop: 8,
     marginBottom: 6,
@@ -1246,14 +1353,14 @@ const styles = StyleSheet.create({
   // Labels / Inputs
   label: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.textPrimary,
     marginTop: 16,
     marginBottom: 6,
   },
   inputLabel: {
     fontSize: 13,
-    fontWeight: '500',
+    fontWeight: "500",
     color: COLORS.textSecondary,
     marginBottom: 6,
     marginTop: 10,
@@ -1276,13 +1383,13 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: COLORS.border,
     minHeight: 100,
-    textAlignVertical: 'top',
+    textAlignVertical: "top",
     marginBottom: 16,
   },
 
   // Segmented controls
   segmentRow: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 10,
     marginBottom: 12,
   },
@@ -1293,15 +1400,15 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: COLORS.border,
     backgroundColor: COLORS.bgSecondary,
-    alignItems: 'center',
+    alignItems: "center",
   },
   segmentOptionActive: {
     borderColor: COLORS.primary,
-    backgroundColor: COLORS.primary + '10',
+    backgroundColor: COLORS.primary + "10",
   },
   segmentText: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.textMuted,
   },
   segmentTextActive: {
@@ -1310,8 +1417,8 @@ const styles = StyleSheet.create({
 
   // Dynamic rows
   inputRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 10,
     marginBottom: 8,
   },
@@ -1329,26 +1436,26 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 12,
-    backgroundColor: COLORS.error + '16',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: COLORS.error + "16",
+    alignItems: "center",
+    justifyContent: "center",
   },
   addBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     gap: 8,
     paddingVertical: 12,
     marginTop: 4,
     marginBottom: 14,
     borderRadius: 999,
     borderWidth: 1,
-    borderColor: COLORS.primary + '40',
-    backgroundColor: COLORS.primary + '10',
+    borderColor: COLORS.primary + "40",
+    backgroundColor: COLORS.primary + "10",
   },
   addBtnText: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.primary,
   },
 
@@ -1357,20 +1464,20 @@ const styles = StyleSheet.create({
     marginBottom: 14,
   },
   roomTypeHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 10,
   },
   roomTypeTitle: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.textPrimary,
-    textTransform: 'capitalize',
+    textTransform: "capitalize",
   },
   typeRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: "row",
+    flexWrap: "wrap",
     gap: 8,
     marginBottom: 10,
   },
@@ -1384,14 +1491,14 @@ const styles = StyleSheet.create({
   },
   typeChipActive: {
     borderColor: COLORS.primary,
-    backgroundColor: COLORS.primary + '16',
+    backgroundColor: COLORS.primary + "16",
   },
   typeChipDisabled: {
     opacity: 0.4,
   },
   typeChipText: {
     fontSize: 12,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.textSecondary,
   },
   typeChipTextActive: {
@@ -1402,7 +1509,7 @@ const styles = StyleSheet.create({
   },
 
   row: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 10,
   },
   halfInput: {
@@ -1415,13 +1522,13 @@ const styles = StyleSheet.create({
     marginBottom: 14,
   },
   facilityRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
   facilityInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 10,
   },
   facilityText: {
@@ -1436,8 +1543,8 @@ const styles = StyleSheet.create({
 
   // Images
   imagesGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: "row",
+    flexWrap: "wrap",
     gap: 10,
     marginBottom: 12,
   },
@@ -1445,23 +1552,23 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 16,
-    overflow: 'hidden',
+    overflow: "hidden",
     backgroundColor: COLORS.bgSecondary,
   },
   uploadedImage: {
-    width: '100%',
-    height: '100%',
+    width: "100%",
+    height: "100%",
   },
   removeImageBtn: {
-    position: 'absolute',
+    position: "absolute",
     top: 6,
     right: 6,
     width: 24,
     height: 24,
     borderRadius: 12,
     backgroundColor: COLORS.error,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   addImageBtn: {
     width: 100,
@@ -1469,10 +1576,10 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     borderWidth: 2,
     borderColor: COLORS.border,
-    borderStyle: 'dashed',
+    borderStyle: "dashed",
     backgroundColor: COLORS.bgSecondary,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     gap: 6,
   },
   addImageText: {

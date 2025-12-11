@@ -4,24 +4,28 @@ import { COLORS, OPACITY } from '@/constants/colors';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { Building2, MapPin, Plus, Star, Users } from 'lucide-react-native';
 import React, { useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   FlatList,
   Image,
   Pressable,
   RefreshControl,
   StyleSheet,
-  Text,
   View,
-} from 'react-native';
+} from "react-native";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
 import { hostelsApi } from '@/api/hostels';
-import { Badge, Button, EmptyState, LoadingScreen } from '@/components/ui';
+import AppText from "@/components/common/AppText";
+import { Badge, Button, EmptyState, LoadingScreen } from "@/components/ui";
 import { Hostel } from '@/types';
+
 
 export default function HostelsScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
+
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [hostels, setHostels] = useState<Hostel[]>([]);
@@ -35,8 +39,10 @@ export default function HostelsScreen() {
     } catch (error: any) {
       Toast.show({
         type: 'error',
-        text1: 'Error',
-        text2: error?.response?.data?.message || 'Failed to fetch hostels',
+        text1: t('common.error'),
+        text2:
+          error?.response?.data?.message ||
+          t('manager.hostels.fetch_failed'),
       });
     } finally {
       setLoading(false);
@@ -78,11 +84,15 @@ export default function HostelsScreen() {
         {/* Content */}
         <View style={styles.hostelContent}>
           <View style={styles.hostelHeader}>
-            <Text style={styles.hostelName} numberOfLines={1}>
+            <AppText style={styles.hostelName} numberOfLines={1}>
               {item.hostelName}
-            </Text>
+            </AppText>
             <Badge
-              label={item.isActive ? 'ACTIVE' : 'INACTIVE'}
+              label={t(
+                item.isActive
+                  ? 'manager.hostels.status.active'
+                  : 'manager.hostels.status.inactive'
+              )}
               variant={item.isActive ? 'success' : 'error'}
               size="sm"
             />
@@ -90,27 +100,31 @@ export default function HostelsScreen() {
 
           <View style={styles.locationRow}>
             <MapPin size={14} color={COLORS.textMuted} strokeWidth={1.5} />
-            <Text style={styles.locationText} numberOfLines={1}>
+            <AppText style={styles.locationText} numberOfLines={1}>
               {item.city}, {item.address}
-            </Text>
+            </AppText>
           </View>
 
           <View style={styles.hostelFooter}>
             <View style={styles.footerItem}>
               <Users size={14} color={COLORS.textSecondary} strokeWidth={1.5} />
-              <Text style={styles.footerText}>{item.hostelFor}</Text>
+              <AppText style={styles.footerText}>{item.hostelFor}</AppText>
             </View>
 
             {item.rating > 0 && (
               <View style={styles.footerItem}>
                 <Star size={14} color={COLORS.warning} fill={COLORS.warning} />
-                <Text style={styles.footerText}>{item.rating.toFixed(1)}</Text>
+                <AppText style={styles.footerText}>{item.rating.toFixed(1)}</AppText>
               </View>
             )}
 
-            <Text style={styles.priceText}>
-              Rs. {minPrice.toLocaleString()}<Text style={styles.priceUnit}>/mo</Text>
-            </Text>
+            <AppText style={styles.priceText}>
+              {t('manager.hostels.price_prefix')}{' '}
+              {minPrice.toLocaleString()}
+              <AppText style={styles.priceUnit}>
+                {t('manager.hostels.price_suffix')}
+              </AppText>
+            </AppText>
           </View>
         </View>
       </Pressable>
@@ -121,15 +135,19 @@ export default function HostelsScreen() {
     return <LoadingScreen />;
   }
 
+  const count = hostels.length;
+
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       {/* Header */}
       <View style={styles.header}>
         <View>
-          <Text style={styles.title}>My Hostels</Text>
-          <Text style={styles.subtitle}>
-            {hostels.length} hostel{hostels.length !== 1 ? 's' : ''} registered
-          </Text>
+          <AppText style={styles.title}>
+            {t('manager.hostels.title')}
+          </AppText>
+          <AppText style={styles.subtitle}>
+            {t('manager.hostels.subtitle', { count })}
+          </AppText>
         </View>
         <Pressable
           style={({ pressed }) => [
@@ -159,14 +177,26 @@ export default function HostelsScreen() {
         }
         ListEmptyComponent={
           <EmptyState
-            icon={<Building2 size={48} color={COLORS.textMuted} strokeWidth={1.5} />}
-            title="No hostels yet"
-            description="Add your first hostel to start receiving bookings from students."
+            icon={
+              <Building2
+                size={48}
+                color={COLORS.textMuted}
+                strokeWidth={1.5}
+              />
+            }
+            title={t('manager.hostels.empty_title')}
+            description={t('manager.hostels.empty_description')}
             action={
               <Button
-                title="Add Hostel"
+                title={t('manager.hostels.empty_action')}
                 onPress={() => router.push('/(app)/manager/hostel/create')}
-                icon={<Plus size={18} color={COLORS.textInverse} strokeWidth={2} />}
+                icon={
+                  <Plus
+                    size={18}
+                    color={COLORS.textInverse}
+                    strokeWidth={2}
+                  />
+                }
                 size="md"
               />
             }

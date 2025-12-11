@@ -1,26 +1,30 @@
 // screens/ReportsScreen.tsx
 
-import { COLORS, OPACITY } from '@/constants/colors';
-import { useRouter } from 'expo-router';
-import { AlertTriangle, ArrowLeft, FileText } from 'lucide-react-native';
-import React, { useEffect, useState } from 'react';
+import { COLORS, OPACITY } from "@/constants/colors";
+import { useRouter } from "expo-router";
+import { AlertTriangle, ArrowLeft, FileText } from "lucide-react-native";
+import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   FlatList,
   Pressable,
   RefreshControl,
   StyleSheet,
-  Text,
   View,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import Toast from 'react-native-toast-message';
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import Toast from "react-native-toast-message";
 
-import { reportsApi } from '@/api/reports';
-import { Badge, EmptyState, LoadingScreen } from '@/components/ui';
-import { Report } from '@/types';
+import { reportsApi } from "@/api/reports";
+import AppText from "@/components/common/AppText";
+import { Badge, EmptyState, LoadingScreen } from "@/components/ui";
+import { Report } from "@/types";
+
 
 export default function ReportsScreen() {
+  const { t } = useTranslation();
   const router = useRouter();
+
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [reports, setReports] = useState<Report[]>([]);
@@ -32,10 +36,12 @@ export default function ReportsScreen() {
         setReports(response.data);
       }
     } catch (error: any) {
+      // FIXED: Added "student." prefix
       Toast.show({
-        type: 'error',
-        text1: 'Error',
-        text2: error?.response?.data?.message || 'Failed to fetch reports',
+        type: "error",
+        text1: t("student.reports.toast_error_title"),
+        text2:
+          error?.response?.data?.message || t("student.reports.toast_error_message"),
       });
     } finally {
       setLoading(false);
@@ -53,25 +59,25 @@ export default function ReportsScreen() {
   };
 
   const getStatusVariant = (status: string) => {
-    return status === 'RESOLVED' ? 'success' : 'warning';
+    return status === "RESOLVED" ? "success" : "warning";
   };
 
   const getDecisionVariant = (decision?: string) => {
     switch (decision) {
-      case 'STUDENT_FAULT':
-        return 'error';
-      case 'MANAGER_FAULT':
-        return 'success';
+      case "STUDENT_FAULT":
+        return "error";
+      case "MANAGER_FAULT":
+        return "success";
       default:
-        return 'default';
+        return "default";
     }
   };
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString([], {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
+      month: "short",
+      day: "numeric",
+      year: "numeric",
     });
   };
 
@@ -82,55 +88,54 @@ export default function ReportsScreen() {
         <View style={styles.reportIcon}>
           <AlertTriangle size={18} color={COLORS.warning} strokeWidth={1.5} />
         </View>
-        
+
         <View style={styles.reportInfo}>
-          <Text style={styles.hostelName} numberOfLines={1}>
-            {item.booking?.hostel?.hostelName || 'Hostel'}
-          </Text>
-          <Text style={styles.reportDate}>
-            {formatDate(item.createdAt)}
-          </Text>
+          <AppText style={styles.hostelName} numberOfLines={1}>
+            {/* FIXED: Added "student." prefix */}
+            {item.booking?.hostel?.hostelName || t("student.reports.hostel_fallback")}
+          </AppText>
+          <AppText style={styles.reportDate}>{formatDate(item.createdAt)}</AppText>
         </View>
-        
+
+        {/* FIXED: Added "student." prefix */}
         <Badge
-          label={item.status}
+          label={t(`student.reports.status.${item.status.toLowerCase()}`)}
           variant={getStatusVariant(item.status)}
           size="sm"
         />
       </View>
 
       {/* Description */}
-      <Text style={styles.description}>{item.description}</Text>
+      <AppText style={styles.description}>{item.description}</AppText>
 
-      {/* Resolution */}
-      {item.status === 'RESOLVED' && (
+      {/* Resolution Box */}
+      {item.status === "RESOLVED" && (
         <View style={styles.resolutionBox}>
           {item.decision && (
             <View style={styles.decisionRow}>
-              <Text style={styles.decisionLabel}>Decision</Text>
+              {/* FIXED: Added "student." prefix */}
+              <AppText style={styles.decisionLabel}>
+                {t("student.reports.decision_label")}
+              </AppText>
               <Badge
-                label={item.decision.replace('_', ' ')}
+                label={item.decision.replace("_", " ")}
                 variant={getDecisionVariant(item.decision)}
                 size="sm"
               />
             </View>
           )}
           {item.finalResolution && (
-            <Text style={styles.resolutionText}>
-              {item.finalResolution}
-            </Text>
+            <AppText style={styles.resolutionText}>{item.finalResolution}</AppText>
           )}
         </View>
       )}
     </View>
   );
 
-  if (loading) {
-    return <LoadingScreen />;
-  }
+  if (loading) return <LoadingScreen />;
 
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+    <SafeAreaView style={styles.container} edges={["top", "bottom"]}>
       {/* Header */}
       <View style={styles.header}>
         <Pressable
@@ -142,9 +147,10 @@ export default function ReportsScreen() {
         >
           <ArrowLeft size={22} color={COLORS.textPrimary} strokeWidth={1.5} />
         </Pressable>
-        
-        <Text style={styles.headerTitle}>My Reports</Text>
-        
+
+        {/* FIXED: Added "student." prefix */}
+        <AppText style={styles.headerTitle}>{t("student.reports.header_title")}</AppText>
+
         <View style={styles.headerSpacer} />
       </View>
 
@@ -165,9 +171,12 @@ export default function ReportsScreen() {
         }
         ListEmptyComponent={
           <EmptyState
-            icon={<FileText size={48} color={COLORS.textMuted} strokeWidth={1.5} />}
-            title="No reports yet"
-            description="Your complaint reports will appear here when you submit them."
+            icon={
+              <FileText size={48} color={COLORS.textMuted} strokeWidth={1.5} />
+            }
+            // FIXED: Added "student." prefix
+            title={t("student.reports.empty_title")}
+            description={t("student.reports.empty_description")}
           />
         }
         ItemSeparatorComponent={() => <View style={styles.separator} />}
@@ -181,12 +190,12 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.bgPrimary,
   },
-  
+
   // Header
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: 16,
     paddingVertical: 12,
     backgroundColor: COLORS.bgPrimary,
@@ -198,21 +207,21 @@ const styles = StyleSheet.create({
     height: 44,
     borderRadius: 14,
     backgroundColor: COLORS.bgCard,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     borderWidth: 1,
     borderColor: COLORS.borderLight,
   },
   headerTitle: {
     fontSize: 17,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.textPrimary,
     letterSpacing: -0.2,
   },
   headerSpacer: {
     width: 44,
   },
-  
+
   // List
   list: {
     padding: 20,
@@ -221,7 +230,7 @@ const styles = StyleSheet.create({
   separator: {
     height: 12,
   },
-  
+
   // Report Card
   reportCard: {
     backgroundColor: COLORS.bgCard,
@@ -231,8 +240,8 @@ const styles = StyleSheet.create({
     borderColor: COLORS.borderLight,
   },
   reportHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 14,
   },
   reportIcon: {
@@ -240,8 +249,8 @@ const styles = StyleSheet.create({
     height: 42,
     borderRadius: 12,
     backgroundColor: COLORS.warningLight,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     marginRight: 12,
   },
   reportInfo: {
@@ -250,7 +259,7 @@ const styles = StyleSheet.create({
   },
   hostelName: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.textPrimary,
     marginBottom: 2,
     letterSpacing: -0.2,
@@ -264,7 +273,7 @@ const styles = StyleSheet.create({
     color: COLORS.textSecondary,
     lineHeight: 22,
   },
-  
+
   // Resolution Box
   resolutionBox: {
     marginTop: 14,
@@ -273,14 +282,14 @@ const styles = StyleSheet.create({
     padding: 14,
   },
   decisionRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     marginBottom: 10,
   },
   decisionLabel: {
     fontSize: 13,
-    fontWeight: '500',
+    fontWeight: "500",
     color: COLORS.textMuted,
   },
   resolutionText: {

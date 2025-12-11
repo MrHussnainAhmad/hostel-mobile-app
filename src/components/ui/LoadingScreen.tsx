@@ -1,8 +1,9 @@
 // components/LoadingScreen.tsx
 
+import AppText from '@/components/common/AppText';
 import { COLORS } from '@/constants/colors';
 import React from 'react';
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
 
 interface LoadingScreenProps {
   message?: string;
@@ -18,7 +19,7 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({
       <View style={styles.overlay}>
         <View style={styles.overlayContent}>
           <ActivityIndicator size="large" color={COLORS.primary} />
-          {message && <Text style={styles.overlayMessage}>{message}</Text>}
+          {message && <AppText style={styles.overlayMessage}>{message}</AppText>}
         </View>
       </View>
     );
@@ -33,7 +34,7 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({
       
       {/* Message */}
       {message && (
-        <Text style={styles.message}>{message}</Text>
+        <AppText style={styles.message}>{message}</AppText>
       )}
     </View>
   );
@@ -55,7 +56,6 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.bgCard,
     justifyContent: 'center',
     alignItems: 'center',
-    // Subtle shadow
     shadowColor: COLORS.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.06,
@@ -72,7 +72,6 @@ const styles = StyleSheet.create({
     letterSpacing: 0.1,
   },
   
-  // Overlay variant
   overlay: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: COLORS.overlay,
@@ -87,7 +86,6 @@ const styles = StyleSheet.create({
     paddingVertical: 28,
     borderRadius: 20,
     alignItems: 'center',
-    // Subtle shadow
     shadowColor: COLORS.black,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.15,

@@ -4,20 +4,22 @@ import { COLORS, OPACITY } from '@/constants/colors';
 import { useRouter } from 'expo-router';
 import { ChevronRight, MessageCircle } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   FlatList,
   Pressable,
   RefreshControl,
   StyleSheet,
-  Text,
   View,
-} from 'react-native';
+} from "react-native";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
 import { chatApi } from '@/api/chat';
+import AppText from "@/components/common/AppText";
 import { EmptyState, LoadingScreen } from '@/components/ui';
 import { Conversation } from '@/types';
+
 
 // Avatar colors
 const AVATAR_COLORS = [
@@ -31,6 +33,8 @@ const AVATAR_COLORS = [
 
 export default function ManagerChatScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
+
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [conversations, setConversations] = useState<Conversation[]>([]);
@@ -44,8 +48,10 @@ export default function ManagerChatScreen() {
     } catch (error: any) {
       Toast.show({
         type: 'error',
-        text1: 'Error',
-        text2: error?.response?.data?.message || 'Failed to fetch conversations',
+        text1: t('common.error'),
+        text2:
+          error?.response?.data?.message ||
+          t('manager.chat.fetch_failed'),
       });
     } finally {
       setLoading(false);
@@ -72,7 +78,7 @@ export default function ManagerChatScreen() {
     if (days === 0) {
       return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     } else if (days === 1) {
-      return 'Yesterday';
+      return t('manager.chat.yesterday');
     } else if (days < 7) {
       return date.toLocaleDateString([], { weekday: 'short' });
     } else {
@@ -86,7 +92,11 @@ export default function ManagerChatScreen() {
   };
 
   const renderConversation = ({ item }: { item: Conversation }) => {
-    const studentName = item.student?.fullName || item.student?.user?.email || 'Student';
+    const studentName =
+      item.student?.fullName ||
+      item.student?.user?.email ||
+      t('manager.chat.student_fallback_name');
+
     const initial = studentName.charAt(0).toUpperCase();
     const avatarColor = getAvatarColor(studentName);
 
@@ -100,25 +110,25 @@ export default function ManagerChatScreen() {
       >
         {/* Avatar */}
         <View style={[styles.avatar, { backgroundColor: avatarColor }]}>
-          <Text style={styles.avatarText}>{initial}</Text>
+          <AppText style={styles.avatarText}>{initial}</AppText>
         </View>
 
         {/* Content */}
         <View style={styles.conversationContent}>
           <View style={styles.conversationHeader}>
-            <Text style={styles.conversationName} numberOfLines={1}>
+            <AppText style={styles.conversationName} numberOfLines={1}>
               {studentName}
-            </Text>
+            </AppText>
             {item.lastMessageAt && (
-              <Text style={styles.conversationTime}>
+              <AppText style={styles.conversationTime}>
                 {formatTime(item.lastMessageAt)}
-              </Text>
+              </AppText>
             )}
           </View>
 
-          <Text style={styles.lastMessage} numberOfLines={1}>
-            {item.lastMessage || 'No messages yet'}
-          </Text>
+          <AppText style={styles.lastMessage} numberOfLines={1}>
+            {item.lastMessage || t('manager.chat.last_message_fallback')}
+          </AppText>
         </View>
 
         {/* Arrow */}
@@ -131,14 +141,20 @@ export default function ManagerChatScreen() {
     return <LoadingScreen />;
   }
 
+  const count = conversations.length;
+  const conversationLabel =
+    count === 1
+      ? t('manager.chat.conversation_singular')
+      : t('manager.chat.conversation_plural');
+
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.title}>Messages</Text>
-        <Text style={styles.subtitle}>
-          {conversations.length} conversation{conversations.length !== 1 ? 's' : ''}
-        </Text>
+        <AppText style={styles.title}>{t('manager.chat.title')}</AppText>
+        <AppText style={styles.subtitle}>
+          {count} {conversationLabel}
+        </AppText>
       </View>
 
       {/* List */}
@@ -158,9 +174,15 @@ export default function ManagerChatScreen() {
         }
         ListEmptyComponent={
           <EmptyState
-            icon={<MessageCircle size={48} color={COLORS.textMuted} strokeWidth={1.5} />}
-            title="No messages"
-            description="When students message you, they'll appear here."
+            icon={
+              <MessageCircle
+                size={48}
+                color={COLORS.textMuted}
+                strokeWidth={1.5}
+              />
+            }
+            title={t('manager.chat.empty_title')}
+            description={t('manager.chat.empty_description')}
           />
         }
         ItemSeparatorComponent={() => <View style={styles.separator} />}

@@ -1,27 +1,29 @@
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from "expo-router";
 import {
   ArrowLeft,
   Mail,
   MessageCircle,
   Phone,
   Users,
-} from 'lucide-react-native';
-import React, { useEffect, useState } from 'react';
+} from "lucide-react-native";
+import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Animated,
   FlatList,
   RefreshControl,
   StyleSheet,
-  Text,
   TouchableOpacity,
   View,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import Toast from 'react-native-toast-message';
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import Toast from "react-native-toast-message";
 
-import { hostelsApi } from '@/api/hostels';
-import { Badge, Card, EmptyState, LoadingScreen } from '@/components/ui';
-import { COLORS } from '@/constants/colors';
+import { hostelsApi } from "@/api/hostels";
+import AppText from "@/components/common/AppText";
+import { Badge, Card, EmptyState, LoadingScreen } from "@/components/ui";
+import { COLORS } from "@/constants/colors";
+
 
 interface Student {
   id: string;
@@ -38,6 +40,7 @@ interface Student {
 }
 
 export default function HostelStudentsScreen() {
+  const { t } = useTranslation();
   const { hostelId } = useLocalSearchParams<{ hostelId: string }>();
   const router = useRouter();
 
@@ -63,9 +66,11 @@ export default function HostelStudentsScreen() {
       }
     } catch (error: any) {
       Toast.show({
-        type: 'error',
-        text1: 'Error',
-        text2: error?.response?.data?.message || 'Failed to fetch students',
+        type: "error",
+        text1: t("manager.students.fetch_error_title"),
+        text2:
+          error?.response?.data?.message ||
+          t("manager.students.fetch_error_message"),
       });
     } finally {
       setLoading(false);
@@ -86,47 +91,63 @@ export default function HostelStudentsScreen() {
 
   const formatDate = (dateString: string) =>
     new Date(dateString).toLocaleDateString([], {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
+      month: "short",
+      day: "numeric",
+      year: "numeric",
     });
+
+  const getStudentCountText = () => {
+    if (students.length === 1) {
+      return t("manager.students.count_singular", { count: students.length });
+    }
+    return t("manager.students.count_plural", { count: students.length });
+  };
 
   const renderStudent = ({ item }: { item: Student }) => (
     <Animated.View style={{ opacity: fadeAnim }}>
       <Card style={styles.studentCard}>
         <View style={styles.studentHeader}>
           <View style={styles.avatar}>
-            <Text style={styles.avatarText}>{item.fullName?.charAt(0) || 'S'}</Text>
+            <AppText style={styles.avatarText}>
+              {item.fullName?.charAt(0) || "S"}
+            </AppText>
           </View>
 
           <View style={styles.studentInfo}>
-            <Text style={styles.studentName}>{item.fullName}</Text>
-            <Badge label={item.booking.roomType.replace('_', ' ')} variant="info" />
+            <AppText style={styles.studentName}>{item.fullName}</AppText>
+            <Badge
+              label={item.booking.roomType.replace("_", " ")}
+              variant="info"
+            />
           </View>
         </View>
 
         <View style={styles.detailsGrid}>
           <View style={styles.detailItem}>
             <Mail size={16} color={COLORS.textMuted} />
-            <Text style={styles.detailText}>{item.user.email}</Text>
+            <AppText style={styles.detailText}>{item.user.email}</AppText>
           </View>
 
           {item.phoneNumber && (
             <View style={styles.detailItem}>
               <Phone size={16} color={COLORS.textMuted} />
-              <Text style={styles.detailText}>{item.phoneNumber}</Text>
+              <AppText style={styles.detailText}>{item.phoneNumber}</AppText>
             </View>
           )}
 
           {item.whatsappNumber && (
             <View style={styles.detailItem}>
               <MessageCircle size={16} color={COLORS.textMuted} />
-              <Text style={styles.detailText}>{item.whatsappNumber}</Text>
+              <AppText style={styles.detailText}>{item.whatsappNumber}</AppText>
             </View>
           )}
         </View>
 
-        <Text style={styles.joinedDate}>Joined: {formatDate(item.booking.createdAt)}</Text>
+        <AppText style={styles.joinedDate}>
+          {t("manager.students.joined_date", {
+            date: formatDate(item.booking.createdAt),
+          })}
+        </AppText>
       </Card>
     </Animated.View>
   );
@@ -134,21 +155,22 @@ export default function HostelStudentsScreen() {
   if (loading) return <LoadingScreen />;
 
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+    <SafeAreaView style={styles.container} edges={["top", "bottom"]}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+        <TouchableOpacity
+          onPress={() => router.back()}
+          style={styles.backButton}
+        >
           <ArrowLeft size={24} color={COLORS.textPrimary} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Hostel students</Text>
+        <AppText style={styles.headerTitle}>{t("manager.students.title")}</AppText>
         <View style={{ width: 40 }} />
       </View>
 
       {/* Count */}
       <View style={styles.countContainer}>
-        <Text style={styles.countText}>
-          {students.length} student{students.length !== 1 ? 's' : ''} currently staying
-        </Text>
+        <AppText style={styles.countText}>{getStudentCountText()}</AppText>
       </View>
 
       {/* List */}
@@ -160,13 +182,17 @@ export default function HostelStudentsScreen() {
           contentContainerStyle={styles.list}
           showsVerticalScrollIndicator={false}
           refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLORS.primary} />
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              tintColor={COLORS.primary}
+            />
           }
           ListEmptyComponent={
             <EmptyState
               icon={<Users size={64} color={COLORS.textMuted} />}
-              title="No students"
-              description="No students are currently staying at this hostel."
+              title={t("manager.students.empty_title")}
+              description={t("manager.students.empty_description")}
             />
           }
         />
@@ -182,9 +208,9 @@ const styles = StyleSheet.create({
   },
 
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: 18,
     paddingVertical: 14,
     borderBottomWidth: 1,
@@ -196,14 +222,14 @@ const styles = StyleSheet.create({
     width: 42,
     height: 42,
     borderRadius: 21,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     backgroundColor: COLORS.bgSecondary,
   },
 
   headerTitle: {
     fontSize: 19,
-    fontWeight: '700',
+    fontWeight: "700",
     color: COLORS.textPrimary,
   },
 
@@ -233,8 +259,8 @@ const styles = StyleSheet.create({
   },
 
   studentHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 14,
     marginBottom: 14,
   },
@@ -244,9 +270,9 @@ const styles = StyleSheet.create({
     height: 52,
     borderRadius: 26,
     backgroundColor: COLORS.primary,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
     shadowOpacity: 0.15,
     shadowRadius: 4,
     elevation: 3,
@@ -254,19 +280,19 @@ const styles = StyleSheet.create({
 
   avatarText: {
     fontSize: 20,
-    fontWeight: '700',
+    fontWeight: "700",
     color: COLORS.textInverse,
-    textTransform: 'uppercase',
+    textTransform: "uppercase",
   },
 
   studentInfo: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: "center",
   },
 
   studentName: {
     fontSize: 17,
-    fontWeight: '700',
+    fontWeight: "700",
     color: COLORS.textPrimary,
     marginBottom: 4,
   },
@@ -277,8 +303,8 @@ const styles = StyleSheet.create({
   },
 
   detailItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 10,
   },
 

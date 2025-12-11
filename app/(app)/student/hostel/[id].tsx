@@ -1,7 +1,7 @@
 // app/(app)/student/hostel/[id].tsx
 
-import { COLORS, OPACITY } from '@/constants/colors';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { COLORS, OPACITY } from "@/constants/colors";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import {
   ArrowLeft,
   Building2,
@@ -17,28 +17,31 @@ import {
   Users,
   Wifi,
   Zap,
-} from 'lucide-react-native';
-import React, { useEffect, useState } from 'react';
+} from "lucide-react-native";
+import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Dimensions,
   Image,
   Pressable,
   ScrollView,
   StyleSheet,
-  Text,
   View,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import Toast from 'react-native-toast-message';
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import Toast from "react-native-toast-message";
 
-import { chatApi } from '@/api/chat';
-import { hostelsApi } from '@/api/hostels';
-import { LoadingScreen } from '@/components/ui';
-import { Hostel } from '@/types';
+import { chatApi } from "@/api/chat";
+import { hostelsApi } from "@/api/hostels";
+import AppText from "@/components/common/AppText";
+import { LoadingScreen } from "@/components/ui";
+import { Hostel } from "@/types";
 
-const { width } = Dimensions.get('window');
+
+const { width } = Dimensions.get("window");
 
 export default function HostelDetailScreen() {
+  const { t } = useTranslation();
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const [loading, setLoading] = useState(true);
@@ -54,14 +57,14 @@ export default function HostelDetailScreen() {
   const fetchHostel = async () => {
     try {
       const response = await hostelsApi.getById(id);
-      if (response.success) {
-        setHostel(response.data);
-      }
+      if (response.success) setHostel(response.data);
     } catch (error: any) {
       Toast.show({
-        type: 'error',
-        text1: 'Error',
-        text2: error?.response?.data?.message || 'Failed to fetch hostel',
+        type: "error",
+        text1: t("student.hostel.error_title"),
+        text2:
+          error?.response?.data?.message ||
+          t("student.hostel.error_fetch_hostel"),
       });
       handleGoBack();
     } finally {
@@ -70,64 +73,66 @@ export default function HostelDetailScreen() {
   };
 
   const handleGoBack = () => {
-    if (router.canGoBack()) {
-      router.back();
-    } else {
-      router.replace('/(app)/student/search');
-    }
+    if (router.canGoBack()) router.back();
+    else router.replace("/(app)/student/search");
   };
 
   const handleStartChat = async () => {
     if (!hostel?.manager?.id) {
-      Toast.show({ type: 'error', text1: 'Error', text2: 'Manager not available for chat' });
+      Toast.show({
+        type: "error",
+        text1: t("student.hostel.error_title"),
+        text2: t("student.hostel.error_manager_unavailable"),
+      });
       return;
     }
 
     try {
       setStartingChat(true);
       const response = await chatApi.startConversation(hostel.manager.id);
-      if (response.success) {
+      if (response.success)
         router.push(`/(app)/student/conversation/${response.data.id}`);
-      }
     } catch (error: any) {
       Toast.show({
-        type: 'error',
-        text1: 'Error',
-        text2: error?.response?.data?.message || 'Failed to start chat',
+        type: "error",
+        text1: t("student.hostel.error_title"),
+        text2:
+          error?.response?.data?.message ||
+          t("student.hostel.error_start_chat"),
       });
     } finally {
       setStartingChat(false);
     }
   };
 
-  if (loading) {
-    return <LoadingScreen />;
-  }
-
-  if (!hostel) {
-    return null;
-  }
+  if (loading) return <LoadingScreen />;
+  if (!hostel) return null;
 
   const facilities = hostel.facilities;
-  const minPrice = Math.min(...(hostel.roomTypes?.map((rt) => rt.price) || [0]));
-  const totalRooms = hostel.roomTypes?.reduce((acc, rt) => acc + rt.availableRooms, 0) || 0;
+  const minPrice = Math.min(
+    ...(hostel.roomTypes?.map((rt) => rt.price) || [0])
+  );
+  const totalRooms =
+    hostel.roomTypes?.reduce((acc, rt) => acc + rt.availableRooms, 0) || 0;
 
   return (
-    <SafeAreaView style={styles.container} edges={['bottom']}>
+    <SafeAreaView style={styles.container} edges={["bottom"]}>
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
         {/* Hero Image */}
         <View style={styles.heroSection}>
-          {hostel.roomImages && hostel.roomImages.length > 0 ? (
+          {hostel.roomImages?.length > 0 ? (
             <>
               <ScrollView
                 horizontal
                 pagingEnabled
                 showsHorizontalScrollIndicator={false}
                 onScroll={(e) => {
-                  const index = Math.round(e.nativeEvent.contentOffset.x / width);
+                  const index = Math.round(
+                    e.nativeEvent.contentOffset.x / width
+                  );
                   setActiveImageIndex(index);
                 }}
                 scrollEventThrottle={16}
@@ -143,9 +148,9 @@ export default function HostelDetailScreen() {
 
               {/* Image Counter */}
               <View style={styles.imageCounter}>
-                <Text style={styles.imageCounterText}>
+                <AppText style={styles.imageCounterText}>
                   {activeImageIndex + 1}/{hostel.roomImages.length}
-                </Text>
+                </AppText>
               </View>
 
               {/* Indicators */}
@@ -164,33 +169,53 @@ export default function HostelDetailScreen() {
           ) : (
             <View style={styles.heroPlaceholder}>
               <Building2 size={64} color={COLORS.textMuted} strokeWidth={1} />
-              <Text style={styles.placeholderText}>No images available</Text>
+              <AppText style={styles.placeholderText}>
+                {t("student.hostel.no_images")}
+              </AppText>
             </View>
           )}
 
           {/* Header Buttons */}
           <View style={styles.headerButtons}>
             <Pressable
-              style={({ pressed }) => [styles.headerBtn, pressed && { opacity: OPACITY.pressed }]}
+              style={({ pressed }) => [
+                styles.headerBtn,
+                pressed && { opacity: OPACITY.pressed },
+              ]}
               onPress={handleGoBack}
             >
-              <ArrowLeft size={22} color={COLORS.textInverse} strokeWidth={1.5} />
+              <ArrowLeft
+                size={22}
+                color={COLORS.textInverse}
+                strokeWidth={1.5}
+              />
             </Pressable>
 
             <View style={styles.headerRight}>
               <Pressable
-                style={({ pressed }) => [styles.headerBtn, pressed && { opacity: OPACITY.pressed }]}
+                style={({ pressed }) => [
+                  styles.headerBtn,
+                  pressed && { opacity: OPACITY.pressed },
+                ]}
               >
-                <Share2 size={20} color={COLORS.textInverse} strokeWidth={1.5} />
+                <Share2
+                  size={20}
+                  color={COLORS.textInverse}
+                  strokeWidth={1.5}
+                />
               </Pressable>
+
               <Pressable
-                style={({ pressed }) => [styles.headerBtn, pressed && { opacity: OPACITY.pressed }]}
+                style={({ pressed }) => [
+                  styles.headerBtn,
+                  pressed && { opacity: OPACITY.pressed },
+                ]}
                 onPress={() => setLiked(!liked)}
               >
                 <Heart
                   size={20}
                   color={liked ? COLORS.error : COLORS.textInverse}
-                  fill={liked ? COLORS.error : 'transparent'}
+                  fill={liked ? COLORS.error : "transparent"}
                   strokeWidth={1.5}
                 />
               </Pressable>
@@ -199,140 +224,229 @@ export default function HostelDetailScreen() {
 
           {/* Badge */}
           <View style={styles.heroBadge}>
-            <Text style={styles.heroBadgeText}>{hostel.hostelFor}</Text>
+            <AppText style={styles.heroBadgeText}>
+              {t("student.hostel.badge_for", { value: hostel.hostelFor })}
+            </AppText>
           </View>
         </View>
 
         {/* Main Content */}
         <View style={styles.mainContent}>
-          {/* Title Section */}
+          {/* Title */}
           <View style={styles.titleSection}>
             <View style={styles.titleRow}>
-              <Text style={styles.hostelName}>{hostel.hostelName}</Text>
+              <AppText style={styles.hostelName}>{hostel.hostelName}</AppText>
               {hostel.rating > 0 && (
                 <View style={styles.ratingBadge}>
-                  <Star size={14} color={COLORS.warning} fill={COLORS.warning} />
-                  <Text style={styles.ratingText}>{hostel.rating.toFixed(1)}</Text>
+                  <Star
+                    size={14}
+                    color={COLORS.warning}
+                    fill={COLORS.warning}
+                  />
+                  <AppText style={styles.ratingText}>
+                    {hostel.rating.toFixed(1)}
+                  </AppText>
                 </View>
               )}
             </View>
 
             <View style={styles.locationRow}>
               <MapPin size={16} color={COLORS.primary} strokeWidth={1.5} />
-              <Text style={styles.locationText}>
+              <AppText style={styles.locationText}>
                 {hostel.city}, {hostel.address}
-              </Text>
+              </AppText>
             </View>
 
             {hostel.reviewCount > 0 && (
-              <Text style={styles.reviewCount}>{hostel.reviewCount} reviews</Text>
+              <AppText style={styles.reviewCount}>
+                {t("student.hostel.reviews", { count: hostel.reviewCount })}
+              </AppText>
             )}
           </View>
 
           {/* Stats */}
           <View style={styles.statsRow}>
-            <StatCard value={`Rs. ${minPrice.toLocaleString()}`} label="Starting price" />
+            <StatCard
+              value={`Rs. ${minPrice.toLocaleString()}`}
+              label={t("student.hostel.starting_price")}
+            />
             <View style={styles.statDivider} />
-            <StatCard value={totalRooms.toString()} label="Available" />
+            <StatCard
+              value={totalRooms.toString()}
+              label={t("student.hostel.available")}
+            />
             <View style={styles.statDivider} />
-            <StatCard value={(hostel.roomTypes?.length || 0).toString()} label="Room types" />
+            <StatCard
+              value={(hostel.roomTypes?.length || 0).toString()}
+              label={t("student.hostel.room_types")}
+            />
           </View>
 
           {/* Action Buttons */}
           <View style={styles.actionButtons}>
             <ActionButton
-              icon={<MessageCircle size={22} color={COLORS.info} strokeWidth={1.5} />}
-              label="Chat"
+              icon={
+                <MessageCircle
+                  size={22}
+                  color={COLORS.info}
+                  strokeWidth={1.5}
+                />
+              }
+              label={t("student.hostel.chat")}
               color={COLORS.infoLight}
               onPress={handleStartChat}
               disabled={startingChat}
             />
             <ActionButton
-              icon={<Calendar size={22} color={COLORS.warning} strokeWidth={1.5} />}
-              label="Reserve"
+              icon={
+                <Calendar size={22} color={COLORS.warning} strokeWidth={1.5} />
+              }
+              label={t("student.hostel.reserve")}
               color={COLORS.warningLight}
               onPress={() => router.push(`/(app)/student/reserve/${id}`)}
             />
             <ActionButton
-              icon={<CreditCard size={22} color={COLORS.success} strokeWidth={1.5} />}
-              label="Book"
+              icon={
+                <CreditCard
+                  size={22}
+                  color={COLORS.success}
+                  strokeWidth={1.5}
+                />
+              }
+              label={t("student.hostel.book")}
               color={COLORS.successLight}
               onPress={() => router.push(`/(app)/student/book/${id}`)}
             />
           </View>
 
           {/* Room Types */}
-          <Section title="Available Rooms">
+          <Section title={t("student.hostel.available_rooms")}>
             {hostel.roomTypes?.map((roomType, index) => (
-              <View key={roomType.id ?? `room-${index}`} style={styles.roomCard}>
+              <View
+                key={roomType.id ?? `room-${index}`}
+                style={styles.roomCard}
+              >
                 <View style={styles.roomCardLeft}>
                   <View style={styles.roomIconBox}>
                     <Users size={20} color={COLORS.primary} strokeWidth={1.5} />
                   </View>
+
                   <View style={styles.roomInfo}>
-                    <Text style={styles.roomName}>{roomType.type.replace('_', ' ')}</Text>
-                    <Text style={styles.roomDetail}>
-                      {roomType.personsInRoom} {roomType.personsInRoom > 1 ? 'persons' : 'person'} per room
-                    </Text>
+                    <AppText style={styles.roomName}>
+                      {roomType.type.replace("_", " ")}
+                    </AppText>
+
+                    <AppText style={styles.roomDetail}>
+                      {roomType.personsInRoom}{" "}
+                      {roomType.personsInRoom > 1
+                        ? t("student.hostel.persons")
+                        : t("student.hostel.person")}{" "}
+                      {t("student.hostel.per_room")}
+                    </AppText>
+
                     <View style={styles.roomAvailability}>
                       <View
                         style={[
                           styles.availabilityDot,
-                          { backgroundColor: roomType.availableRooms > 0 ? COLORS.success : COLORS.error },
+                          {
+                            backgroundColor:
+                              roomType.availableRooms > 0
+                                ? COLORS.success
+                                : COLORS.error,
+                          },
                         ]}
                       />
-                      <Text style={styles.availabilityText}>
-                        {roomType.availableRooms > 0 ? `${roomType.availableRooms} available` : 'Not available'}
-                      </Text>
+                      <AppText style={styles.availabilityText}>
+                        {roomType.availableRooms > 0
+                          ? t("student.hostel.x_available", {
+                              count: roomType.availableRooms,
+                            })
+                          : t("student.hostel.not_available")}
+                      </AppText>
                     </View>
                   </View>
                 </View>
+
                 <View style={styles.roomCardRight}>
-                  <Text style={styles.roomPrice}>Rs. {roomType.price.toLocaleString()}</Text>
-                  <Text style={styles.roomPriceUnit}>/month</Text>
+                  <AppText style={styles.roomPrice}>
+                    Rs. {roomType.price.toLocaleString()}
+                  </AppText>
+                  <AppText style={styles.roomPriceUnit}>
+                    {t("student.hostel.per_month")}
+                  </AppText>
                 </View>
               </View>
             ))}
           </Section>
 
           {/* Facilities */}
-          <Section title="Facilities & Amenities">
+          <Section title={t("student.hostel.facilities")}>
             <View style={styles.facilitiesGrid}>
               {facilities?.hotColdWaterBath && (
-                <FacilityChip icon={<Droplets size={16} color={COLORS.info} strokeWidth={1.5} />} label="Hot/Cold water" />
+                <FacilityChip
+                  icon={
+                    <Droplets size={16} color={COLORS.info} strokeWidth={1.5} />
+                  }
+                  label={t("student.hostel.hot_cold_water")}
+                />
               )}
               {facilities?.drinkingWater && (
-                <FacilityChip icon={<Droplets size={16} color={COLORS.info} strokeWidth={1.5} />} label="Drinking water" />
+                <FacilityChip
+                  icon={
+                    <Droplets size={16} color={COLORS.info} strokeWidth={1.5} />
+                  }
+                  label={t("student.hostel.drinking_water")}
+                />
               )}
               {facilities?.electricityBackup && (
-                <FacilityChip icon={<Zap size={16} color={COLORS.warning} strokeWidth={1.5} />} label="Power backup" />
+                <FacilityChip
+                  icon={
+                    <Zap size={16} color={COLORS.warning} strokeWidth={1.5} />
+                  }
+                  label={t("student.hostel.power_backup")}
+                />
               )}
               {facilities?.wifiEnabled && (
-                <FacilityChip icon={<Wifi size={16} color={COLORS.success} strokeWidth={1.5} />} label="Free WiFi" />
+                <FacilityChip
+                  icon={
+                    <Wifi size={16} color={COLORS.success} strokeWidth={1.5} />
+                  }
+                  label={t("student.hostel.free_wifi")}
+                />
               )}
               {facilities?.customFacilities?.map((facility, index) => (
-                <FacilityChip key={`facility-${index}`} icon={<Check size={16} color={COLORS.primary} strokeWidth={1.5} />} label={facility} />
+                <FacilityChip
+                  key={`facility-${index}`}
+                  icon={
+                    <Check size={16} color={COLORS.primary} strokeWidth={1.5} />
+                  }
+                  label={facility}
+                />
               ))}
             </View>
           </Section>
 
           {/* Rules */}
           {hostel.rules && (
-            <Section title="House Rules">
+            <Section title={t("student.hostel.house_rules")}>
               <View style={styles.rulesBox}>
-                <Text style={styles.rulesText}>{hostel.rules}</Text>
+                <AppText style={styles.rulesText}>{hostel.rules}</AppText>
               </View>
             </Section>
           )}
 
           {/* Nearby */}
-          {hostel.nearbyLocations && hostel.nearbyLocations.length > 0 && (
-            <Section title="Nearby Places">
+          {hostel.nearbyLocations?.length > 0 && (
+            <Section title={t("student.hostel.nearby_places")}>
               <View style={styles.nearbyContainer}>
                 {hostel.nearbyLocations.map((location, index) => (
                   <View key={`location-${index}`} style={styles.nearbyChip}>
-                    <MapPin size={14} color={COLORS.primary} strokeWidth={1.5} />
-                    <Text style={styles.nearbyText}>{location}</Text>
+                    <MapPin
+                      size={14}
+                      color={COLORS.primary}
+                      strokeWidth={1.5}
+                    />
+                    <AppText style={styles.nearbyText}>{location}</AppText>
                   </View>
                 ))}
               </View>
@@ -341,23 +455,35 @@ export default function HostelDetailScreen() {
 
           {/* Manager */}
           {hostel.manager && (
-            <Section title="Manager">
+            <Section title={t("student.hostel.manager")}>
               <Pressable
-                style={({ pressed }) => [styles.managerCard, pressed && { opacity: OPACITY.pressed }]}
+                style={({ pressed }) => [
+                  styles.managerCard,
+                  pressed && { opacity: OPACITY.pressed },
+                ]}
                 onPress={handleStartChat}
               >
                 <View style={styles.managerAvatar}>
-                  <Text style={styles.managerAvatarText}>
-                    {hostel.manager.fullName?.charAt(0) || 'M'}
-                  </Text>
+                  <AppText style={styles.managerAvatarText}>
+                    {hostel.manager.fullName?.charAt(0) || "M"}
+                  </AppText>
                 </View>
+
                 <View style={styles.managerInfo}>
-                  <Text style={styles.managerName}>
-                    {hostel.manager.fullName || 'Hostel Manager'}
-                  </Text>
-                  <Text style={styles.managerSubtext}>Tap to chat</Text>
+                  <AppText style={styles.managerName}>
+                    {hostel.manager.fullName ||
+                      t("student.hostel.manager_default")}
+                  </AppText>
+                  <AppText style={styles.managerSubtext}>
+                    {t("student.hostel.tap_to_chat")}
+                  </AppText>
                 </View>
-                <MessageCircle size={22} color={COLORS.primary} strokeWidth={1.5} />
+
+                <MessageCircle
+                  size={22}
+                  color={COLORS.primary}
+                  strokeWidth={1.5}
+                />
               </Pressable>
             </Section>
           )}
@@ -370,17 +496,23 @@ export default function HostelDetailScreen() {
 }
 
 // Helper Components
-const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
+const Section = ({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) => (
   <View style={styles.section}>
-    <Text style={styles.sectionTitle}>{title}</Text>
+    <AppText style={styles.sectionTitle}>{title}</AppText>
     {children}
   </View>
 );
 
 const StatCard = ({ value, label }: { value: string; label: string }) => (
   <View style={styles.statCard}>
-    <Text style={styles.statValue}>{value}</Text>
-    <Text style={styles.statLabel}>{label}</Text>
+    <AppText style={styles.statValue}>{value}</AppText>
+    <AppText style={styles.statLabel}>{label}</AppText>
   </View>
 );
 
@@ -392,21 +524,38 @@ interface ActionButtonProps {
   disabled?: boolean;
 }
 
-const ActionButton: React.FC<ActionButtonProps> = ({ icon, label, color, onPress, disabled }) => (
+const ActionButton: React.FC<ActionButtonProps> = ({
+  icon,
+  label,
+  color,
+  onPress,
+  disabled,
+}) => (
   <Pressable
-    style={({ pressed }) => [styles.actionBtn, pressed && { opacity: OPACITY.pressed }]}
+    style={({ pressed }) => [
+      styles.actionBtn,
+      pressed && { opacity: OPACITY.pressed },
+    ]}
     onPress={onPress}
     disabled={disabled}
   >
-    <View style={[styles.actionIconBox, { backgroundColor: color }]}>{icon}</View>
-    <Text style={styles.actionBtnText}>{label}</Text>
+    <View style={[styles.actionIconBox, { backgroundColor: color }]}>
+      {icon}
+    </View>
+    <AppText style={styles.actionBtnText}>{label}</AppText>
   </Pressable>
 );
 
-const FacilityChip = ({ icon, label }: { icon: React.ReactNode; label: string }) => (
+const FacilityChip = ({
+  icon,
+  label,
+}: {
+  icon: React.ReactNode;
+  label: string;
+}) => (
   <View style={styles.facilityChip}>
     {icon}
-    <Text style={styles.facilityChipText}>{label}</Text>
+    <AppText style={styles.facilityChipText}>{label}</AppText>
   </View>
 );
 
@@ -421,20 +570,20 @@ const styles = StyleSheet.create({
 
   // Hero
   heroSection: {
-    position: 'relative',
+    position: "relative",
     height: 300,
   },
   heroImage: {
     width,
     height: 300,
-    resizeMode: 'cover',
+    resizeMode: "cover",
   },
   heroPlaceholder: {
     width,
     height: 300,
     backgroundColor: COLORS.bgSecondary,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     gap: 12,
   },
   placeholderText: {
@@ -442,10 +591,10 @@ const styles = StyleSheet.create({
     color: COLORS.textMuted,
   },
   imageCounter: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 50,
     right: 20,
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: "rgba(0,0,0,0.5)",
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 16,
@@ -453,50 +602,50 @@ const styles = StyleSheet.create({
   imageCounterText: {
     color: COLORS.textInverse,
     fontSize: 12,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   indicators: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 24,
     left: 0,
     right: 0,
-    flexDirection: 'row',
-    justifyContent: 'center',
+    flexDirection: "row",
+    justifyContent: "center",
     gap: 6,
   },
   indicator: {
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: 'rgba(255,255,255,0.4)',
+    backgroundColor: "rgba(255,255,255,0.4)",
   },
   indicatorActive: {
     width: 20,
     backgroundColor: COLORS.textInverse,
   },
   headerButtons: {
-    position: 'absolute',
+    position: "absolute",
     top: 50,
     left: 0,
     right: 0,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     paddingHorizontal: 20,
   },
   headerBtn: {
     width: 44,
     height: 44,
     borderRadius: 14,
-    backgroundColor: 'rgba(0,0,0,0.35)',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "rgba(0,0,0,0.35)",
+    justifyContent: "center",
+    alignItems: "center",
   },
   headerRight: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 10,
   },
   heroBadge: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 50,
     left: 20,
     backgroundColor: COLORS.primary,
@@ -507,7 +656,7 @@ const styles = StyleSheet.create({
   heroBadgeText: {
     color: COLORS.textInverse,
     fontSize: 12,
-    fontWeight: '600',
+    fontWeight: "600",
     letterSpacing: 0.5,
   },
 
@@ -526,23 +675,23 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   titleRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "flex-start",
+    justifyContent: "space-between",
     marginBottom: 10,
   },
   hostelName: {
     flex: 1,
     fontSize: 24,
-    fontWeight: '700',
+    fontWeight: "700",
     color: COLORS.textPrimary,
     marginRight: 12,
     letterSpacing: -0.4,
     lineHeight: 30,
   },
   ratingBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 5,
     backgroundColor: COLORS.warningLight,
     paddingHorizontal: 10,
@@ -551,12 +700,12 @@ const styles = StyleSheet.create({
   },
   ratingText: {
     fontSize: 14,
-    fontWeight: '700',
+    fontWeight: "700",
     color: COLORS.warning,
   },
   locationRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 8,
     marginBottom: 6,
   },
@@ -572,7 +721,7 @@ const styles = StyleSheet.create({
 
   // Stats
   statsRow: {
-    flexDirection: 'row',
+    flexDirection: "row",
     backgroundColor: COLORS.bgCard,
     borderRadius: 16,
     padding: 18,
@@ -582,11 +731,11 @@ const styles = StyleSheet.create({
   },
   statCard: {
     flex: 1,
-    alignItems: 'center',
+    alignItems: "center",
   },
   statValue: {
     fontSize: 16,
-    fontWeight: '700',
+    fontWeight: "700",
     color: COLORS.textPrimary,
     marginBottom: 4,
   },
@@ -602,25 +751,25 @@ const styles = StyleSheet.create({
 
   // Actions
   actionButtons: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 14,
     marginBottom: 28,
   },
   actionBtn: {
     flex: 1,
-    alignItems: 'center',
+    alignItems: "center",
     gap: 10,
   },
   actionIconBox: {
     width: 56,
     height: 56,
     borderRadius: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   actionBtnText: {
     fontSize: 12,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.textSecondary,
   },
 
@@ -630,7 +779,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.textPrimary,
     marginBottom: 16,
     letterSpacing: -0.2,
@@ -638,9 +787,9 @@ const styles = StyleSheet.create({
 
   // Room Card
   roomCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     backgroundColor: COLORS.bgCard,
     borderRadius: 16,
     padding: 16,
@@ -649,8 +798,8 @@ const styles = StyleSheet.create({
     borderColor: COLORS.borderLight,
   },
   roomCardLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     flex: 1,
   },
   roomIconBox: {
@@ -658,8 +807,8 @@ const styles = StyleSheet.create({
     height: 48,
     borderRadius: 14,
     backgroundColor: COLORS.primaryLight,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     marginRight: 14,
   },
   roomInfo: {
@@ -667,9 +816,9 @@ const styles = StyleSheet.create({
   },
   roomName: {
     fontSize: 15,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.textPrimary,
-    textTransform: 'capitalize',
+    textTransform: "capitalize",
     marginBottom: 4,
   },
   roomDetail: {
@@ -678,8 +827,8 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   roomAvailability: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 6,
   },
   availabilityDot: {
@@ -692,11 +841,11 @@ const styles = StyleSheet.create({
     color: COLORS.textSecondary,
   },
   roomCardRight: {
-    alignItems: 'flex-end',
+    alignItems: "flex-end",
   },
   roomPrice: {
     fontSize: 17,
-    fontWeight: '700',
+    fontWeight: "700",
     color: COLORS.primary,
   },
   roomPriceUnit: {
@@ -706,13 +855,13 @@ const styles = StyleSheet.create({
 
   // Facilities
   facilitiesGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: "row",
+    flexWrap: "wrap",
     gap: 10,
   },
   facilityChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 8,
     backgroundColor: COLORS.bgCard,
     paddingHorizontal: 14,
@@ -724,7 +873,7 @@ const styles = StyleSheet.create({
   facilityChipText: {
     fontSize: 13,
     color: COLORS.textSecondary,
-    fontWeight: '500',
+    fontWeight: "500",
   },
 
   // Rules
@@ -743,13 +892,13 @@ const styles = StyleSheet.create({
 
   // Nearby
   nearbyContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: "row",
+    flexWrap: "wrap",
     gap: 10,
   },
   nearbyChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 6,
     backgroundColor: COLORS.primaryLight,
     paddingHorizontal: 14,
@@ -759,13 +908,13 @@ const styles = StyleSheet.create({
   nearbyText: {
     fontSize: 13,
     color: COLORS.primary,
-    fontWeight: '500',
+    fontWeight: "500",
   },
 
   // Manager
   managerCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     backgroundColor: COLORS.bgCard,
     borderRadius: 16,
     padding: 16,
@@ -777,22 +926,22 @@ const styles = StyleSheet.create({
     height: 52,
     borderRadius: 16,
     backgroundColor: COLORS.primary,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     marginRight: 14,
   },
   managerAvatarText: {
     fontSize: 22,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.textInverse,
-    textTransform: 'uppercase',
+    textTransform: "uppercase",
   },
   managerInfo: {
     flex: 1,
   },
   managerName: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.textPrimary,
     marginBottom: 3,
   },

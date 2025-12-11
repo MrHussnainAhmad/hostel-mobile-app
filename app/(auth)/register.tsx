@@ -5,6 +5,7 @@ import { useRouter } from "expo-router";
 import { ArrowRight, ChevronLeft, Lock, Mail, User } from "lucide-react-native";
 import React, { useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 import {
   Image,
   KeyboardAvoidingView,
@@ -12,7 +13,6 @@ import {
   Pressable,
   ScrollView,
   StyleSheet,
-  Text,
   View,
 } from "react-native";
 import Animated, {
@@ -25,14 +25,17 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
 
 import { authApi } from "@/api/auth";
+import AppText from "@/components/common/AppText";
 import { Button, Input, RoleSelector } from "@/components/ui";
 import { COLORS, OPACITY } from "@/constants/colors";
 import { useAuthStore } from "@/stores/authStore";
 import { RegisterFormData, registerSchema } from "@/utils/validation";
 
+
 export default function RegisterScreen() {
   const router = useRouter();
   const { setAuth } = useAuthStore();
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const slowServerTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -70,8 +73,8 @@ export default function RegisterScreen() {
       slowServerTimeoutRef.current = setTimeout(() => {
         Toast.show({
           type: "info",
-          text1: "Ahhh, Here we go slow server",
-          text2: "Just few more seconds. Sorry, we're working to change server but it costs 🥴",
+          text1: t("auth.register.slow_server_title"),
+          text2: t("auth.register.slow_server_message"),
           visibilityTime: 5000,
         });
       }, 10000);
@@ -97,8 +100,8 @@ export default function RegisterScreen() {
 
         Toast.show({
           type: "success",
-          text1: "Account Created!",
-          text2: "Welcome to HostelsHub",
+          text1: t("auth.register.success_title"),
+          text2: t("auth.register.success_message"),
         });
 
         if (user.role === "STUDENT") {
@@ -116,8 +119,8 @@ export default function RegisterScreen() {
 
       Toast.show({
         type: "error",
-        text1: "Registration Failed",
-        text2: error?.response?.data?.message || "Something went wrong",
+        text1: t("auth.register.failed_title"),
+        text2: error?.response?.data?.message || t("common.generic_error"),
       });
     } finally {
       setLoading(false);
@@ -169,11 +172,15 @@ export default function RegisterScreen() {
 
             {/* Title */}
             <View style={styles.titleContainer}>
-              <Text style={styles.welcomeLabel}>Get started</Text>
-              <Text style={styles.title}>Create your account</Text>
-              <Text style={styles.subtitle}>
-                Join HostelsHub and find your perfect stay
-              </Text>
+              <AppText style={styles.welcomeLabel}>
+                {t("auth.register.welcome_label")}
+              </AppText>
+              <AppText style={styles.title}>
+                {t("auth.register.welcome_title")}
+              </AppText>
+              <AppText style={styles.subtitle}>
+                {t("auth.register.welcome_subtitle")}
+              </AppText>
             </View>
           </Animated.View>
 
@@ -206,10 +213,16 @@ export default function RegisterScreen() {
                   name="fullName"
                   render={({ field: { onChange, onBlur, value } }) => (
                     <Input
-                      label="Full name"
-                      placeholder="Enter your full name"
+                      label={t("auth.register.full_name_label")}
+                      placeholder={t("auth.register.full_name_placeholder")}
                       autoComplete="name"
-                      leftIcon={<User size={20} color={COLORS.textMuted} strokeWidth={1.5} />}
+                      leftIcon={
+                        <User
+                          size={20}
+                          color={COLORS.textMuted}
+                          strokeWidth={1.5}
+                        />
+                      }
                       value={value}
                       onChangeText={onChange}
                       onBlur={onBlur}
@@ -226,12 +239,18 @@ export default function RegisterScreen() {
               name="email"
               render={({ field: { onChange, onBlur, value } }) => (
                 <Input
-                  label="Email"
-                  placeholder="Enter your email"
+                  label={t("auth.register.email_label")}
+                  placeholder={t("auth.register.email_placeholder")}
                   keyboardType="email-address"
                   autoCapitalize="none"
                   autoComplete="email"
-                  leftIcon={<Mail size={20} color={COLORS.textMuted} strokeWidth={1.5} />}
+                  leftIcon={
+                    <Mail
+                      size={20}
+                      color={COLORS.textMuted}
+                      strokeWidth={1.5}
+                    />
+                  }
                   value={value}
                   onChangeText={onChange}
                   onBlur={onBlur}
@@ -246,11 +265,17 @@ export default function RegisterScreen() {
               name="password"
               render={({ field: { onChange, onBlur, value } }) => (
                 <Input
-                  label="Password"
-                  placeholder="Create a strong password"
+                  label={t("auth.register.password_label")}
+                  placeholder={t("auth.register.password_placeholder")}
                   secureTextEntry
                   autoComplete="password-new"
-                  leftIcon={<Lock size={20} color={COLORS.textMuted} strokeWidth={1.5} />}
+                  leftIcon={
+                    <Lock
+                      size={20}
+                      color={COLORS.textMuted}
+                      strokeWidth={1.5}
+                    />
+                  }
                   value={value}
                   onChangeText={onChange}
                   onBlur={onBlur}
@@ -262,20 +287,26 @@ export default function RegisterScreen() {
             {/* Submit Button */}
             <View style={styles.buttonContainer}>
               <Button
-                title="Create Account"
+                title={t("auth.register.submit_button")}
                 onPress={handleSubmit(onSubmit)}
                 loading={loading}
-                icon={<ArrowRight size={18} color={COLORS.textInverse} strokeWidth={2} />}
+                icon={
+                  <ArrowRight
+                    size={18}
+                    color={COLORS.textInverse}
+                    strokeWidth={2}
+                  />
+                }
               />
             </View>
 
             {/* Info Box */}
             <View style={styles.infoBox}>
-              <Text style={styles.infoText}>
+              <AppText style={styles.infoText}>
                 {selectedRole === "STUDENT"
-                  ? "🎓 Browse hostels, book rooms, and manage your stay easily."
-                  : "🏢 List your hostels, manage rooms, and connect with students."}
-              </Text>
+                  ? t("auth.register.info_student")
+                  : t("auth.register.info_manager")}
+              </AppText>
             </View>
           </Animated.View>
 
@@ -286,7 +317,9 @@ export default function RegisterScreen() {
           >
             {/* Login Link */}
             <View style={styles.loginRow}>
-              <Text style={styles.loginText}>Already have an account?</Text>
+              <AppText style={styles.loginText}>
+                {t("auth.register.login_text")}
+              </AppText>
               <Pressable
                 onPress={() => router.push("/(auth)/login")}
                 style={({ pressed }) => [
@@ -294,27 +327,29 @@ export default function RegisterScreen() {
                   pressed && { opacity: OPACITY.pressed },
                 ]}
               >
-                <Text style={styles.loginLink}>Sign in</Text>
+                <AppText style={styles.loginLink}>
+                  {t("auth.register.login_link")}
+                </AppText>
               </Pressable>
             </View>
 
             {/* Terms */}
-            <Text style={styles.termsText}>
-              By creating an account, you agree to our{" "}
-              <Text
+            <AppText style={styles.termsText}>
+              {t("auth.register.terms_prefix")}{" "}
+              <AppText
                 style={styles.termsLink}
                 onPress={() => router.push("/(auth)/legal?type=terms")}
               >
-                Terms
-              </Text>{" "}
-              and{" "}
-              <Text
+                {t("auth.register.terms")}
+              </AppText>{" "}
+              {t("auth.register.terms_and")}{" "}
+              <AppText
                 style={styles.termsLink}
                 onPress={() => router.push("/(auth)/legal?type=privacy")}
               >
-                Privacy Policy
-              </Text>
-            </Text>
+                {t("auth.register.privacy_policy")}
+              </AppText>
+            </AppText>
           </Animated.View>
         </ScrollView>
       </KeyboardAvoidingView>

@@ -1,28 +1,29 @@
-// app/(app)/student/conversation/[id].tsx
-
-import { COLORS, OPACITY } from '@/constants/colors';
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import { ArrowLeft, Send } from 'lucide-react-native';
-import React, { useEffect, useRef, useState } from 'react';
+import { COLORS, OPACITY } from "@/constants/colors";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { ArrowLeft, Send } from "lucide-react-native";
+import React, { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   FlatList,
   KeyboardAvoidingView,
   Platform,
   Pressable,
   StyleSheet,
-  Text,
   TextInput,
   View,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import Toast from 'react-native-toast-message';
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import Toast from "react-native-toast-message";
 
-import { chatApi } from '@/api/chat';
-import { LoadingScreen } from '@/components/ui';
-import { useAuthStore } from '@/stores/authStore';
-import { Message } from '@/types';
+import { chatApi } from "@/api/chat";
+import AppText from "@/components/common/AppText";
+import { LoadingScreen } from "@/components/ui";
+import { useAuthStore } from "@/stores/authStore";
+import { Message } from "@/types";
+
 
 export default function StudentConversationScreen() {
+  const { t } = useTranslation();
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const { user } = useAuthStore();
@@ -31,7 +32,7 @@ export default function StudentConversationScreen() {
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [newMessage, setNewMessage] = useState('');
+  const [newMessage, setNewMessage] = useState("");
 
   const fetchMessages = async () => {
     try {
@@ -41,9 +42,11 @@ export default function StudentConversationScreen() {
       }
     } catch (error: any) {
       Toast.show({
-        type: 'error',
-        text1: 'Error',
-        text2: error?.response?.data?.message || 'Failed to fetch messages',
+        type: "error",
+        text1: t("student.conversations.error_title"),
+        text2:
+          error?.response?.data?.message ||
+          t("student.conversations.error_fetch_messages"),
       });
     } finally {
       setLoading(false);
@@ -68,16 +71,18 @@ export default function StudentConversationScreen() {
 
       if (response.success) {
         setMessages((prev) => [...prev, response.data]);
-        setNewMessage('');
+        setNewMessage("");
         setTimeout(() => {
           flatListRef.current?.scrollToEnd({ animated: true });
         }, 100);
       }
     } catch (error: any) {
       Toast.show({
-        type: 'error',
-        text1: 'Error',
-        text2: error?.response?.data?.message || 'Failed to send message',
+        type: "error",
+        text1: t("student.conversations.error_title"),
+        text2:
+          error?.response?.data?.message ||
+          t("student.conversations.error_send_message"),
       });
     } finally {
       setSending(false);
@@ -86,7 +91,7 @@ export default function StudentConversationScreen() {
 
   const formatTime = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
   };
 
   const renderMessage = ({ item }: { item: Message }) => {
@@ -94,13 +99,18 @@ export default function StudentConversationScreen() {
 
     return (
       <View style={[styles.messageRow, isMe && styles.messageRowMe]}>
-        <View style={[styles.messageBubble, isMe ? styles.bubbleMe : styles.bubbleOther]}>
-          <Text style={[styles.messageText, isMe && styles.messageTextMe]}>
+        <View
+          style={[
+            styles.messageBubble,
+            isMe ? styles.bubbleMe : styles.bubbleOther,
+          ]}
+        >
+          <AppText style={[styles.messageText, isMe && styles.messageTextMe]}>
             {item.text}
-          </Text>
-          <Text style={[styles.messageTime, isMe && styles.messageTimeMe]}>
+          </AppText>
+          <AppText style={[styles.messageTime, isMe && styles.messageTimeMe]}>
             {formatTime(item.createdAt)}
-          </Text>
+          </AppText>
         </View>
       </View>
     );
@@ -111,24 +121,29 @@ export default function StudentConversationScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+    <SafeAreaView style={styles.container} edges={["top", "bottom"]}>
       {/* Header */}
       <View style={styles.header}>
         <Pressable
           onPress={() => router.back()}
-          style={({ pressed }) => [styles.backButton, pressed && { opacity: OPACITY.pressed }]}
+          style={({ pressed }) => [
+            styles.backButton,
+            pressed && { opacity: OPACITY.pressed },
+          ]}
         >
           <ArrowLeft size={22} color={COLORS.textPrimary} strokeWidth={1.5} />
         </Pressable>
-        <Text style={styles.headerTitle}>Conversation</Text>
+        <AppText style={styles.headerTitle}>
+          {t("student.conversations.header_title")}
+        </AppText>
         <View style={styles.headerSpacer} />
       </View>
 
       {/* Messages */}
       <KeyboardAvoidingView
         style={styles.keyboardView}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0}
       >
         <FlatList
           ref={flatListRef}
@@ -140,8 +155,12 @@ export default function StudentConversationScreen() {
           onContentSizeChange={() => flatListRef.current?.scrollToEnd()}
           ListEmptyComponent={
             <View style={styles.emptyContainer}>
-              <Text style={styles.emptyText}>No messages yet</Text>
-              <Text style={styles.emptySubtext}>Start the conversation!</Text>
+              <AppText style={styles.emptyText}>
+                {t("student.conversations.empty_title")}
+              </AppText>
+              <AppText style={styles.emptySubtext}>
+                {t("student.conversations.empty_subtitle")}
+              </AppText>
             </View>
           }
         />
@@ -150,7 +169,7 @@ export default function StudentConversationScreen() {
         <View style={styles.inputContainer}>
           <TextInput
             style={styles.input}
-            placeholder="Type a message..."
+            placeholder={t("student.conversations.placeholder_message")}
             placeholderTextColor={COLORS.inputPlaceholder}
             value={newMessage}
             onChangeText={setNewMessage}
@@ -186,9 +205,9 @@ const styles = StyleSheet.create({
 
   // Header
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: 16,
     paddingVertical: 12,
     backgroundColor: COLORS.bgPrimary,
@@ -200,14 +219,14 @@ const styles = StyleSheet.create({
     height: 44,
     borderRadius: 14,
     backgroundColor: COLORS.bgCard,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     borderWidth: 1,
     borderColor: COLORS.borderLight,
   },
   headerTitle: {
     fontSize: 17,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.textPrimary,
     letterSpacing: -0.2,
   },
@@ -228,13 +247,13 @@ const styles = StyleSheet.create({
   // Message Bubble
   messageRow: {
     marginBottom: 12,
-    flexDirection: 'row',
+    flexDirection: "row",
   },
   messageRowMe: {
-    justifyContent: 'flex-end',
+    justifyContent: "flex-end",
   },
   messageBubble: {
-    maxWidth: '78%',
+    maxWidth: "78%",
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderRadius: 20,
@@ -261,22 +280,22 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: COLORS.textMuted,
     marginTop: 6,
-    alignSelf: 'flex-end',
+    alignSelf: "flex-end",
   },
   messageTimeMe: {
-    color: 'rgba(255, 255, 255, 0.7)',
+    color: "rgba(255, 255, 255, 0.7)",
   },
 
   // Empty
   emptyContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     paddingVertical: 80,
   },
   emptyText: {
     fontSize: 17,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.textSecondary,
   },
   emptySubtext: {
@@ -287,8 +306,8 @@ const styles = StyleSheet.create({
 
   // Input
   inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
+    flexDirection: "row",
+    alignItems: "flex-end",
     paddingHorizontal: 20,
     paddingVertical: 14,
     backgroundColor: COLORS.bgPrimary,
@@ -313,8 +332,8 @@ const styles = StyleSheet.create({
     height: 48,
     borderRadius: 24,
     backgroundColor: COLORS.primary,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   sendButtonDisabled: {
     backgroundColor: COLORS.bgSecondary,

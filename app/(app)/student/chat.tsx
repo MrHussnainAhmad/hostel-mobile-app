@@ -1,36 +1,40 @@
 // screens/ChatScreen.tsx
 
-import { COLORS, OPACITY } from '@/constants/colors';
-import { useRouter } from 'expo-router';
-import { ChevronRight, MessageCircle } from 'lucide-react-native';
-import React, { useEffect, useState } from 'react';
+import { COLORS, OPACITY } from "@/constants/colors";
+import { useRouter } from "expo-router";
+import { ChevronRight, MessageCircle } from "lucide-react-native";
+import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   FlatList,
   Pressable,
   RefreshControl,
   StyleSheet,
-  Text,
   View,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import Toast from 'react-native-toast-message';
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import Toast from "react-native-toast-message";
 
-import { chatApi } from '@/api/chat';
-import { EmptyState, LoadingScreen } from '@/components/ui';
-import { Conversation } from '@/types';
+import { chatApi } from "@/api/chat";
+import AppText from "@/components/common/AppText";
+import { EmptyState, LoadingScreen } from "@/components/ui";
+import { Conversation } from "@/types";
 
-// Avatar colors - subtle, professional palette
+
+// Avatar colors
 const AVATAR_COLORS = [
-  '#5856D6', // Primary
-  '#34C759', // Success
-  '#007AFF', // Info
-  '#FF9500', // Warning
-  '#AF52DE', // Purple
-  '#FF2D55', // Pink
+  "#5856D6",
+  "#34C759",
+  "#007AFF",
+  "#FF9500",
+  "#AF52DE",
+  "#FF2D55",
 ];
 
 export default function StudentChatScreen() {
+  const { t } = useTranslation();
   const router = useRouter();
+
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [conversations, setConversations] = useState<Conversation[]>([]);
@@ -42,10 +46,11 @@ export default function StudentChatScreen() {
         setConversations(response.data);
       }
     } catch (error: any) {
+      // FIXED: Added "student." prefix
       Toast.show({
-        type: 'error',
-        text1: 'Error',
-        text2: error?.response?.data?.message || 'Failed to fetch conversations',
+        type: "error",
+        text1: t("student.chat.toast_error_title"),
+        text2: error?.response?.data?.message || t("student.chat.toast_error_message"),
       });
     } finally {
       setLoading(false);
@@ -63,20 +68,24 @@ export default function StudentChatScreen() {
   };
 
   const formatTime = (dateString?: string) => {
-    if (!dateString) return '';
+    if (!dateString) return "";
     const date = new Date(dateString);
     const now = new Date();
     const diff = now.getTime() - date.getTime();
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
 
     if (days === 0) {
-      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      return date.toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
     } else if (days === 1) {
-      return 'Yesterday';
+      // FIXED: Added "student." prefix
+      return t("student.chat.yesterday");
     } else if (days < 7) {
-      return date.toLocaleDateString([], { weekday: 'short' });
+      return date.toLocaleDateString([], { weekday: "short" });
     } else {
-      return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+      return date.toLocaleDateString([], { month: "short", day: "numeric" });
     }
   };
 
@@ -85,9 +94,13 @@ export default function StudentChatScreen() {
     return AVATAR_COLORS[index];
   };
 
-  const renderConversation = ({ item, index }: { item: Conversation; index: number }) => {
+  const renderConversation = ({ item }: { item: Conversation }) => {
     const managerName =
-      item.manager?.fullName || item.manager?.user?.email || 'Manager';
+      item.manager?.fullName ||
+      item.manager?.user?.email ||
+      // FIXED: Added "student." prefix
+      t("student.chat.manager_fallback");
+
     const initial = managerName.charAt(0).toUpperCase();
     const avatarColor = getAvatarColor(managerName);
 
@@ -101,25 +114,27 @@ export default function StudentChatScreen() {
       >
         {/* Avatar */}
         <View style={[styles.avatar, { backgroundColor: avatarColor }]}>
-          <Text style={styles.avatarText}>{initial}</Text>
+          <AppText style={styles.avatarText}>{initial}</AppText>
         </View>
 
         {/* Content */}
         <View style={styles.conversationContent}>
           <View style={styles.conversationHeader}>
-            <Text style={styles.conversationName} numberOfLines={1}>
+            <AppText style={styles.conversationName} numberOfLines={1}>
               {managerName}
-            </Text>
+            </AppText>
+
             {item.lastMessageAt && (
-              <Text style={styles.conversationTime}>
+              <AppText style={styles.conversationTime}>
                 {formatTime(item.lastMessageAt)}
-              </Text>
+              </AppText>
             )}
           </View>
 
-          <Text style={styles.lastMessage} numberOfLines={1}>
-            {item.lastMessage || 'No messages yet'}
-          </Text>
+          <AppText style={styles.lastMessage} numberOfLines={1}>
+            {/* FIXED: Added "student." prefix */}
+            {item.lastMessage || t("student.chat.no_messages_yet")}
+          </AppText>
         </View>
 
         {/* Arrow */}
@@ -128,18 +143,23 @@ export default function StudentChatScreen() {
     );
   };
 
-  if (loading) {
-    return <LoadingScreen />;
-  }
+  if (loading) return <LoadingScreen />;
+
+  // FIXED: Added "student." prefix
+  const plural =
+    conversations.length !== 1
+      ? t("student.chat.conversation_plural")
+      : t("student.chat.conversation_singular");
 
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+    <SafeAreaView style={styles.container} edges={["top", "bottom"]}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.title}>Messages</Text>
-        <Text style={styles.subtitle}>
-          {conversations.length} conversation{conversations.length !== 1 ? 's' : ''}
-        </Text>
+        {/* FIXED: Added "student." prefix */}
+        <AppText style={styles.title}>{t("student.chat.title")}</AppText>
+        <AppText style={styles.subtitle}>
+          {conversations.length} {plural}
+        </AppText>
       </View>
 
       {/* List */}
@@ -159,9 +179,16 @@ export default function StudentChatScreen() {
         }
         ListEmptyComponent={
           <EmptyState
-            icon={<MessageCircle size={48} color={COLORS.textMuted} strokeWidth={1.5} />}
-            title="No messages"
-            description="Start a conversation with a hostel manager from any hostel page."
+            icon={
+              <MessageCircle
+                size={48}
+                color={COLORS.textMuted}
+                strokeWidth={1.5}
+              />
+            }
+            // FIXED: Added "student." prefix
+            title={t("student.chat.empty_title")}
+            description={t("student.chat.empty_description")}
           />
         }
         ItemSeparatorComponent={() => <View style={styles.separator} />}
@@ -175,7 +202,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.bgPrimary,
   },
-  
+
   // Header
   header: {
     paddingHorizontal: 24,
@@ -184,7 +211,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 28,
-    fontWeight: '700',
+    fontWeight: "700",
     color: COLORS.textPrimary,
     letterSpacing: -0.5,
   },
@@ -193,7 +220,7 @@ const styles = StyleSheet.create({
     color: COLORS.textMuted,
     marginTop: 4,
   },
-  
+
   // List
   list: {
     paddingHorizontal: 20,
@@ -203,11 +230,11 @@ const styles = StyleSheet.create({
   separator: {
     height: 8,
   },
-  
+
   // Conversation Card
   conversationCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     backgroundColor: COLORS.bgCard,
     borderRadius: 16,
     padding: 14,
@@ -218,13 +245,13 @@ const styles = StyleSheet.create({
     width: 52,
     height: 52,
     borderRadius: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     marginRight: 14,
   },
   avatarText: {
     fontSize: 20,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.textInverse,
   },
   conversationContent: {
@@ -232,14 +259,14 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   conversationHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 4,
   },
   conversationName: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.textPrimary,
     flex: 1,
     marginRight: 12,

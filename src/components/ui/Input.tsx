@@ -7,12 +7,12 @@ import {
   Platform,
   Pressable,
   StyleSheet,
-  Text,
   TextInput,
   TextInputProps,
   View,
-  ViewStyle,
+  ViewStyle
 } from 'react-native';
+import AppText from '../common/AppText';
 
 interface InputProps extends TextInputProps {
   label?: string;
@@ -51,7 +51,7 @@ export const Input: React.FC<InputProps> = ({
   return (
     <View style={[styles.container, containerStyle]}>
       {label && (
-        <Text
+        <AppText
           style={[
             styles.label,
             isFocused && styles.labelFocused,
@@ -59,7 +59,7 @@ export const Input: React.FC<InputProps> = ({
           ]}
         >
           {label}
-        </Text>
+        </AppText>
       )}
 
       <View
@@ -74,6 +74,7 @@ export const Input: React.FC<InputProps> = ({
       >
         {leftIcon && <View style={styles.leftIcon}>{leftIcon}</View>}
 
+        {/* FIXED: Replaced broken AppTextInput with proper TextInput wrapped for Urdu font */}
         <TextInput
           style={[
             styles.input,
@@ -111,9 +112,9 @@ export const Input: React.FC<InputProps> = ({
         )}
       </View>
 
-      {error && <Text style={styles.errorText}>{error}</Text>}
+      {error && <AppText style={styles.errorText}>{error}</AppText>}
 
-      {hint && !error && <Text style={styles.hintText}>{hint}</Text>}
+      {hint && !error && <AppText style={styles.hintText}>{hint}</AppText>}
     </View>
   );
 };
@@ -146,8 +147,8 @@ const styles = StyleSheet.create({
     minHeight: 56,
     backgroundColor: COLORS.inputBg,
   },
+
   inputWrapperFocused: {
-    // Only add shadow on iOS; avoid elevation changes on Android
     ...Platform.select({
       ios: {
         shadowColor: COLORS.primary,
@@ -155,9 +156,7 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.1,
         shadowRadius: 8,
       },
-      android: {
-        // no elevation/shadow – keeps layout stable
-      },
+      android: {},
     }),
   },
 

@@ -2,7 +2,8 @@
 
 import { COLORS } from '@/constants/colors';
 import React from 'react';
-import { StyleSheet, Text, View, ViewStyle } from 'react-native';
+import { StyleSheet, View, ViewStyle } from 'react-native';
+import AppText from '../common/AppText';
 
 type BadgeVariant = 'success' | 'error' | 'warning' | 'info' | 'default' | 'primary';
 
@@ -66,7 +67,7 @@ export const Badge: React.FC<BadgeProps> = ({
         style,
       ]}
     >
-      <Text 
+      <AppText 
         style={[
           styles.text, 
           styles[`text_${size}`],
@@ -74,7 +75,7 @@ export const Badge: React.FC<BadgeProps> = ({
         ]}
       >
         {label}
-      </Text>
+      </AppText>
     </View>
   );
 };

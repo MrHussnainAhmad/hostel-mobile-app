@@ -2,7 +2,7 @@
 
 import { COLORS } from '@/constants/colors';
 import { Tabs } from 'expo-router';
-import { Building2, Home, MessageCircle, User } from 'lucide-react-native';
+import { Building2, Home, MessageCircle, User, Cog } from 'lucide-react-native';
 import React from 'react';
 
 export default function ManagerTabLayout() {
@@ -71,6 +71,18 @@ export default function ManagerTabLayout() {
           tabBarHideOnKeyboard: true,
           tabBarIcon: ({ color, size }) => (
             <User size={size} color={color} />
+          ),
+        }}
+      />
+
+      {/* Settings tab */}
+      <Tabs.Screen
+        name="settings"
+        options={{
+          title: 'Settings',
+          tabBarHideOnKeyboard: true,
+          tabBarIcon: ({ color, size }) => (
+            <Cog size={size} color={color} />
           ),
         }}
       />

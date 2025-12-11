@@ -1,27 +1,31 @@
 // screens/ReservationsScreen.tsx
 
-import { COLORS, OPACITY } from '@/constants/colors';
-import { useRouter } from 'expo-router';
-import { ArrowLeft, Calendar, X } from 'lucide-react-native';
-import React, { useEffect, useState } from 'react';
+import { COLORS, OPACITY } from "@/constants/colors";
+import { useRouter } from "expo-router";
+import { ArrowLeft, Calendar, X } from "lucide-react-native";
+import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Alert,
   FlatList,
   Pressable,
   RefreshControl,
   StyleSheet,
-  Text,
   View,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import Toast from 'react-native-toast-message';
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import Toast from "react-native-toast-message";
 
-import { reservationsApi } from '@/api/reservations';
-import { Badge, Button, EmptyState, LoadingScreen } from '@/components/ui';
-import { Reservation } from '@/types';
+import { reservationsApi } from "@/api/reservations";
+import AppText from "@/components/common/AppText";
+import { Badge, Button, EmptyState, LoadingScreen } from "@/components/ui";
+import { Reservation } from "@/types";
+
 
 export default function ReservationsScreen() {
+  const { t } = useTranslation();
   const router = useRouter();
+
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [reservations, setReservations] = useState<Reservation[]>([]);
@@ -33,10 +37,13 @@ export default function ReservationsScreen() {
         setReservations(response.data);
       }
     } catch (error: any) {
+      // FIXED: Added "student." prefix
       Toast.show({
-        type: 'error',
-        text1: 'Error',
-        text2: error?.response?.data?.message || 'Failed to fetch reservations',
+        type: "error",
+        text1: t("student.reservations.toast_error_title"),
+        text2:
+          error?.response?.data?.message ||
+          t("student.reservations.toast_error_message"),
       });
     } finally {
       setLoading(false);
@@ -54,28 +61,33 @@ export default function ReservationsScreen() {
   };
 
   const handleCancel = async (id: string) => {
+    // FIXED: Added "student." prefix to alerts
     Alert.alert(
-      'Cancel Reservation',
-      'Are you sure you want to cancel this reservation request?',
+      t("student.reservations.cancel_alert_title"),
+      t("student.reservations.cancel_alert_message"),
       [
-        { text: 'No', style: 'cancel' },
+        { text: t("student.reservations.cancel_alert_no"), style: "cancel" },
         {
-          text: 'Yes, Cancel',
-          style: 'destructive',
+          text: t("student.reservations.cancel_alert_yes"),
+          style: "destructive",
           onPress: async () => {
             try {
               await reservationsApi.cancel(id);
+              // FIXED: Added "student." prefix to toast
               Toast.show({
-                type: 'success',
-                text1: 'Cancelled',
-                text2: 'Reservation cancelled successfully',
+                type: "success",
+                text1: t("student.reservations.toast_cancelled_title"),
+                text2: t("student.reservations.toast_cancelled_message"),
               });
               fetchReservations();
             } catch (error: any) {
+              // FIXED: Added "student." prefix to toast
               Toast.show({
-                type: 'error',
-                text1: 'Error',
-                text2: error?.response?.data?.message || 'Failed to cancel',
+                type: "error",
+                text1: t("student.reservations.toast_error_title"),
+                text2:
+                  error?.response?.data?.message ||
+                  t("student.reservations.toast_cancel_failed"),
               });
             }
           },
@@ -86,22 +98,22 @@ export default function ReservationsScreen() {
 
   const getStatusVariant = (status: string) => {
     switch (status) {
-      case 'ACCEPTED':
-        return 'success';
-      case 'REJECTED':
-        return 'error';
-      case 'CANCELLED':
-        return 'default';
+      case "ACCEPTED":
+        return "success";
+      case "REJECTED":
+        return "error";
+      case "CANCELLED":
+        return "default";
       default:
-        return 'warning';
+        return "warning";
     }
   };
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString([], {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
+      month: "short",
+      day: "numeric",
+      year: "numeric",
     });
   };
 
@@ -109,34 +121,40 @@ export default function ReservationsScreen() {
     <View style={styles.reservationCard}>
       {/* Header */}
       <View style={styles.reservationHeader}>
-        <Text style={styles.hostelName} numberOfLines={1}>
+        <AppText style={styles.hostelName} numberOfLines={1}>
           {item.hostel.hostelName}
-        </Text>
+        </AppText>
+        {/* FIXED: Added "student." prefix to status lookup */}
         <Badge
-          label={item.status}
+          label={t(`student.reservations.status.${item.status.toLowerCase()}`)}
           variant={getStatusVariant(item.status)}
           size="sm"
         />
       </View>
 
       {/* Details */}
-      <Text style={styles.details}>
-        {item.hostel.city} • {item.roomType.replace('_', ' ')}
-      </Text>
-      <Text style={styles.date}>
-        Requested on {formatDate(item.createdAt)}
-      </Text>
+      <AppText style={styles.details}>
+        {item.hostel.city} • {item.roomType.replace("_", " ")}
+      </AppText>
+
+      {/* FIXED: Added "student." prefix */}
+      <AppText style={styles.date}>
+        {t("student.reservations.requested_on")} {formatDate(item.createdAt)}
+      </AppText>
 
       {/* Rejection Reason */}
       {item.rejectReason && (
         <View style={styles.rejectBox}>
-          <Text style={styles.rejectLabel}>Rejection reason</Text>
-          <Text style={styles.rejectText}>{item.rejectReason}</Text>
+          {/* FIXED: Added "student." prefix */}
+          <AppText style={styles.rejectLabel}>
+            {t("student.reservations.rejection_label")}
+          </AppText>
+          <AppText style={styles.rejectText}>{item.rejectReason}</AppText>
         </View>
       )}
 
-      {/* Actions */}
-      {item.status === 'PENDING' && (
+      {/* Cancel Button */}
+      {item.status === "PENDING" && (
         <Pressable
           style={({ pressed }) => [
             styles.cancelButton,
@@ -145,14 +163,19 @@ export default function ReservationsScreen() {
           onPress={() => handleCancel(item.id)}
         >
           <X size={16} color={COLORS.error} strokeWidth={1.5} />
-          <Text style={styles.cancelText}>Cancel Request</Text>
+          {/* FIXED: Added "student." prefix */}
+          <AppText style={styles.cancelText}>
+            {t("student.reservations.cancel_button")}
+          </AppText>
         </Pressable>
       )}
 
-      {item.status === 'ACCEPTED' && (
+      {/* Proceed to Booking */}
+      {item.status === "ACCEPTED" && (
         <View style={styles.actionButton}>
+          {/* FIXED: Added "student." prefix */}
           <Button
-            title="Proceed to Booking"
+            title={t("student.reservations.proceed_button")}
             onPress={() =>
               router.push(
                 `/(app)/student/book/${item.hostel.id}?roomType=${item.roomType}&reservationId=${item.id}`
@@ -165,12 +188,10 @@ export default function ReservationsScreen() {
     </View>
   );
 
-  if (loading) {
-    return <LoadingScreen />;
-  }
+  if (loading) return <LoadingScreen />;
 
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+    <SafeAreaView style={styles.container} edges={["top", "bottom"]}>
       {/* Header */}
       <View style={styles.header}>
         <Pressable
@@ -182,9 +203,10 @@ export default function ReservationsScreen() {
         >
           <ArrowLeft size={22} color={COLORS.textPrimary} strokeWidth={1.5} />
         </Pressable>
-        
-        <Text style={styles.headerTitle}>My Reservations</Text>
-        
+
+        {/* FIXED: Added "student." prefix */}
+        <AppText style={styles.headerTitle}>{t("student.reservations.header_title")}</AppText>
+
         <View style={styles.headerSpacer} />
       </View>
 
@@ -205,13 +227,16 @@ export default function ReservationsScreen() {
         }
         ListEmptyComponent={
           <EmptyState
-            icon={<Calendar size={48} color={COLORS.textMuted} strokeWidth={1.5} />}
-            title="No reservations"
-            description="Your reservation requests will appear here when you send them."
+            icon={
+              <Calendar size={48} color={COLORS.textMuted} strokeWidth={1.5} />
+            }
+            // FIXED: Added "student." prefix to empty state
+            title={t("student.reservations.empty_title")}
+            description={t("student.reservations.empty_description")}
             action={
               <Button
-                title="Find Hostels"
-                onPress={() => router.push('/(app)/student/search')}
+                title={t("student.reservations.empty_action")}
+                onPress={() => router.push("/(app)/student/search")}
                 size="md"
               />
             }
@@ -228,12 +253,12 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.bgPrimary,
   },
-  
+
   // Header
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: 16,
     paddingVertical: 12,
     backgroundColor: COLORS.bgPrimary,
@@ -245,21 +270,21 @@ const styles = StyleSheet.create({
     height: 44,
     borderRadius: 14,
     backgroundColor: COLORS.bgCard,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     borderWidth: 1,
     borderColor: COLORS.borderLight,
   },
   headerTitle: {
     fontSize: 17,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.textPrimary,
     letterSpacing: -0.2,
   },
   headerSpacer: {
     width: 44,
   },
-  
+
   // List
   list: {
     padding: 20,
@@ -268,7 +293,7 @@ const styles = StyleSheet.create({
   separator: {
     height: 12,
   },
-  
+
   // Reservation Card
   reservationCard: {
     backgroundColor: COLORS.bgCard,
@@ -278,14 +303,14 @@ const styles = StyleSheet.create({
     borderColor: COLORS.borderLight,
   },
   reservationHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 8,
   },
   hostelName: {
     fontSize: 17,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.textPrimary,
     flex: 1,
     marginRight: 12,
@@ -300,7 +325,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: COLORS.textMuted,
   },
-  
+
   // Rejection Box
   rejectBox: {
     marginTop: 14,
@@ -312,10 +337,10 @@ const styles = StyleSheet.create({
   },
   rejectLabel: {
     fontSize: 12,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.error,
     marginBottom: 4,
-    textTransform: 'uppercase',
+    textTransform: "uppercase",
     letterSpacing: 0.5,
   },
   rejectText: {
@@ -323,12 +348,12 @@ const styles = StyleSheet.create({
     color: COLORS.textSecondary,
     lineHeight: 20,
   },
-  
+
   // Cancel Button
   cancelButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     marginTop: 16,
     paddingTop: 16,
     borderTopWidth: 1,
@@ -337,10 +362,10 @@ const styles = StyleSheet.create({
   },
   cancelText: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.error,
   },
-  
+
   // Action Button
   actionButton: {
     marginTop: 16,

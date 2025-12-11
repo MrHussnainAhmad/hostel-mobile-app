@@ -1,8 +1,6 @@
-// app/(app)/student/book/[id].tsx
-
-import { COLORS, OPACITY } from '@/constants/colors';
-import * as ImagePicker from 'expo-image-picker';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { COLORS, OPACITY } from "@/constants/colors";
+import * as ImagePicker from "expo-image-picker";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import {
   ArrowLeft,
   Calendar,
@@ -11,8 +9,9 @@ import {
   Clock,
   CreditCard,
   X,
-} from 'lucide-react-native';
-import React, { useEffect, useState } from 'react';
+} from "lucide-react-native";
+import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Image,
   KeyboardAvoidingView,
@@ -20,19 +19,22 @@ import {
   Pressable,
   ScrollView,
   StyleSheet,
-  Text,
   View,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import Toast from 'react-native-toast-message';
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import Toast from "react-native-toast-message";
 
-import { bookingsApi } from '@/api/bookings';
-import { hostelsApi } from '@/api/hostels';
-import { Button, Input, LoadingScreen } from '@/components/ui';
-import { Hostel } from '@/types';
+import { bookingsApi } from "@/api/bookings";
+import { hostelsApi } from "@/api/hostels";
+import AppText from "@/components/common/AppText";
+import { Button, Input, LoadingScreen } from "@/components/ui";
+import { Hostel } from "@/types";
+
 
 export default function BookHostelScreen() {
+  const { t } = useTranslation();
   const router = useRouter();
+
   const {
     id,
     roomType: preselectedRoomType,
@@ -49,13 +51,13 @@ export default function BookHostelScreen() {
 
   // Form state
   const [selectedRoomType, setSelectedRoomType] = useState<string>(
-    preselectedRoomType || ''
+    preselectedRoomType || ""
   );
   const [transactionImage, setTransactionImage] = useState<string | null>(null);
-  const [transactionDate, setTransactionDate] = useState('');
-  const [transactionTime, setTransactionTime] = useState('');
-  const [fromAccount, setFromAccount] = useState('');
-  const [toAccount, setToAccount] = useState('');
+  const [transactionDate, setTransactionDate] = useState("");
+  const [transactionTime, setTransactionTime] = useState("");
+  const [fromAccount, setFromAccount] = useState("");
+  const [toAccount, setToAccount] = useState("");
 
   useEffect(() => {
     fetchHostel();
@@ -75,9 +77,11 @@ export default function BookHostelScreen() {
       }
     } catch (error: any) {
       Toast.show({
-        type: 'error',
-        text1: 'Error',
-        text2: error?.response?.data?.message || 'Failed to fetch hostel',
+        type: "error",
+        text1: t("student.book.error_title"),
+        text2:
+          error?.response?.data?.message ||
+          t("student.book.error_fetch_hostel"),
       });
       router.back();
     } finally {
@@ -99,27 +103,51 @@ export default function BookHostelScreen() {
 
   const validate = () => {
     if (!selectedRoomType) {
-      Toast.show({ type: 'error', text1: 'Error', text2: 'Select a room type' });
+      Toast.show({
+        type: "error",
+        text1: t("student.book.error_title"),
+        text2: t("student.book.error_select_room"),
+      });
       return false;
     }
     if (!transactionImage) {
-      Toast.show({ type: 'error', text1: 'Error', text2: 'Upload payment screenshot' });
+      Toast.show({
+        type: "error",
+        text1: t("student.book.error_title"),
+        text2: t("student.book.error_upload_screenshot"),
+      });
       return false;
     }
     if (!transactionDate.trim()) {
-      Toast.show({ type: 'error', text1: 'Error', text2: 'Enter transaction date' });
+      Toast.show({
+        type: "error",
+        text1: t("student.book.error_title"),
+        text2: t("student.book.error_enter_date"),
+      });
       return false;
     }
     if (!transactionTime.trim()) {
-      Toast.show({ type: 'error', text1: 'Error', text2: 'Enter transaction time' });
+      Toast.show({
+        type: "error",
+        text1: t("student.book.error_title"),
+        text2: t("student.book.error_enter_time"),
+      });
       return false;
     }
     if (!fromAccount.trim()) {
-      Toast.show({ type: 'error', text1: 'Error', text2: 'Enter sender account' });
+      Toast.show({
+        type: "error",
+        text1: t("student.book.error_title"),
+        text2: t("student.book.error_enter_from_account"),
+      });
       return false;
     }
     if (!toAccount.trim()) {
-      Toast.show({ type: 'error', text1: 'Error', text2: 'Enter receiver account' });
+      Toast.show({
+        type: "error",
+        text1: t("student.book.error_title"),
+        text2: t("student.book.error_enter_to_account"),
+      });
       return false;
     }
     return true;
@@ -132,23 +160,23 @@ export default function BookHostelScreen() {
       setSubmitting(true);
 
       const formData = new FormData();
-      formData.append('hostelId', id);
-      formData.append('roomType', selectedRoomType);
-      formData.append('transactionDate', transactionDate.trim());
-      formData.append('transactionTime', transactionTime.trim());
-      formData.append('fromAccount', fromAccount.trim());
-      formData.append('toAccount', toAccount.trim());
+      formData.append("hostelId", id);
+      formData.append("roomType", selectedRoomType);
+      formData.append("transactionDate", transactionDate.trim());
+      formData.append("transactionTime", transactionTime.trim());
+      formData.append("fromAccount", fromAccount.trim());
+      formData.append("toAccount", toAccount.trim());
 
       if (reservationId) {
-        formData.append('reservationId', reservationId);
+        formData.append("reservationId", reservationId);
       }
 
       if (transactionImage) {
-        const filename = transactionImage.split('/').pop() || 'payment.jpg';
+        const filename = transactionImage.split("/").pop() || "payment.jpg";
         const match = /\.(\w+)$/.exec(filename);
-        const type = match ? `image/${match[1]}` : 'image/jpeg';
+        const type = match ? `image/${match[1]}` : "image/jpeg";
 
-        formData.append('transactionImage', {
+        formData.append("transactionImage", {
           uri: transactionImage,
           name: filename,
           type,
@@ -159,18 +187,20 @@ export default function BookHostelScreen() {
 
       if (response.success) {
         Toast.show({
-          type: 'success',
-          text1: 'Booking Submitted',
-          text2: 'Manager will review your payment',
+          type: "success",
+          text1: t("student.book.success_title"),
+          text2: t("student.book.success_message"),
         });
         router.back();
-        router.push('/(app)/student/bookings');
+        router.push("/(app)/student/bookings");
       }
     } catch (error: any) {
       Toast.show({
-        type: 'error',
-        text1: 'Error',
-        text2: error?.response?.data?.message || 'Failed to submit booking',
+        type: "error",
+        text1: t("student.book.error_title"),
+        text2:
+          error?.response?.data?.message ||
+          t("student.book.error_failed_submit"),
       });
     } finally {
       setSubmitting(false);
@@ -185,10 +215,12 @@ export default function BookHostelScreen() {
     return null;
   }
 
-  const selectedRoom = hostel.roomTypes?.find((rt) => rt.type === selectedRoomType);
+  const selectedRoom = hostel.roomTypes?.find(
+    (rt) => rt.type === selectedRoomType
+  );
 
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+    <SafeAreaView style={styles.container} edges={["top", "bottom"]}>
       {/* Header */}
       <View style={styles.header}>
         <Pressable
@@ -200,14 +232,15 @@ export default function BookHostelScreen() {
         >
           <ArrowLeft size={22} color={COLORS.textPrimary} strokeWidth={1.5} />
         </Pressable>
-        <Text style={styles.headerTitle}>Book Hostel</Text>
+
+        <AppText style={styles.headerTitle}>{t("student.book.title")}</AppText>
+
         <View style={styles.headerSpacer} />
       </View>
 
       <KeyboardAvoidingView
         style={styles.keyboardView}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
         <ScrollView
           style={styles.content}
@@ -217,39 +250,45 @@ export default function BookHostelScreen() {
         >
           {/* Hostel Info */}
           <View style={styles.hostelCard}>
-            <Text style={styles.hostelName}>{hostel.hostelName}</Text>
-            <Text style={styles.hostelLocation}>
+            <AppText style={styles.hostelName}>{hostel.hostelName}</AppText>
+            <AppText style={styles.hostelLocation}>
               {hostel.city}, {hostel.address}
-            </Text>
+            </AppText>
           </View>
 
           {/* Room Type Selection */}
-          <Text style={styles.sectionTitle}>Select Room Type</Text>
-          
+          <AppText style={styles.sectionTitle}>
+            {t("student.book.select_room_type")}
+          </AppText>
+
           {hostel.roomTypes?.map((roomType, index) => (
             <Pressable
               key={roomType.id ?? `${roomType.type}-${index}`}
               style={({ pressed }) => [
                 styles.roomTypeCard,
-                selectedRoomType === roomType.type && styles.roomTypeCardSelected,
+                selectedRoomType === roomType.type &&
+                  styles.roomTypeCardSelected,
                 pressed && { opacity: OPACITY.pressed },
               ]}
               onPress={() => setSelectedRoomType(roomType.type)}
             >
               <View style={styles.roomTypeContent}>
                 <View>
-                  <Text style={styles.roomTypeName}>
-                    {roomType.type.replace('_', ' ')}
-                  </Text>
-                  <Text style={styles.roomTypeDetail}>
-                    {roomType.personsInRoom} person(s) • {roomType.availableRooms} available
-                  </Text>
+                  <AppText style={styles.roomTypeName}>
+                    {roomType.type.replace("_", " ")}
+                  </AppText>
+                  <AppText style={styles.roomTypeDetail}>
+                    {roomType.personsInRoom} {t("student.book.persons")} •{" "}
+                    {roomType.availableRooms} {t("student.book.available")}
+                  </AppText>
                 </View>
                 <View style={styles.roomTypeRight}>
-                  <Text style={styles.roomTypePrice}>
+                  <AppText style={styles.roomTypePrice}>
                     Rs. {roomType.price.toLocaleString()}
-                  </Text>
-                  <Text style={styles.roomTypePriceLabel}>/month</Text>
+                  </AppText>
+                  <AppText style={styles.roomTypePriceLabel}>
+                    {t("student.book.per_month")}
+                  </AppText>
                 </View>
               </View>
 
@@ -264,22 +303,29 @@ export default function BookHostelScreen() {
           {/* Payment Amount */}
           {selectedRoom && (
             <View style={styles.paymentCard}>
-              <Text style={styles.paymentLabel}>Amount to Pay</Text>
-              <Text style={styles.paymentAmount}>
+              <AppText style={styles.paymentLabel}>
+                {t("student.book.amount_to_pay")}
+              </AppText>
+              <AppText style={styles.paymentAmount}>
                 Rs. {selectedRoom.price.toLocaleString()}
-              </Text>
-              <Text style={styles.paymentNote}>
-                Transfer to manager's account and upload screenshot
-              </Text>
+              </AppText>
+              <AppText style={styles.paymentNote}>
+                {t("student.book.transfer_note")}
+              </AppText>
             </View>
           )}
 
           {/* Payment Screenshot */}
-          <Text style={styles.sectionTitle}>Payment Proof</Text>
-          
+          <AppText style={styles.sectionTitle}>
+            {t("student.book.payment_proof")}
+          </AppText>
+
           {transactionImage ? (
             <View style={styles.imagePreview}>
-              <Image source={{ uri: transactionImage }} style={styles.previewImage} />
+              <Image
+                source={{ uri: transactionImage }}
+                style={styles.previewImage}
+              />
               <Pressable
                 style={({ pressed }) => [
                   styles.removeImageBtn,
@@ -299,28 +345,41 @@ export default function BookHostelScreen() {
               onPress={pickImage}
             >
               <Camera size={28} color={COLORS.textMuted} strokeWidth={1.5} />
-              <Text style={styles.uploadText}>Upload Payment Screenshot</Text>
+              <AppText style={styles.uploadText}>
+                {t("student.book.upload_screenshot")}
+              </AppText>
             </Pressable>
           )}
 
           {/* Transaction Details */}
-          <Text style={styles.sectionTitle}>Transaction Details</Text>
-          
+          <AppText style={styles.sectionTitle}>
+            {t("student.book.transaction_details")}
+          </AppText>
+
           <View style={styles.row}>
             <View style={styles.halfInput}>
               <Input
-                label="Date"
+                label={t("student.book.date")}
                 placeholder="2024-01-15"
-                leftIcon={<Calendar size={18} color={COLORS.textMuted} strokeWidth={1.5} />}
+                leftIcon={
+                  <Calendar
+                    size={18}
+                    color={COLORS.textMuted}
+                    strokeWidth={1.5}
+                  />
+                }
                 value={transactionDate}
                 onChangeText={setTransactionDate}
               />
             </View>
+
             <View style={styles.halfInput}>
               <Input
-                label="Time"
+                label={t("student.book.time")}
                 placeholder="14:30"
-                leftIcon={<Clock size={18} color={COLORS.textMuted} strokeWidth={1.5} />}
+                leftIcon={
+                  <Clock size={18} color={COLORS.textMuted} strokeWidth={1.5} />
+                }
                 value={transactionTime}
                 onChangeText={setTransactionTime}
               />
@@ -328,17 +387,29 @@ export default function BookHostelScreen() {
           </View>
 
           <Input
-            label="From Account (Your Account)"
+            label={t("student.book.from_account")}
             placeholder="0300-1234567"
-            leftIcon={<CreditCard size={18} color={COLORS.textMuted} strokeWidth={1.5} />}
+            leftIcon={
+              <CreditCard
+                size={18}
+                color={COLORS.textMuted}
+                strokeWidth={1.5}
+              />
+            }
             value={fromAccount}
             onChangeText={setFromAccount}
           />
 
           <Input
-            label="To Account (Manager's Account)"
+            label={t("student.book.to_account")}
             placeholder="0321-9876543"
-            leftIcon={<CreditCard size={18} color={COLORS.textMuted} strokeWidth={1.5} />}
+            leftIcon={
+              <CreditCard
+                size={18}
+                color={COLORS.textMuted}
+                strokeWidth={1.5}
+              />
+            }
             value={toAccount}
             onChangeText={setToAccount}
           />
@@ -350,7 +421,7 @@ export default function BookHostelScreen() {
       {/* Bottom Action */}
       <View style={styles.bottomBar}>
         <Button
-          title="Submit Booking"
+          title={t("student.book.submit_button")}
           onPress={handleSubmit}
           loading={submitting}
         />
@@ -367,9 +438,9 @@ const styles = StyleSheet.create({
 
   // Header
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: 16,
     paddingVertical: 12,
     backgroundColor: COLORS.bgPrimary,
@@ -381,14 +452,14 @@ const styles = StyleSheet.create({
     height: 44,
     borderRadius: 14,
     backgroundColor: COLORS.bgCard,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     borderWidth: 1,
     borderColor: COLORS.borderLight,
   },
   headerTitle: {
     fontSize: 17,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.textPrimary,
     letterSpacing: -0.2,
   },
@@ -418,7 +489,7 @@ const styles = StyleSheet.create({
   },
   hostelName: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.textPrimary,
     marginBottom: 4,
     letterSpacing: -0.2,
@@ -431,7 +502,7 @@ const styles = StyleSheet.create({
   // Section
   sectionTitle: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.textPrimary,
     marginBottom: 14,
     letterSpacing: -0.2,
@@ -445,22 +516,22 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     borderWidth: 1.5,
     borderColor: COLORS.border,
-    position: 'relative',
+    position: "relative",
   },
   roomTypeCardSelected: {
     borderColor: COLORS.primary,
     backgroundColor: COLORS.primaryLight,
   },
   roomTypeContent: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   roomTypeName: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.textPrimary,
-    textTransform: 'capitalize',
+    textTransform: "capitalize",
     marginBottom: 4,
   },
   roomTypeDetail: {
@@ -468,11 +539,11 @@ const styles = StyleSheet.create({
     color: COLORS.textMuted,
   },
   roomTypeRight: {
-    alignItems: 'flex-end',
+    alignItems: "flex-end",
   },
   roomTypePrice: {
     fontSize: 18,
-    fontWeight: '700',
+    fontWeight: "700",
     color: COLORS.primary,
   },
   roomTypePriceLabel: {
@@ -480,15 +551,15 @@ const styles = StyleSheet.create({
     color: COLORS.textMuted,
   },
   checkIcon: {
-    position: 'absolute',
+    position: "absolute",
     top: -8,
     right: -8,
     width: 26,
     height: 26,
     borderRadius: 13,
     backgroundColor: COLORS.primary,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
 
   // Payment Card
@@ -498,7 +569,7 @@ const styles = StyleSheet.create({
     padding: 20,
     marginTop: 14,
     marginBottom: 28,
-    alignItems: 'center',
+    alignItems: "center",
     borderWidth: 1,
     borderColor: COLORS.successMuted,
   },
@@ -509,7 +580,7 @@ const styles = StyleSheet.create({
   },
   paymentAmount: {
     fontSize: 32,
-    fontWeight: '700',
+    fontWeight: "700",
     color: COLORS.success,
     marginBottom: 8,
     letterSpacing: -0.5,
@@ -517,7 +588,7 @@ const styles = StyleSheet.create({
   paymentNote: {
     fontSize: 13,
     color: COLORS.textMuted,
-    textAlign: 'center',
+    textAlign: "center",
   },
 
   // Upload
@@ -527,43 +598,43 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.bgCard,
     borderWidth: 2,
     borderColor: COLORS.border,
-    borderStyle: 'dashed',
-    justifyContent: 'center',
-    alignItems: 'center',
+    borderStyle: "dashed",
+    justifyContent: "center",
+    alignItems: "center",
     gap: 10,
     marginBottom: 24,
   },
   uploadText: {
     fontSize: 14,
     color: COLORS.textMuted,
-    fontWeight: '500',
+    fontWeight: "500",
   },
 
   // Image Preview
   imagePreview: {
-    position: 'relative',
+    position: "relative",
     marginBottom: 24,
   },
   previewImage: {
-    width: '100%',
+    width: "100%",
     height: 200,
     borderRadius: 16,
   },
   removeImageBtn: {
-    position: 'absolute',
+    position: "absolute",
     top: 12,
     right: 12,
     width: 36,
     height: 36,
     borderRadius: 18,
     backgroundColor: COLORS.error,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
 
   // Row
   row: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 12,
   },
   halfInput: {

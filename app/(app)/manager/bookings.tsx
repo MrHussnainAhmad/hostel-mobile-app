@@ -10,6 +10,7 @@ import {
   X,
 } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Alert,
   FlatList,
@@ -17,20 +18,23 @@ import {
   Pressable,
   RefreshControl,
   StyleSheet,
-  Text,
   View,
-} from 'react-native';
+} from "react-native";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
 import { bookingsApi } from '@/api/bookings';
 import { hostelsApi } from '@/api/hostels';
+import AppText from "@/components/common/AppText";
 import { Badge, EmptyState, LoadingScreen } from '@/components/ui';
 import { Booking, Hostel } from '@/types';
+
 
 export default function ManagerBookingsScreen() {
   const router = useRouter();
   const params = useLocalSearchParams<{ hostelId?: string }>();
+  const { t } = useTranslation();
+
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [bookings, setBookings] = useState<Booking[]>([]);
@@ -68,8 +72,10 @@ export default function ManagerBookingsScreen() {
     } catch (error: any) {
       Toast.show({
         type: 'error',
-        text1: 'Error',
-        text2: error?.response?.data?.message || 'Failed to fetch bookings',
+        text1: t('common.error'),
+        text2:
+          error?.response?.data?.message ||
+          t('manager.bookings.fetch_failed'),
       });
     } finally {
       setLoading(false);
@@ -93,73 +99,24 @@ export default function ManagerBookingsScreen() {
     fetchBookings();
   };
 
-  const handleApprove = async (id: string) => {
-    Alert.alert(
-      'Approve Booking',
-      'Are you sure you want to approve this booking?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Approve',
-          onPress: async () => {
-            try {
-              await bookingsApi.approve(id);
-              Toast.show({
-                type: 'success',
-                text1: 'Approved',
-                text2: 'Booking approved successfully',
-              });
-              fetchBookings();
-            } catch (error: any) {
-              Toast.show({
-                type: 'error',
-                text1: 'Error',
-                text2: error?.response?.data?.message || 'Failed to approve',
-              });
-            }
-          },
-        },
-      ]
-    );
-  };
-
-  const handleKick = async (id: string, reason: 'LEFT_HOSTEL' | 'VIOLATED_RULES') => {
-    Alert.alert(
-      'Remove Student',
-      'Are you sure you want to remove this student from the hostel?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Remove',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await bookingsApi.kick(id, { kickReason: reason });
-              Toast.show({
-                type: 'success',
-                text1: 'Removed',
-                text2: 'Student removed successfully',
-              });
-              fetchBookings();
-            } catch (error: any) {
-              Toast.show({
-                type: 'error',
-                text1: 'Error',
-                text2: error?.response?.data?.message || 'Failed to remove student',
-              });
-            }
-          },
-        },
-      ]
-    );
-  };
-
   const getStatusVariant = (status: string) => {
     switch (status) {
       case 'APPROVED': return 'success';
       case 'DISAPPROVED': return 'error';
       case 'PENDING': return 'warning';
       default: return 'default';
+    }
+  };
+
+  const getStatusLabel = (status: string) => {
+    switch (status) {
+      case 'APPROVED':
+        return t('manager.bookings.status.approved');
+      case 'DISAPPROVED':
+        return t('manager.bookings.status.disapproved');
+      case 'PENDING':
+      default:
+        return t('manager.bookings.status.pending');
     }
   };
 
@@ -171,6 +128,74 @@ export default function ManagerBookingsScreen() {
     });
   };
 
+  const handleApprove = async (id: string) => {
+    Alert.alert(
+      t('manager.bookings.approve_alert_title'),
+      t('manager.bookings.approve_alert_message'),
+      [
+        { text: t('common.cancel'), style: 'cancel' },
+        {
+          text: t('common.approve'),
+          onPress: async () => {
+            try {
+              await bookingsApi.approve(id);
+              Toast.show({
+                type: 'success',
+                text1: t('manager.bookings.approve_success_title'),
+                text2: t('manager.bookings.approve_success_message'),
+              });
+              fetchBookings();
+            } catch (error: any) {
+              Toast.show({
+                type: 'error',
+                text1: t('common.error'),
+                text2:
+                  error?.response?.data?.message ||
+                  t('manager.bookings.approve_error_message'),
+              });
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  const handleKick = async (
+    id: string,
+    reason: 'LEFT_HOSTEL' | 'VIOLATED_RULES'
+  ) => {
+    Alert.alert(
+      t('manager.bookings.remove_alert_title'),
+      t('manager.bookings.remove_alert_message'),
+      [
+        { text: t('common.cancel'), style: 'cancel' },
+        {
+          text: t('common.remove'),
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await bookingsApi.kick(id, { kickReason: reason });
+              Toast.show({
+                type: 'success',
+                text1: t('manager.bookings.remove_success_title'),
+                text2: t('manager.bookings.remove_success_message'),
+              });
+              fetchBookings();
+            } catch (error: any) {
+              Toast.show({
+                type: 'error',
+                text1: t('common.error'),
+                text2:
+                  error?.response?.data?.message ||
+                  t('manager.bookings.remove_error_message'),
+              });
+            }
+          },
+        },
+      ]
+    );
+  };
+
   const selectedHostel = hostels.find((h) => h.id === selectedHostelId);
 
   const renderBooking = ({ item }: { item: Booking }) => (
@@ -178,21 +203,38 @@ export default function ManagerBookingsScreen() {
       {/* Header */}
       <View style={styles.bookingHeader}>
         <View style={styles.studentInfo}>
-          <Text style={styles.studentName}>
-            {(item as any).student?.fullName || 'Student'}
-          </Text>
-          <Text style={styles.studentEmail}>
+          <AppText style={styles.studentName}>
+            {(item as any).student?.fullName ||
+              t('manager.bookings.student_fallback_name')}
+          </AppText>
+          <AppText style={styles.studentEmail}>
             {(item as any).student?.user?.email}
-          </Text>
+          </AppText>
         </View>
-        <Badge label={item.status} variant={getStatusVariant(item.status)} size="sm" />
+        <Badge
+          label={getStatusLabel(item.status)}
+          variant={getStatusVariant(item.status)}
+          size="sm"
+        />
       </View>
 
       {/* Details */}
       <View style={styles.bookingDetails}>
-        <DetailRow label="Room Type" value={item.roomType.replace('_', ' ')} />
-        <DetailRow label="Transaction" value={`${item.transactionDate} at ${item.transactionTime}`} />
-        <DetailRow label="From → To" value={`${item.fromAccount} → ${item.toAccount}`} />
+        <DetailRow
+          label={t('manager.bookings.detail_room_type')}
+          value={item.roomType.replace('_', ' ')}
+        />
+        <DetailRow
+          label={t('manager.bookings.detail_transaction_label')}
+          value={t('manager.bookings.detail_transaction_value', {
+            date: item.transactionDate,
+            time: item.transactionTime,
+          })}
+        />
+        <DetailRow
+          label={t('manager.bookings.detail_from_to')}
+          value={`${item.fromAccount} → ${item.toAccount}`}
+        />
       </View>
 
       {/* Transaction Image */}
@@ -203,7 +245,9 @@ export default function ManagerBookingsScreen() {
             style={styles.transactionImage}
             resizeMode="cover"
           />
-          <Text style={styles.imageLabel}>Payment Proof</Text>
+          <AppText style={styles.imageLabel}>
+            {t('manager.bookings.payment_proof_label')}
+          </AppText>
         </View>
       )}
 
@@ -219,13 +263,15 @@ export default function ManagerBookingsScreen() {
             onPress={() => {
               Toast.show({
                 type: 'info',
-                text1: 'Coming Soon',
-                text2: 'Disapprove with refund feature',
+                text1: t('manager.bookings.coming_soon_title'),
+                text2: t('manager.bookings.coming_soon_description'),
               });
             }}
           >
             <X size={18} color={COLORS.error} strokeWidth={1.5} />
-            <Text style={styles.disapproveButtonText}>Disapprove</Text>
+            <AppText style={styles.disapproveButtonText}>
+              {t('manager.bookings.disapprove_button')}
+            </AppText>
           </Pressable>
 
           <Pressable
@@ -237,7 +283,9 @@ export default function ManagerBookingsScreen() {
             onPress={() => handleApprove(item.id)}
           >
             <Check size={18} color={COLORS.textInverse} strokeWidth={1.5} />
-            <Text style={styles.approveButtonText}>Approve</Text>
+            <AppText style={styles.approveButtonText}>
+              {t('common.approve')}
+            </AppText>
           </Pressable>
         </View>
       )}
@@ -252,7 +300,9 @@ export default function ManagerBookingsScreen() {
             ]}
             onPress={() => handleKick(item.id, 'LEFT_HOSTEL')}
           >
-            <Text style={styles.kickButtonText}>Mark as Left</Text>
+            <AppText style={styles.kickButtonText}>
+              {t('manager.bookings.mark_left_button')}
+            </AppText>
           </Pressable>
 
           <Pressable
@@ -263,7 +313,9 @@ export default function ManagerBookingsScreen() {
             ]}
             onPress={() => handleKick(item.id, 'VIOLATED_RULES')}
           >
-            <Text style={styles.kickViolatedButtonText}>Kick (Violated Rules)</Text>
+            <AppText style={styles.kickViolatedButtonText}>
+              {t('manager.bookings.kick_violated_button')}
+            </AppText>
           </Pressable>
         </View>
       )}
@@ -287,7 +339,9 @@ export default function ManagerBookingsScreen() {
         >
           <ArrowLeft size={22} color={COLORS.textPrimary} strokeWidth={1.5} />
         </Pressable>
-        <Text style={styles.headerTitle}>Bookings</Text>
+        <AppText style={styles.headerTitle}>
+          {t('manager.bookings.title')}
+        </AppText>
         <View style={styles.headerSpacer} />
       </View>
 
@@ -300,9 +354,10 @@ export default function ManagerBookingsScreen() {
           ]}
           onPress={() => setShowHostelPicker(!showHostelPicker)}
         >
-          <Text style={styles.hostelPickerText}>
-            {selectedHostel?.hostelName || 'Select Hostel'}
-          </Text>
+          <AppText style={styles.hostelPickerText}>
+            {selectedHostel?.hostelName ||
+              t('manager.bookings.hostel_picker_placeholder')}
+          </AppText>
           <ChevronDown size={20} color={COLORS.textMuted} strokeWidth={1.5} />
         </Pressable>
       )}
@@ -323,14 +378,15 @@ export default function ManagerBookingsScreen() {
                 setShowHostelPicker(false);
               }}
             >
-              <Text
+              <AppText
                 style={[
                   styles.hostelOptionText,
-                  selectedHostelId === hostel.id && styles.hostelOptionTextSelected,
+                  selectedHostelId === hostel.id &&
+                    styles.hostelOptionTextSelected,
                 ]}
               >
                 {hostel.hostelName}
-              </Text>
+              </AppText>
               {selectedHostelId === hostel.id && (
                 <Check size={18} color={COLORS.primary} strokeWidth={2} />
               )}
@@ -357,8 +413,8 @@ export default function ManagerBookingsScreen() {
         ListEmptyComponent={
           <EmptyState
             icon={<FileText size={48} color={COLORS.textMuted} strokeWidth={1.5} />}
-            title="No bookings"
-            description="Booking requests will appear here when students book your hostel."
+            title={t('manager.bookings.empty_title')}
+            description={t('manager.bookings.empty_description')}
           />
         }
         ItemSeparatorComponent={() => <View style={styles.separator} />}
@@ -370,8 +426,8 @@ export default function ManagerBookingsScreen() {
 // Detail Row Component
 const DetailRow = ({ label, value }: { label: string; value: string }) => (
   <View style={styles.detailRow}>
-    <Text style={styles.detailLabel}>{label}</Text>
-    <Text style={styles.detailValue}>{value}</Text>
+    <AppText style={styles.detailLabel}>{label}</AppText>
+    <AppText style={styles.detailValue}>{value}</AppText>
   </View>
 );
 

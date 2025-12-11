@@ -1,27 +1,30 @@
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import { ArrowLeft, Send } from 'lucide-react-native';
-import React, { useEffect, useRef, useState } from 'react';
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { ArrowLeft, Send } from "lucide-react-native";
+import React, { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Animated,
   FlatList,
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
-  Text,
   TextInput,
   TouchableOpacity,
   View,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import Toast from 'react-native-toast-message';
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import Toast from "react-native-toast-message";
 
-import { chatApi } from '@/api/chat';
-import { LoadingScreen } from '@/components/ui';
-import { COLORS } from '@/constants/colors';
-import { useAuthStore } from '@/stores/authStore';
-import { Message } from '@/types';
+import { chatApi } from "@/api/chat";
+import AppText from "@/components/common/AppText";
+import { LoadingScreen } from "@/components/ui";
+import { COLORS } from "@/constants/colors";
+import { useAuthStore } from "@/stores/authStore";
+import { Message } from "@/types";
+
 
 export default function ManagerConversationScreen() {
+  const { t } = useTranslation();
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const { user } = useAuthStore();
@@ -30,9 +33,8 @@ export default function ManagerConversationScreen() {
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [newMessage, setNewMessage] = useState('');
+  const [newMessage, setNewMessage] = useState("");
 
-  // Smooth fade-in animation for messages
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
   const animateMessages = () => {
@@ -52,11 +54,11 @@ export default function ManagerConversationScreen() {
       }
     } catch (error: any) {
       Toast.show({
-        type: 'error',
-        text1: 'Error',
+        type: "error",
+        text1: t("manager.conversation.fetch_error_title"),
         text2:
           error?.response?.data?.message ||
-          'Failed to fetch messages',
+          t("manager.conversation.fetch_error_message"),
       });
     } finally {
       setLoading(false);
@@ -64,11 +66,8 @@ export default function ManagerConversationScreen() {
   };
 
   const handleGoBack = () => {
-    if (router.canGoBack()) {
-      router.back();
-    } else {
-      router.replace('/(app)/manager/chat');
-    }
+    if (router.canGoBack()) router.back();
+    else router.replace("/(app)/manager/chat");
   };
 
   useEffect(() => {
@@ -90,7 +89,7 @@ export default function ManagerConversationScreen() {
 
       if (response.success) {
         setMessages((prev) => [...prev, response.data]);
-        setNewMessage('');
+        setNewMessage("");
 
         setTimeout(() => {
           flatListRef.current?.scrollToEnd({ animated: true });
@@ -98,11 +97,11 @@ export default function ManagerConversationScreen() {
       }
     } catch (error: any) {
       Toast.show({
-        type: 'error',
-        text1: 'Error',
+        type: "error",
+        text1: t("manager.conversation.send_error_title"),
         text2:
           error?.response?.data?.message ||
-          'Failed to send message',
+          t("manager.conversation.send_error_message"),
       });
     } finally {
       setSending(false);
@@ -112,8 +111,8 @@ export default function ManagerConversationScreen() {
   const formatTime = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleTimeString([], {
-      hour: '2-digit',
-      minute: '2-digit',
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
@@ -134,23 +133,17 @@ export default function ManagerConversationScreen() {
             isMe ? styles.bubbleMe : styles.bubbleOther,
           ]}
         >
-          <Text
-            style={[
-              styles.messageText,
-              isMe && styles.messageTextMe,
-            ]}
+          <AppText
+            style={[styles.messageText, isMe && styles.messageTextMe]}
           >
             {item.text}
-          </Text>
+          </AppText>
 
-          <Text
-            style={[
-              styles.messageTime,
-              isMe && styles.messageTimeMe,
-            ]}
+          <AppText
+            style={[styles.messageTime, isMe && styles.messageTimeMe]}
           >
             {formatTime(item.createdAt)}
-          </Text>
+          </AppText>
         </View>
       </Animated.View>
     );
@@ -159,21 +152,23 @@ export default function ManagerConversationScreen() {
   if (loading) return <LoadingScreen />;
 
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+    <SafeAreaView style={styles.container} edges={["top", "bottom"]}>
       {/* HEADER */}
       <View style={styles.header}>
         <TouchableOpacity onPress={handleGoBack} style={styles.backButton}>
           <ArrowLeft size={26} color={COLORS.textPrimary} />
         </TouchableOpacity>
 
-        <Text style={styles.headerTitle}>Conversation</Text>
+        <AppText style={styles.headerTitle}>
+          {t("manager.conversation.title")}
+        </AppText>
 
         <View style={{ width: 40 }} />
       </View>
 
       <KeyboardAvoidingView
         style={styles.content}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
         keyboardVerticalOffset={90}
       >
         {/* MESSAGE LIST */}
@@ -187,8 +182,12 @@ export default function ManagerConversationScreen() {
           onContentSizeChange={() => flatListRef.current?.scrollToEnd()}
           ListEmptyComponent={
             <View style={styles.emptyContainer}>
-              <Text style={styles.emptyText}>No messages yet</Text>
-              <Text style={styles.emptySubtext}>Start the conversation!</Text>
+              <AppText style={styles.emptyText}>
+                {t("manager.conversation.empty_title")}
+              </AppText>
+              <AppText style={styles.emptySubtext}>
+                {t("manager.conversation.empty_subtitle")}
+              </AppText>
             </View>
           }
         />
@@ -198,7 +197,7 @@ export default function ManagerConversationScreen() {
           <View style={styles.inputFieldWrapper}>
             <TextInput
               style={styles.input}
-              placeholder="Message..."
+              placeholder={t("manager.conversation.input_placeholder")}
               placeholderTextColor={COLORS.textMuted}
               value={newMessage}
               onChangeText={setNewMessage}
@@ -231,19 +230,19 @@ export default function ManagerConversationScreen() {
 }
 
 /* ----------------------------------------------------------
-   Redesigned Modern Styles
+   Styles
 ---------------------------------------------------------- */
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.bgPrimary,
   },
 
-  /* HEADER */
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: 18,
     paddingVertical: 14,
     backgroundColor: COLORS.bgPrimary,
@@ -253,16 +252,15 @@ const styles = StyleSheet.create({
   backButton: {
     width: 40,
     height: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   headerTitle: {
     fontSize: 20,
-    fontWeight: '700',
+    fontWeight: "700",
     color: COLORS.textPrimary,
   },
 
-  /* CONTENT */
   content: {
     flex: 1,
   },
@@ -272,21 +270,23 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
 
-  /* MESSAGES */
+  /* MESSAGE ROWS */
   messageRow: {
     marginBottom: 14,
-    flexDirection: 'row',
+    flexDirection: "row",
   },
   messageRowMe: {
-    justifyContent: 'flex-end',
+    justifyContent: "flex-end",
   },
+
+  /* BUBBLES */
   messageBubble: {
-    maxWidth: '78%',
+    maxWidth: "78%",
     paddingHorizontal: 16,
     paddingVertical: 10,
     borderRadius: 18,
     elevation: 1,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOpacity: 0.06,
     shadowRadius: 2,
     shadowOffset: { width: 0, height: 1 },
@@ -312,23 +312,23 @@ const styles = StyleSheet.create({
   messageTime: {
     fontSize: 11,
     marginTop: 6,
-    alignSelf: 'flex-end',
+    alignSelf: "flex-end",
     color: COLORS.textMuted,
   },
   messageTimeMe: {
-    color: 'rgba(255,255,255,0.75)',
+    color: "rgba(255,255,255,0.75)",
   },
 
   /* EMPTY STATE */
   emptyContainer: {
     flex: 1,
-    alignItems: 'center',
+    alignItems: "center",
     paddingVertical: 80,
   },
   emptyText: {
     fontSize: 18,
     color: COLORS.textSecondary,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   emptySubtext: {
     marginTop: 6,
@@ -338,8 +338,8 @@ const styles = StyleSheet.create({
 
   /* INPUT AREA */
   inputWrapper: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
+    flexDirection: "row",
+    alignItems: "flex-end",
     paddingHorizontal: 16,
     paddingVertical: 12,
     backgroundColor: COLORS.bgPrimary,
@@ -369,10 +369,11 @@ const styles = StyleSheet.create({
     height: 48,
     borderRadius: 24,
     backgroundColor: COLORS.primary,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   sendButtonDisabled: {
     backgroundColor: COLORS.bgSecondary,
   },
 });
+

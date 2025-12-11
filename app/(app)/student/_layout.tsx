@@ -1,6 +1,6 @@
 import { COLORS } from '@/constants/colors';
 import { Tabs } from 'expo-router';
-import { Home, MessageCircle, Search, User } from 'lucide-react-native';
+import { Home, MessageCircle, Search, User, Cog } from 'lucide-react-native';
 import React from 'react';
 
 export default function StudentTabLayout() {
@@ -58,6 +58,15 @@ export default function StudentTabLayout() {
           title: 'Profile',
           tabBarIcon: ({ color, size }) => (
             <User size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="settings"
+        options={{
+          title: 'Settings',
+          tabBarIcon: ({ color, size }) => (
+            <Cog size={size} color={color} />
           ),
         }}
       />

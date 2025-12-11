@@ -1,35 +1,37 @@
 // app/(app)/student/reserve/[id].tsx
 
-import { COLORS, OPACITY } from '@/constants/colors';
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import { ArrowLeft, Check } from 'lucide-react-native';
-import React, { useEffect, useState } from 'react';
+import { COLORS, OPACITY } from "@/constants/colors";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { ArrowLeft, Check } from "lucide-react-native";
+import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   KeyboardAvoidingView,
   Platform,
   Pressable,
   ScrollView,
   StyleSheet,
-  Text,
   TextInput,
   View,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import Toast from 'react-native-toast-message';
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import Toast from "react-native-toast-message";
 
-import { hostelsApi } from '@/api/hostels';
-import { reservationsApi } from '@/api/reservations';
-import { Button, LoadingScreen } from '@/components/ui';
-import { Hostel } from '@/types';
+import { hostelsApi } from "@/api/hostels";
+import { reservationsApi } from "@/api/reservations";
+import AppText from "@/components/common/AppText";
+import { Button, LoadingScreen } from "@/components/ui";
+import { Hostel } from "@/types";
 
 export default function ReserveScreen() {
+  const { t } = useTranslation();
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [hostel, setHostel] = useState<Hostel | null>(null);
   const [selectedRoomType, setSelectedRoomType] = useState<string | null>(null);
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState("");
 
   const fetchHostel = async () => {
     try {
@@ -42,9 +44,11 @@ export default function ReserveScreen() {
       }
     } catch (error: any) {
       Toast.show({
-        type: 'error',
-        text1: 'Error',
-        text2: error?.response?.data?.message || 'Failed to fetch hostel',
+        type: "error",
+        text1: t("student.reserve.error_title"),
+        text2:
+          error?.response?.data?.message ||
+          t("student.reserve.error_fetch_hostel"),
       });
       router.back();
     } finally {
@@ -59,9 +63,9 @@ export default function ReserveScreen() {
   const handleSubmit = async () => {
     if (!selectedRoomType) {
       Toast.show({
-        type: 'error',
-        text1: 'Error',
-        text2: 'Please select a room type',
+        type: "error",
+        text1: t("student.reserve.error_title"),
+        text2: t("student.reserve.error_select_room"),
       });
       return;
     }
@@ -76,18 +80,20 @@ export default function ReserveScreen() {
 
       if (response.success) {
         Toast.show({
-          type: 'success',
-          text1: 'Reservation Sent',
-          text2: 'The manager will review your request',
+          type: "success",
+          text1: t("student.reserve.success_title"),
+          text2: t("student.reserve.success_message"),
         });
         router.back();
-        router.push('/(app)/student/reservations');
+        router.push("/(app)/student/reservations");
       }
     } catch (error: any) {
       Toast.show({
-        type: 'error',
-        text1: 'Error',
-        text2: error?.response?.data?.message || 'Failed to create reservation',
+        type: "error",
+        text1: t("student.reserve.error_title"),
+        text2:
+          error?.response?.data?.message ||
+          t("student.reserve.error_create_reservation"),
       });
     } finally {
       setSubmitting(false);
@@ -103,7 +109,7 @@ export default function ReserveScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+    <SafeAreaView style={styles.container} edges={["top", "bottom"]}>
       {/* Header */}
       <View style={styles.header}>
         <Pressable
@@ -115,14 +121,13 @@ export default function ReserveScreen() {
         >
           <ArrowLeft size={22} color={COLORS.textPrimary} strokeWidth={1.5} />
         </Pressable>
-        <Text style={styles.headerTitle}>Reserve Hostel</Text>
+        <AppText style={styles.headerTitle}>{t("student.reserve.title")}</AppText>
         <View style={styles.headerSpacer} />
       </View>
 
       <KeyboardAvoidingView
         style={styles.keyboardView}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
         <ScrollView
           showsVerticalScrollIndicator={false}
@@ -132,25 +137,27 @@ export default function ReserveScreen() {
         >
           {/* Hostel Info */}
           <View style={styles.hostelCard}>
-            <Text style={styles.hostelName}>{hostel.hostelName}</Text>
-            <Text style={styles.hostelLocation}>
+            <AppText style={styles.hostelName}>{hostel.hostelName}</AppText>
+            <AppText style={styles.hostelLocation}>
               {hostel.city}, {hostel.address}
-            </Text>
+            </AppText>
           </View>
 
           {/* Info Note */}
           <View style={styles.infoNote}>
-            <Text style={styles.infoNoteText}>
-              Send a reservation request to the manager. Once accepted, you can proceed with booking and payment.
-            </Text>
+            <AppText style={styles.infoNoteText}>
+              {t("student.reserve.info_note")}
+            </AppText>
           </View>
 
           {/* Room Type Selection */}
-          <Text style={styles.sectionTitle}>Select Room Type</Text>
-          
+          <AppText style={styles.sectionTitle}>
+            {t("student.reserve.select_room_type")}
+          </AppText>
+
           {hostel.roomTypes?.map((roomType, index) => {
             const isSelected = selectedRoomType === roomType.type;
-            
+
             return (
               <Pressable
                 key={roomType.id ?? `${roomType.type}-${index}`}
@@ -163,32 +170,44 @@ export default function ReserveScreen() {
               >
                 <View style={styles.roomTypeContent}>
                   <View style={styles.roomTypeLeft}>
-                    <Text style={[
-                      styles.roomTypeName,
-                      isSelected && styles.roomTypeNameSelected,
-                    ]}>
-                      {roomType.type.replace('_', ' ')}
-                    </Text>
-                    <Text style={styles.roomTypeDetail}>
-                      {roomType.personsInRoom} person(s) • {roomType.availableRooms} available
-                    </Text>
+                    <AppText
+                      style={[
+                        styles.roomTypeName,
+                        isSelected && styles.roomTypeNameSelected,
+                      ]}
+                    >
+                      {roomType.type.replace("_", " ")}
+                    </AppText>
+
+                    <AppText style={styles.roomTypeDetail}>
+                      {roomType.personsInRoom} {t("student.reserve.persons")} •{" "}
+                      {roomType.availableRooms} {t("student.reserve.available")}
+                    </AppText>
                   </View>
-                  
+
                   <View style={styles.roomTypeRight}>
-                    <Text style={[
-                      styles.roomTypePrice,
-                      isSelected && styles.roomTypePriceSelected,
-                    ]}>
+                    <AppText
+                      style={[
+                        styles.roomTypePrice,
+                        isSelected && styles.roomTypePriceSelected,
+                      ]}
+                    >
                       Rs. {roomType.price.toLocaleString()}
-                    </Text>
-                    <Text style={styles.roomTypePriceLabel}>/month</Text>
+                    </AppText>
+                    <AppText style={styles.roomTypePriceLabel}>
+                      {t("student.reserve.per_month")}
+                    </AppText>
                   </View>
                 </View>
 
                 {/* Check Icon */}
                 {isSelected && (
                   <View style={styles.checkIcon}>
-                    <Check size={14} color={COLORS.textInverse} strokeWidth={2.5} />
+                    <Check
+                      size={14}
+                      color={COLORS.textInverse}
+                      strokeWidth={2.5}
+                    />
                   </View>
                 )}
               </Pressable>
@@ -196,12 +215,16 @@ export default function ReserveScreen() {
           })}
 
           {/* Message */}
-          <Text style={styles.sectionTitle}>Message to Manager</Text>
-          <Text style={styles.sectionSubtitle}>Optional - introduce yourself or ask questions</Text>
-          
+          <AppText style={styles.sectionTitle}>
+            {t("student.reserve.message_title")}
+          </AppText>
+          <AppText style={styles.sectionSubtitle}>
+            {t("student.reserve.message_subtitle")}
+          </AppText>
+
           <TextInput
             style={styles.messageInput}
-            placeholder="Hi, I'm interested in this hostel..."
+            placeholder={t("student.reserve.message_placeholder")}
             placeholderTextColor={COLORS.inputPlaceholder}
             value={message}
             onChangeText={setMessage}
@@ -220,14 +243,16 @@ export default function ReserveScreen() {
         <View style={styles.bottomContent}>
           {selectedRoomType && (
             <View style={styles.selectedInfo}>
-              <Text style={styles.selectedLabel}>Selected:</Text>
-              <Text style={styles.selectedValue}>
-                {selectedRoomType.replace('_', ' ')}
-              </Text>
+              <AppText style={styles.selectedLabel}>
+                {t("student.reserve.selected")}:
+              </AppText>
+              <AppText style={styles.selectedValue}>
+                {selectedRoomType.replace("_", " ")}
+              </AppText>
             </View>
           )}
           <Button
-            title="Send Request"
+            title={t("student.reserve.send_request")}
             onPress={handleSubmit}
             loading={submitting}
           />
@@ -245,9 +270,9 @@ const styles = StyleSheet.create({
 
   // Header
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: 16,
     paddingVertical: 12,
     backgroundColor: COLORS.bgPrimary,
@@ -259,14 +284,14 @@ const styles = StyleSheet.create({
     height: 44,
     borderRadius: 14,
     backgroundColor: COLORS.bgCard,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     borderWidth: 1,
     borderColor: COLORS.borderLight,
   },
   headerTitle: {
     fontSize: 17,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.textPrimary,
     letterSpacing: -0.2,
   },
@@ -293,7 +318,7 @@ const styles = StyleSheet.create({
   },
   hostelName: {
     fontSize: 20,
-    fontWeight: '700',
+    fontWeight: "700",
     color: COLORS.textPrimary,
     marginBottom: 6,
     letterSpacing: -0.3,
@@ -319,7 +344,7 @@ const styles = StyleSheet.create({
   // Section
   sectionTitle: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.textPrimary,
     marginBottom: 6,
     letterSpacing: -0.2,
@@ -338,16 +363,16 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     borderWidth: 1.5,
     borderColor: COLORS.border,
-    position: 'relative',
+    position: "relative",
   },
   roomTypeCardSelected: {
     borderColor: COLORS.primary,
     backgroundColor: COLORS.primaryLight,
   },
   roomTypeContent: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   roomTypeLeft: {
     flex: 1,
@@ -355,9 +380,9 @@ const styles = StyleSheet.create({
   },
   roomTypeName: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.textPrimary,
-    textTransform: 'capitalize',
+    textTransform: "capitalize",
     marginBottom: 4,
   },
   roomTypeNameSelected: {
@@ -368,11 +393,11 @@ const styles = StyleSheet.create({
     color: COLORS.textMuted,
   },
   roomTypeRight: {
-    alignItems: 'flex-end',
+    alignItems: "flex-end",
   },
   roomTypePrice: {
     fontSize: 18,
-    fontWeight: '700',
+    fontWeight: "700",
     color: COLORS.textPrimary,
   },
   roomTypePriceSelected: {
@@ -384,15 +409,15 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   checkIcon: {
-    position: 'absolute',
+    position: "absolute",
     top: -6,
     right: -6,
     width: 24,
     height: 24,
     borderRadius: 12,
     backgroundColor: COLORS.primary,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     // Subtle shadow
     shadowColor: COLORS.primary,
     shadowOffset: { width: 0, height: 2 },
@@ -416,7 +441,7 @@ const styles = StyleSheet.create({
 
   // Bottom Bar
   bottomBar: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 0,
     left: 0,
     right: 0,
@@ -431,9 +456,9 @@ const styles = StyleSheet.create({
     gap: 14,
   },
   selectedInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     gap: 6,
   },
   selectedLabel: {
@@ -442,8 +467,8 @@ const styles = StyleSheet.create({
   },
   selectedValue: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.primary,
-    textTransform: 'capitalize',
+    textTransform: "capitalize",
   },
 });

@@ -1,4 +1,4 @@
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from "expo-router";
 import {
   ArrowLeft,
   Building2,
@@ -14,29 +14,32 @@ import {
   Users,
   Wifi,
   Zap,
-} from 'lucide-react-native';
-import React, { useEffect, useState } from 'react';
+} from "lucide-react-native";
+import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Alert,
   Dimensions,
   Image,
   ScrollView,
   StyleSheet,
-  Text,
   TouchableOpacity,
   View,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import Toast from 'react-native-toast-message';
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import Toast from "react-native-toast-message";
 
-import { hostelsApi } from '@/api/hostels';
-import { Badge, Button, Card, LoadingScreen } from '@/components/ui';
-import { COLORS } from '@/constants/colors';
-import { Hostel } from '@/types';
+import { hostelsApi } from "@/api/hostels";
+import AppText from "@/components/common/AppText";
+import { Badge, Button, Card, LoadingScreen } from "@/components/ui";
+import { COLORS } from "@/constants/colors";
 
-const { width } = Dimensions.get('window');
+import { Hostel } from "@/types";
+
+const { width } = Dimensions.get("window");
 
 export default function ManagerHostelDetailScreen() {
+  const { t } = useTranslation();
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const [loading, setLoading] = useState(true);
@@ -52,11 +55,11 @@ export default function ManagerHostelDetailScreen() {
       }
     } catch (error: any) {
       Toast.show({
-        type: 'error',
-        text1: 'Error',
+        type: "error",
+        text1: t("manager.hostel_detail.fetch_error_title"),
         text2:
           error?.response?.data?.message ||
-          'Failed to fetch hostel',
+          t("manager.hostel_detail.fetch_error_message"),
       });
       handleGoBack();
     } finally {
@@ -72,36 +75,36 @@ export default function ManagerHostelDetailScreen() {
     if (router.canGoBack()) {
       router.back();
     } else {
-      router.replace('/(app)/manager/hostels');
+      router.replace("/(app)/manager/hostels");
     }
   };
 
   const handleDelete = () => {
     Alert.alert(
-      'Delete hostel',
-      'Are you sure you want to delete this hostel? This action cannot be undone.',
+      t("manager.hostel_detail.delete_alert_title"),
+      t("manager.hostel_detail.delete_alert_message"),
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: t("common.cancel"), style: "cancel" },
         {
-          text: 'Delete',
-          style: 'destructive',
+          text: t("manager.hostel_detail.delete_button"),
+          style: "destructive",
           onPress: async () => {
             try {
               setDeleting(true);
               await hostelsApi.deleteHostel(id);
               Toast.show({
-                type: 'success',
-                text1: 'Deleted',
-                text2: 'Hostel deleted successfully',
+                type: "success",
+                text1: t("manager.hostel_detail.delete_success_title"),
+                text2: t("manager.hostel_detail.delete_success_message"),
               });
-              router.replace('/(app)/manager/hostels');
+              router.replace("/(app)/manager/hostels");
             } catch (error: any) {
               Toast.show({
-                type: 'error',
-                text1: 'Error',
+                type: "error",
+                text1: t("manager.hostel_detail.delete_error_title"),
                 text2:
                   error?.response?.data?.message ||
-                  'Failed to delete hostel',
+                  t("manager.hostel_detail.delete_error_message"),
               });
             } finally {
               setDeleting(false);
@@ -123,10 +126,7 @@ export default function ManagerHostelDetailScreen() {
   const facilities = hostel.facilities;
 
   return (
-    <SafeAreaView
-      style={styles.container}
-      edges={['top', 'bottom']}
-    >
+    <SafeAreaView style={styles.container} edges={["top", "bottom"]}>
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Image Gallery */}
         <View style={styles.imageContainer}>
@@ -159,8 +159,7 @@ export default function ManagerHostelDetailScreen() {
                     key={`indicator-${index}`}
                     style={[
                       styles.indicator,
-                      activeImageIndex === index &&
-                        styles.indicatorActive,
+                      activeImageIndex === index && styles.indicatorActive,
                     ]}
                   />
                 ))}
@@ -169,25 +168,26 @@ export default function ManagerHostelDetailScreen() {
           ) : (
             <View style={styles.imagePlaceholder}>
               <Building2 size={60} color={COLORS.textMuted} />
-              <Text style={styles.placeholderText}>
-                No images
-              </Text>
+              <AppText style={styles.placeholderText}>
+                {t("manager.hostel_detail.no_images")}
+              </AppText>
             </View>
           )}
 
           {/* Back Button */}
-          <TouchableOpacity
-            style={styles.backButton}
-            onPress={handleGoBack}
-          >
+          <TouchableOpacity style={styles.backButton} onPress={handleGoBack}>
             <ArrowLeft size={24} color={COLORS.textPrimary} />
           </TouchableOpacity>
 
           {/* Status Badge */}
           <View style={styles.statusBadge}>
             <Badge
-              label={hostel.isActive ? 'ACTIVE' : 'INACTIVE'}
-              variant={hostel.isActive ? 'success' : 'error'}
+              label={
+                hostel.isActive
+                  ? t("manager.hostel_detail.status.active")
+                  : t("manager.hostel_detail.status.inactive")
+              }
+              variant={hostel.isActive ? "success" : "error"}
             />
           </View>
         </View>
@@ -196,14 +196,12 @@ export default function ManagerHostelDetailScreen() {
         <View style={styles.content}>
           {/* Header */}
           <View style={styles.header}>
-            <Text style={styles.hostelName}>
-              {hostel.hostelName}
-            </Text>
+            <AppText style={styles.hostelName}>{hostel.hostelName}</AppText>
             <View style={styles.locationRow}>
               <MapPin size={16} color={COLORS.textMuted} />
-              <Text style={styles.locationText}>
+              <AppText style={styles.locationText}>
                 {hostel.city}, {hostel.address}
-              </Text>
+              </AppText>
             </View>
           </View>
 
@@ -211,29 +209,25 @@ export default function ManagerHostelDetailScreen() {
           <Card style={styles.statsCard}>
             <View style={styles.statsRow}>
               <View style={styles.statItem}>
-                <Star
-                  size={18}
-                  color={COLORS.warning}
-                  fill={COLORS.warning}
-                />
-                <Text style={styles.statText}>
+                <Star size={18} color={COLORS.warning} fill={COLORS.warning} />
+                <AppText style={styles.statText}>
                   {hostel.rating > 0
                     ? hostel.rating.toFixed(1)
-                    : 'N/A'}
-                </Text>
+                    : t("manager.hostel_detail.rating_na")}
+                </AppText>
               </View>
               <View style={styles.statDivider} />
               <View style={styles.statItem}>
                 <Users size={18} color={COLORS.info} />
-                <Text style={styles.statText}>
-                  {hostel.reviewCount} reviews
-                </Text>
+                <AppText style={styles.statText}>
+                  {t("manager.hostel_detail.reviews_count", {
+                    count: hostel.reviewCount,
+                  })}
+                </AppText>
               </View>
               <View style={styles.statDivider} />
               <View style={styles.statItem}>
-                <Text style={styles.statText}>
-                  {hostel.hostelFor}
-                </Text>
+                <AppText style={styles.statText}>{hostel.hostelFor}</AppText>
               </View>
             </View>
           </Card>
@@ -242,62 +236,71 @@ export default function ManagerHostelDetailScreen() {
           <View style={styles.actionsRow}>
             <TouchableOpacity
               style={styles.actionButton}
-              onPress={() =>
-                router.push(`/(app)/manager/students/${id}`)
-              }
+              onPress={() => router.push(`/(app)/manager/students/${id}`)}
             >
               <Users size={20} color={COLORS.primary} />
-              <Text style={styles.actionText}>Students</Text>
+              <AppText style={styles.actionText}>
+                {t("manager.hostel_detail.action_students")}
+              </AppText>
             </TouchableOpacity>
 
             <TouchableOpacity
               style={styles.actionButton}
               onPress={() =>
-                router.push(
-                  `/(app)/manager/reservations?hostelId=${id}`
-                )
+                router.push(`/(app)/manager/reservations?hostelId=${id}`)
               }
             >
               <Calendar size={20} color={COLORS.warning} />
-              <Text style={styles.actionText}>Reservations</Text>
+              <AppText style={styles.actionText}>
+                {t("manager.hostel_detail.action_reservations")}
+              </AppText>
             </TouchableOpacity>
 
             <TouchableOpacity
               style={styles.actionButton}
               onPress={() =>
-                router.push(
-                  `/(app)/manager/bookings?hostelId=${id}`
-                )
+                router.push(`/(app)/manager/bookings?hostelId=${id}`)
               }
             >
               <FileText size={20} color={COLORS.success} />
-              <Text style={styles.actionText}>Bookings</Text>
+              <AppText style={styles.actionText}>
+                {t("manager.hostel_detail.action_bookings")}
+              </AppText>
             </TouchableOpacity>
           </View>
 
           {/* Room Types */}
-          <Text style={styles.sectionTitle}>Room types</Text>
+          <AppText style={styles.sectionTitle}>
+            {t("manager.hostel_detail.section_room_types")}
+          </AppText>
           {hostel.roomTypes?.map((roomType, index) => (
             <Card
               key={roomType.id || `room-${index}`}
               style={styles.roomTypeCard}
             >
               <View style={styles.roomTypeHeader}>
-                <Text style={styles.roomTypeName}>
-                  {roomType.type.replace('_', ' ')}
-                </Text>
-                <Text style={styles.roomTypePrice}>
-                  Rs. {roomType.price.toLocaleString()}/mo
-                </Text>
+                <AppText style={styles.roomTypeName}>
+                  {roomType.type.replace("_", " ")}
+                </AppText>
+                <AppText style={styles.roomTypePrice}>
+                  {t("manager.hostel_detail.price_format", {
+                    price: roomType.price.toLocaleString(),
+                  })}
+                </AppText>
               </View>
 
               <View style={styles.roomTypeDetails}>
-                <Text style={styles.roomTypeDetail}>
-                  {roomType.personsInRoom} person(s) per room
-                </Text>
-                <Text style={styles.roomTypeDetail}>
-                  {roomType.totalRooms} total • {roomType.availableRooms} available
-                </Text>
+                <AppText style={styles.roomTypeDetail}>
+                  {t("manager.hostel_detail.persons_per_room", {
+                    count: roomType.personsInRoom,
+                  })}
+                </AppText>
+                <AppText style={styles.roomTypeDetail}>
+                  {t("manager.hostel_detail.rooms_info", {
+                    total: roomType.totalRooms,
+                    available: roomType.availableRooms,
+                  })}
+                </AppText>
               </View>
 
               {/* Urgent Booking Price */}
@@ -306,65 +309,72 @@ export default function ManagerHostelDetailScreen() {
                   <View style={styles.urgentBookingContainer}>
                     <View style={styles.urgentBookingBadge}>
                       <Clock size={14} color={COLORS.warning} />
-                      <Text style={styles.urgentBookingLabel}>
-                        Urgent Booking
-                      </Text>
+                      <AppText style={styles.urgentBookingLabel}>
+                        {t("manager.hostel_detail.urgent_booking")}
+                      </AppText>
                     </View>
-                    <Text style={styles.urgentBookingPrice}>
-                      Rs. {roomType.urgentBookingPrice.toLocaleString()}
-                    </Text>
+                    <AppText style={styles.urgentBookingPrice}>
+                      {t("manager.hostel_detail.price_only", {
+                        price: roomType.urgentBookingPrice.toLocaleString(),
+                      })}
+                    </AppText>
                   </View>
                 )}
 
               {/* Full Room Discounted Price for SHARED_FULLROOM */}
-              {roomType.type === 'SHARED_FULLROOM' &&
+              {roomType.type === "SHARED_FULLROOM" &&
                 roomType.fullRoomPriceDiscounted && (
                   <View style={styles.fullRoomDiscountContainer}>
-                    <Text style={styles.fullRoomDiscountLabel}>
-                      Full room discount:
-                    </Text>
-                    <Text style={styles.fullRoomDiscountPrice}>
-                      Rs. {roomType.fullRoomPriceDiscounted.toLocaleString()}/mo
-                    </Text>
+                    <AppText style={styles.fullRoomDiscountLabel}>
+                      {t("manager.hostel_detail.full_room_discount_label")}
+                    </AppText>
+                    <AppText style={styles.fullRoomDiscountPrice}>
+                      {t("manager.hostel_detail.price_format", {
+                        price:
+                          roomType.fullRoomPriceDiscounted.toLocaleString(),
+                      })}
+                    </AppText>
                   </View>
                 )}
             </Card>
           ))}
 
           {/* Facilities */}
-          <Text style={styles.sectionTitle}>Facilities</Text>
+          <AppText style={styles.sectionTitle}>
+            {t("manager.hostel_detail.section_facilities")}
+          </AppText>
           <Card style={styles.facilitiesCard}>
             <View style={styles.facilitiesGrid}>
               {facilities?.hotColdWaterBath && (
                 <View style={styles.facilityItem}>
                   <Droplets size={20} color={COLORS.info} />
-                  <Text style={styles.facilityText}>
-                    Hot/Cold water
-                  </Text>
+                  <AppText style={styles.facilityText}>
+                    {t("manager.hostel_detail.facility_hot_cold_water")}
+                  </AppText>
                 </View>
               )}
               {facilities?.drinkingWater && (
                 <View style={styles.facilityItem}>
                   <Droplets size={20} color={COLORS.info} />
-                  <Text style={styles.facilityText}>
-                    Drinking water
-                  </Text>
+                  <AppText style={styles.facilityText}>
+                    {t("manager.hostel_detail.facility_drinking_water")}
+                  </AppText>
                 </View>
               )}
               {facilities?.electricityBackup && (
                 <View style={styles.facilityItem}>
                   <Zap size={20} color={COLORS.warning} />
-                  <Text style={styles.facilityText}>
-                    Electricity backup
-                  </Text>
+                  <AppText style={styles.facilityText}>
+                    {t("manager.hostel_detail.facility_electricity_backup")}
+                  </AppText>
                 </View>
               )}
               {facilities?.wifiEnabled && (
                 <View style={styles.facilityItem}>
                   <Wifi size={20} color={COLORS.success} />
-                  <Text style={styles.facilityText}>
-                    WiFi available
-                  </Text>
+                  <AppText style={styles.facilityText}>
+                    {t("manager.hostel_detail.facility_wifi")}
+                  </AppText>
                 </View>
               )}
             </View>
@@ -372,19 +382,15 @@ export default function ManagerHostelDetailScreen() {
             {facilities?.customFacilities &&
               facilities.customFacilities.length > 0 && (
                 <View style={styles.customFacilities}>
-                  {facilities.customFacilities.map(
-                    (facility, index) => (
-                      <View
-                        key={`facility-${index}`}
-                        style={styles.customFacilityItem}
-                      >
-                        <Check size={16} color={COLORS.success} />
-                        <Text style={styles.customFacilityText}>
-                          {facility}
-                        </Text>
-                      </View>
-                    )
-                  )}
+                  {facilities.customFacilities.map((facility, index) => (
+                    <View
+                      key={`facility-${index}`}
+                      style={styles.customFacilityItem}
+                    >
+                      <Check size={16} color={COLORS.success} />
+                      <AppText style={styles.customFacilityText}>{facility}</AppText>
+                    </View>
+                  ))}
                 </View>
               )}
           </Card>
@@ -392,38 +398,30 @@ export default function ManagerHostelDetailScreen() {
           {/* Rules */}
           {hostel.rules && (
             <>
-              <Text style={styles.sectionTitle}>Hostel rules</Text>
+              <AppText style={styles.sectionTitle}>
+                {t("manager.hostel_detail.section_rules")}
+              </AppText>
               <Card style={styles.rulesCard}>
-                <Text style={styles.rulesText}>
-                  {hostel.rules}
-                </Text>
+                <AppText style={styles.rulesText}>{hostel.rules}</AppText>
               </Card>
             </>
           )}
 
           {/* Nearby Locations */}
-          {hostel.nearbyLocations &&
-            hostel.nearbyLocations.length > 0 && (
-              <>
-                <Text style={styles.sectionTitle}>
-                  Nearby locations
-                </Text>
-                <View style={styles.tagsContainer}>
-                  {hostel.nearbyLocations.map(
-                    (location, index) => (
-                      <View
-                        key={`location-${index}`}
-                        style={styles.tag}
-                      >
-                        <Text style={styles.tagText}>
-                          {location}
-                        </Text>
-                      </View>
-                    )
-                  )}
-                </View>
-              </>
-            )}
+          {hostel.nearbyLocations && hostel.nearbyLocations.length > 0 && (
+            <>
+              <AppText style={styles.sectionTitle}>
+                {t("manager.hostel_detail.section_nearby_locations")}
+              </AppText>
+              <View style={styles.tagsContainer}>
+                {hostel.nearbyLocations.map((location, index) => (
+                  <View key={`location-${index}`} style={styles.tag}>
+                    <AppText style={styles.tagText}>{location}</AppText>
+                  </View>
+                ))}
+              </View>
+            </>
+          )}
 
           <View style={{ height: 100 }} />
         </View>
@@ -440,17 +438,10 @@ export default function ManagerHostelDetailScreen() {
         </TouchableOpacity>
 
         <Button
-          title="Edit hostel"
-          onPress={() =>
-            router.push(`/(app)/manager/hostel/edit/${id}`)
-          }
+          title={t("manager.hostel_detail.edit_button")}
+          onPress={() => router.push(`/(app)/manager/hostel/edit/${id}`)}
           style={styles.editButton}
-          icon={
-            <Edit
-              size={20}
-              color={COLORS.textInverse}
-            />
-          }
+          icon={<Edit size={20} color={COLORS.textInverse} />}
         />
       </View>
     </SafeAreaView>
@@ -464,22 +455,22 @@ const styles = StyleSheet.create({
   },
 
   imageContainer: {
-    position: 'relative',
+    position: "relative",
     borderBottomLeftRadius: 18,
     borderBottomRightRadius: 18,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   image: {
     width,
     height: 280,
-    resizeMode: 'cover',
+    resizeMode: "cover",
   },
   imagePlaceholder: {
     width,
     height: 280,
     backgroundColor: COLORS.bgSecondary,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     gap: 12,
   },
   placeholderText: {
@@ -487,37 +478,37 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   indicators: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 16,
     left: 0,
     right: 0,
-    flexDirection: 'row',
-    justifyContent: 'center',
+    flexDirection: "row",
+    justifyContent: "center",
     gap: 6,
   },
   indicator: {
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: 'rgba(255,255,255,0.4)',
+    backgroundColor: "rgba(255,255,255,0.4)",
   },
   indicatorActive: {
     backgroundColor: COLORS.textInverse,
     width: 22,
   },
   backButton: {
-    position: 'absolute',
+    position: "absolute",
     top: 50,
     left: 20,
     width: 44,
     height: 44,
     borderRadius: 22,
     backgroundColor: COLORS.bgSecondary,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   statusBadge: {
-    position: 'absolute',
+    position: "absolute",
     top: 50,
     right: 20,
   },
@@ -530,13 +521,13 @@ const styles = StyleSheet.create({
   },
   hostelName: {
     fontSize: 24,
-    fontWeight: '700',
+    fontWeight: "700",
     color: COLORS.textPrimary,
     marginBottom: 8,
   },
   locationRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 6,
   },
   locationText: {
@@ -551,19 +542,19 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   statsRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   statItem: {
     flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     gap: 6,
   },
   statText: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.textPrimary,
   },
   statDivider: {
@@ -573,7 +564,7 @@ const styles = StyleSheet.create({
   },
 
   actionsRow: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 12,
     marginBottom: 24,
   },
@@ -582,20 +573,20 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.bgSecondary,
     borderRadius: 14,
     padding: 14,
-    alignItems: 'center',
+    alignItems: "center",
     gap: 6,
     borderWidth: 1,
     borderColor: COLORS.border,
   },
   actionText: {
     fontSize: 12,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.textPrimary,
   },
 
   sectionTitle: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.textPrimary,
     marginBottom: 12,
     marginTop: 8,
@@ -606,25 +597,25 @@ const styles = StyleSheet.create({
     borderRadius: 16,
   },
   roomTypeHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 8,
   },
   roomTypeName: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.textPrimary,
-    textTransform: 'capitalize',
+    textTransform: "capitalize",
   },
   roomTypePrice: {
     fontSize: 16,
-    fontWeight: '700',
+    fontWeight: "700",
     color: COLORS.primary,
   },
   roomTypeDetails: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
   roomTypeDetail: {
     fontSize: 13,
@@ -633,39 +624,39 @@ const styles = StyleSheet.create({
 
   // Urgent Booking Styles
   urgentBookingContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginTop: 12,
     paddingTop: 12,
     borderTopWidth: 1,
     borderTopColor: COLORS.border,
   },
   urgentBookingBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 6,
-    backgroundColor: COLORS.warning + '15',
+    backgroundColor: COLORS.warning + "15",
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 8,
   },
   urgentBookingLabel: {
     fontSize: 12,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.warning,
   },
   urgentBookingPrice: {
     fontSize: 15,
-    fontWeight: '700',
+    fontWeight: "700",
     color: COLORS.warning,
   },
 
   // Full Room Discount Styles
   fullRoomDiscountContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginTop: 8,
     paddingTop: 8,
     borderTopWidth: 1,
@@ -677,7 +668,7 @@ const styles = StyleSheet.create({
   },
   fullRoomDiscountPrice: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.success,
   },
 
@@ -686,15 +677,15 @@ const styles = StyleSheet.create({
     borderRadius: 16,
   },
   facilitiesGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: "row",
+    flexWrap: "wrap",
     gap: 16,
   },
   facilityItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 8,
-    width: '45%',
+    width: "45%",
   },
   facilityText: {
     fontSize: 14,
@@ -708,8 +699,8 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   customFacilityItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 8,
   },
   customFacilityText: {
@@ -728,8 +719,8 @@ const styles = StyleSheet.create({
   },
 
   tagsContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: "row",
+    flexWrap: "wrap",
     gap: 8,
     marginBottom: 16,
   },
@@ -745,12 +736,12 @@ const styles = StyleSheet.create({
   },
 
   bottomBar: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 0,
     left: 0,
     right: 0,
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingHorizontal: 24,
     paddingVertical: 16,
     paddingBottom: 32,
@@ -763,9 +754,9 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: COLORS.error + '20',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: COLORS.error + "20",
+    justifyContent: "center",
+    alignItems: "center",
     borderWidth: 1,
     borderColor: COLORS.error,
   },

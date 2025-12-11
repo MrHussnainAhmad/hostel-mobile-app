@@ -1,44 +1,49 @@
 // app/(app)/manager/reservations.tsx
 
-import { COLORS, OPACITY } from '@/constants/colors';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { COLORS, OPACITY } from "@/constants/colors";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import {
   ArrowLeft,
   Calendar,
   Check,
   ChevronDown,
   X,
-} from 'lucide-react-native';
-import React, { useEffect, useState } from 'react';
+} from "lucide-react-native";
+import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Alert,
   FlatList,
   Pressable,
   RefreshControl,
   StyleSheet,
-  Text,
   TextInput,
   View,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import Toast from 'react-native-toast-message';
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import Toast from "react-native-toast-message";
 
-import { hostelsApi } from '@/api/hostels';
-import { reservationsApi } from '@/api/reservations';
-import { Badge, Button, EmptyState, LoadingScreen } from '@/components/ui';
-import { Hostel, Reservation } from '@/types';
+import { hostelsApi } from "@/api/hostels";
+import { reservationsApi } from "@/api/reservations";
+import AppText from "@/components/common/AppText";
+import { Badge, Button, EmptyState, LoadingScreen } from "@/components/ui";
+import { Hostel, Reservation } from "@/types";
+
 
 export default function ManagerReservationsScreen() {
+  const { t } = useTranslation();
   const router = useRouter();
   const params = useLocalSearchParams<{ hostelId?: string }>();
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [hostels, setHostels] = useState<Hostel[]>([]);
-  const [selectedHostelId, setSelectedHostelId] = useState<string | null>(params.hostelId || null);
+  const [selectedHostelId, setSelectedHostelId] = useState<string | null>(
+    params.hostelId || null
+  );
   const [showHostelPicker, setShowHostelPicker] = useState(false);
   const [rejectingId, setRejectingId] = useState<string | null>(null);
-  const [rejectReason, setRejectReason] = useState('');
+  const [rejectReason, setRejectReason] = useState("");
 
   const fetchHostels = async () => {
     try {
@@ -50,7 +55,7 @@ export default function ManagerReservationsScreen() {
         }
       }
     } catch (error) {
-      console.log('Error fetching hostels:', error);
+      console.log("Error fetching hostels:", error);
     }
   };
 
@@ -61,15 +66,19 @@ export default function ManagerReservationsScreen() {
     }
 
     try {
-      const response = await reservationsApi.getHostelReservations(selectedHostelId);
+      const response = await reservationsApi.getHostelReservations(
+        selectedHostelId
+      );
       if (response.success) {
         setReservations(response.data);
       }
     } catch (error: any) {
       Toast.show({
-        type: 'error',
-        text1: 'Error',
-        text2: error?.response?.data?.message || 'Failed to fetch reservations',
+        type: "error",
+        text1: t("manager.reservations.fetch_error_title"),
+        text2:
+          error?.response?.data?.message ||
+          t("manager.reservations.fetch_error_message"),
       });
     } finally {
       setLoading(false);
@@ -94,62 +103,89 @@ export default function ManagerReservationsScreen() {
   };
 
   const handleAccept = async (id: string) => {
-    Alert.alert('Accept Reservation', 'Are you sure you want to accept this reservation?', [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Accept',
-        onPress: async () => {
-          try {
-            await reservationsApi.review(id, { status: 'ACCEPTED' });
-            Toast.show({ type: 'success', text1: 'Accepted', text2: 'Reservation accepted successfully' });
-            fetchReservations();
-          } catch (error: any) {
-            Toast.show({
-              type: 'error',
-              text1: 'Error',
-              text2: error?.response?.data?.message || 'Failed to accept',
-            });
-          }
+    Alert.alert(
+      t("manager.reservations.accept_alert_title"),
+      t("manager.reservations.accept_alert_message"),
+      [
+        { text: t("manager.reservations.button_cancel"), style: "cancel" },
+        {
+          text: t("manager.reservations.button_accept"),
+          onPress: async () => {
+            try {
+              await reservationsApi.review(id, { status: "ACCEPTED" });
+              Toast.show({
+                type: "success",
+                text1: t("manager.reservations.accept_success_title"),
+                text2: t("manager.reservations.accept_success_message"),
+              });
+              fetchReservations();
+            } catch (error: any) {
+              Toast.show({
+                type: "error",
+                text1: t("manager.reservations.fetch_error_title"),
+                text2:
+                  error?.response?.data?.message ||
+                  t("manager.reservations.accept_error_message"),
+              });
+            }
+          },
         },
-      },
-    ]);
+      ]
+    );
   };
 
   const handleReject = async (id: string) => {
     if (!rejectReason.trim()) {
-      Toast.show({ type: 'error', text1: 'Error', text2: 'Please provide a rejection reason' });
+      Toast.show({
+        type: "error",
+        text1: t("manager.reservations.fetch_error_title"),
+        text2: t("manager.reservations.reject_reason_required"),
+      });
       return;
     }
 
     try {
-      await reservationsApi.review(id, { status: 'REJECTED', rejectReason: rejectReason.trim() });
-      Toast.show({ type: 'success', text1: 'Rejected', text2: 'Reservation rejected successfully' });
+      await reservationsApi.review(id, {
+        status: "REJECTED",
+        rejectReason: rejectReason.trim(),
+      });
+      Toast.show({
+        type: "success",
+        text1: t("manager.reservations.reject_success_title"),
+        text2: t("manager.reservations.reject_success_message"),
+      });
       setRejectingId(null);
-      setRejectReason('');
+      setRejectReason("");
       fetchReservations();
     } catch (error: any) {
       Toast.show({
-        type: 'error',
-        text1: 'Error',
-        text2: error?.response?.data?.message || 'Failed to reject',
+        type: "error",
+        text1: t("manager.reservations.fetch_error_title"),
+        text2:
+          error?.response?.data?.message ||
+          t("manager.reservations.reject_error_message"),
       });
     }
   };
 
   const getStatusVariant = (status: string) => {
     switch (status) {
-      case 'ACCEPTED': return 'success';
-      case 'REJECTED': return 'error';
-      case 'CANCELLED': return 'default';
-      default: return 'warning';
+      case "ACCEPTED":
+        return "success";
+      case "REJECTED":
+        return "error";
+      case "CANCELLED":
+        return "default";
+      default:
+        return "warning";
     }
   };
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString([], {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
+      month: "short",
+      day: "numeric",
+      year: "numeric",
     });
   };
 
@@ -160,38 +196,51 @@ export default function ManagerReservationsScreen() {
       {/* Header */}
       <View style={styles.reservationHeader}>
         <View style={styles.studentInfo}>
-          <Text style={styles.studentName}>
-            {(item as any).student?.fullName || 'Student'}
-          </Text>
-          <Text style={styles.studentEmail}>
+          <AppText style={styles.studentName}>
+            {(item as any).student?.fullName ||
+              t("manager.reservations.student_fallback_name")}
+          </AppText>
+          <AppText style={styles.studentEmail}>
             {(item as any).student?.user?.email}
-          </Text>
+          </AppText>
         </View>
-        <Badge label={item.status} variant={getStatusVariant(item.status)} size="sm" />
+        <Badge
+          label={item.status}
+          variant={getStatusVariant(item.status)}
+          size="sm"
+        />
       </View>
 
       {/* Details */}
       <View style={styles.reservationDetails}>
-        <DetailRow label="Room Type" value={item.roomType.replace('_', ' ')} />
-        <DetailRow label="Requested" value={formatDate(item.createdAt)} />
+        <DetailRow
+          label={t("manager.reservations.detail_room_type")}
+          value={item.roomType.replace("_", " ")}
+        />
+        <DetailRow
+          label={t("manager.reservations.detail_requested")}
+          value={formatDate(item.createdAt)}
+        />
       </View>
 
       {/* Message */}
       {item.message && (
         <View style={styles.messageBox}>
-          <Text style={styles.messageLabel}>Message</Text>
-          <Text style={styles.messageText}>{item.message}</Text>
+          <AppText style={styles.messageLabel}>
+            {t("manager.reservations.message_label")}
+          </AppText>
+          <AppText style={styles.messageText}>{item.message}</AppText>
         </View>
       )}
 
       {/* Pending Actions */}
-      {item.status === 'PENDING' && (
+      {item.status === "PENDING" && (
         <>
           {rejectingId === item.id ? (
             <View style={styles.rejectForm}>
               <TextInput
                 style={styles.rejectInput}
-                placeholder="Reason for rejection..."
+                placeholder={t("manager.reservations.reject_placeholder")}
                 placeholderTextColor={COLORS.inputPlaceholder}
                 value={rejectReason}
                 onChangeText={setRejectReason}
@@ -200,20 +249,23 @@ export default function ManagerReservationsScreen() {
               />
               <View style={styles.rejectActions}>
                 <Button
-                  title="Cancel"
+                  title={t("manager.reservations.button_cancel")}
                   onPress={() => {
                     setRejectingId(null);
-                    setRejectReason('');
+                    setRejectReason("");
                   }}
                   variant="secondary"
                   size="sm"
                   style={styles.rejectActionButton}
                 />
                 <Button
-                  title="Reject"
+                  title={t("manager.reservations.button_reject")}
                   onPress={() => handleReject(item.id)}
                   size="sm"
-                  style={[styles.rejectActionButton, { backgroundColor: COLORS.error }]}
+                  style={[
+                    styles.rejectActionButton,
+                    { backgroundColor: COLORS.error },
+                  ]}
                 />
               </View>
             </View>
@@ -228,7 +280,9 @@ export default function ManagerReservationsScreen() {
                 onPress={() => setRejectingId(item.id)}
               >
                 <X size={18} color={COLORS.error} strokeWidth={1.5} />
-                <Text style={styles.rejectButtonText}>Reject</Text>
+                <AppText style={styles.rejectButtonText}>
+                  {t("manager.reservations.button_reject")}
+                </AppText>
               </Pressable>
 
               <Pressable
@@ -240,7 +294,9 @@ export default function ManagerReservationsScreen() {
                 onPress={() => handleAccept(item.id)}
               >
                 <Check size={18} color={COLORS.textInverse} strokeWidth={1.5} />
-                <Text style={styles.acceptButtonText}>Accept</Text>
+                <AppText style={styles.acceptButtonText}>
+                  {t("manager.reservations.button_accept")}
+                </AppText>
               </Pressable>
             </View>
           )}
@@ -254,28 +310,37 @@ export default function ManagerReservationsScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+    <SafeAreaView style={styles.container} edges={["top", "bottom"]}>
       {/* Header */}
       <View style={styles.header}>
         <Pressable
           onPress={() => router.back()}
-          style={({ pressed }) => [styles.backButton, pressed && { opacity: OPACITY.pressed }]}
+          style={({ pressed }) => [
+            styles.backButton,
+            pressed && { opacity: OPACITY.pressed },
+          ]}
         >
           <ArrowLeft size={22} color={COLORS.textPrimary} strokeWidth={1.5} />
         </Pressable>
-        <Text style={styles.headerTitle}>Reservations</Text>
+        <AppText style={styles.headerTitle}>
+          {t("manager.reservations.title")}
+        </AppText>
         <View style={styles.headerSpacer} />
       </View>
 
       {/* Hostel Picker */}
       {hostels.length > 0 && (
         <Pressable
-          style={({ pressed }) => [styles.hostelPicker, pressed && { opacity: OPACITY.pressed }]}
+          style={({ pressed }) => [
+            styles.hostelPicker,
+            pressed && { opacity: OPACITY.pressed },
+          ]}
           onPress={() => setShowHostelPicker(!showHostelPicker)}
         >
-          <Text style={styles.hostelPickerText}>
-            {selectedHostel?.hostelName || 'Select Hostel'}
-          </Text>
+          <AppText style={styles.hostelPickerText}>
+            {selectedHostel?.hostelName ||
+              t("manager.reservations.hostel_picker_placeholder")}
+          </AppText>
           <ChevronDown size={20} color={COLORS.textMuted} strokeWidth={1.5} />
         </Pressable>
       )}
@@ -296,15 +361,18 @@ export default function ManagerReservationsScreen() {
                 setShowHostelPicker(false);
               }}
             >
-              <Text
+              <AppText
                 style={[
                   styles.hostelOptionText,
-                  selectedHostelId === hostel.id && styles.hostelOptionTextSelected,
+                  selectedHostelId === hostel.id &&
+                    styles.hostelOptionTextSelected,
                 ]}
               >
                 {hostel.hostelName}
-              </Text>
-              {selectedHostelId === hostel.id && <Check size={18} color={COLORS.primary} strokeWidth={2} />}
+              </AppText>
+              {selectedHostelId === hostel.id && (
+                <Check size={18} color={COLORS.primary} strokeWidth={2} />
+              )}
             </Pressable>
           ))}
         </View>
@@ -327,9 +395,11 @@ export default function ManagerReservationsScreen() {
         }
         ListEmptyComponent={
           <EmptyState
-            icon={<Calendar size={48} color={COLORS.textMuted} strokeWidth={1.5} />}
-            title="No reservations"
-            description="Reservation requests will appear here when students send them."
+            icon={
+              <Calendar size={48} color={COLORS.textMuted} strokeWidth={1.5} />
+            }
+            title={t("manager.reservations.empty_title")}
+            description={t("manager.reservations.empty_description")}
           />
         }
         ItemSeparatorComponent={() => <View style={styles.separator} />}
@@ -341,8 +411,8 @@ export default function ManagerReservationsScreen() {
 // Detail Row Component
 const DetailRow = ({ label, value }: { label: string; value: string }) => (
   <View style={styles.detailRow}>
-    <Text style={styles.detailLabel}>{label}</Text>
-    <Text style={styles.detailValue}>{value}</Text>
+    <AppText style={styles.detailLabel}>{label}</AppText>
+    <AppText style={styles.detailValue}>{value}</AppText>
   </View>
 );
 
@@ -354,9 +424,9 @@ const styles = StyleSheet.create({
 
   // Header
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: 16,
     paddingVertical: 12,
     backgroundColor: COLORS.bgPrimary,
@@ -368,14 +438,14 @@ const styles = StyleSheet.create({
     height: 44,
     borderRadius: 14,
     backgroundColor: COLORS.bgCard,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     borderWidth: 1,
     borderColor: COLORS.borderLight,
   },
   headerTitle: {
     fontSize: 17,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.textPrimary,
     letterSpacing: -0.2,
   },
@@ -385,9 +455,9 @@ const styles = StyleSheet.create({
 
   // Hostel Picker
   hostelPicker: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     marginHorizontal: 20,
     marginTop: 16,
     padding: 16,
@@ -398,7 +468,7 @@ const styles = StyleSheet.create({
   },
   hostelPickerText: {
     fontSize: 15,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.textPrimary,
   },
   hostelDropdown: {
@@ -408,12 +478,12 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     borderWidth: 1,
     borderColor: COLORS.borderLight,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   hostelOption: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     padding: 16,
   },
   hostelOptionSelected: {
@@ -424,7 +494,7 @@ const styles = StyleSheet.create({
     color: COLORS.textPrimary,
   },
   hostelOptionTextSelected: {
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.primary,
   },
 
@@ -446,9 +516,9 @@ const styles = StyleSheet.create({
     borderColor: COLORS.borderLight,
   },
   reservationHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
     marginBottom: 14,
   },
   studentInfo: {
@@ -457,7 +527,7 @@ const styles = StyleSheet.create({
   },
   studentName: {
     fontSize: 17,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.textPrimary,
     marginBottom: 4,
     letterSpacing: -0.2,
@@ -475,9 +545,9 @@ const styles = StyleSheet.create({
     marginBottom: 14,
   },
   detailRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingVertical: 4,
   },
   detailLabel: {
@@ -486,9 +556,9 @@ const styles = StyleSheet.create({
   },
   detailValue: {
     fontSize: 13,
-    fontWeight: '500',
+    fontWeight: "500",
     color: COLORS.textPrimary,
-    textTransform: 'capitalize',
+    textTransform: "capitalize",
   },
 
   // Message
@@ -500,10 +570,10 @@ const styles = StyleSheet.create({
   },
   messageLabel: {
     fontSize: 12,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.textMuted,
     marginBottom: 6,
-    textTransform: 'uppercase',
+    textTransform: "uppercase",
     letterSpacing: 0.5,
   },
   messageText: {
@@ -514,7 +584,7 @@ const styles = StyleSheet.create({
 
   // Actions
   actions: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 12,
     paddingTop: 14,
     borderTopWidth: 1,
@@ -522,9 +592,9 @@ const styles = StyleSheet.create({
   },
   actionButton: {
     flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     gap: 8,
     paddingVertical: 14,
     borderRadius: 12,
@@ -536,7 +606,7 @@ const styles = StyleSheet.create({
   },
   rejectButtonText: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.error,
   },
   acceptButton: {
@@ -544,7 +614,7 @@ const styles = StyleSheet.create({
   },
   acceptButtonText: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.textInverse,
   },
 
@@ -566,7 +636,7 @@ const styles = StyleSheet.create({
     borderColor: COLORS.inputBorder,
   },
   rejectActions: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 12,
   },
   rejectActionButton: {

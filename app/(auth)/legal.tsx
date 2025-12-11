@@ -1,25 +1,29 @@
 // app/(auth)/legal.tsx
 
+import AppText from "@/components/common/AppText";
 import { COLORS, OPACITY } from '@/constants/colors';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { ArrowLeft } from 'lucide-react-native';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Pressable,
   ScrollView,
   StyleSheet,
-  Text,
   View,
-} from 'react-native';
+} from "react-native";
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function LegalScreen() {
   const router = useRouter();
   const { type } = useLocalSearchParams<{ type: 'terms' | 'privacy' }>();
+  const { t, i18n } = useTranslation();
 
   const isTerms = type === 'terms';
-  const title = isTerms ? 'Terms of Use' : 'Privacy Policy';
-  const lastUpdated = new Date().toLocaleDateString('en-PK', {
+  const title = isTerms ? t('legal.terms.title') : t('legal.privacy.title');
+
+  const locale = i18n.language === 'ur' ? 'ur-PK' : 'en-PK';
+  const lastUpdated = new Date().toLocaleDateString(locale, {
     day: 'numeric',
     month: 'short',
     year: 'numeric',
@@ -39,7 +43,7 @@ export default function LegalScreen() {
           <ArrowLeft size={22} color={COLORS.textPrimary} strokeWidth={1.5} />
         </Pressable>
         
-        <Text style={styles.headerTitle}>{title}</Text>
+        <AppText style={styles.headerTitle}>{title}</AppText>
         
         {/* Spacer */}
         <View style={styles.headerSpacer} />
@@ -53,7 +57,9 @@ export default function LegalScreen() {
       >
         {/* Last Updated */}
         <View style={styles.metaContainer}>
-          <Text style={styles.updated}>Last updated: {lastUpdated}</Text>
+          <AppText style={styles.updated}>
+            {t('legal.last_updated', { date: lastUpdated })}
+          </AppText>
         </View>
 
         {/* Content */}
@@ -65,234 +71,218 @@ export default function LegalScreen() {
   );
 }
 
-const TermsContent = () => (
-  <>
-    <Text style={styles.body}>
-      These Terms of Use ("Terms") govern your use of the HOSTELSHUB platform
-      ("HOSTELSHUB", "we", "our", "us"). By creating an account or using the
-      website, you agree to these Terms.
-    </Text>
+const TermsContent = () => {
+  const { t } = useTranslation();
 
-    <Section title="1. Platform Only">
-      <Text style={styles.body}>
-        HOSTELSHUB is not a hostel owner. We only provide a platform where
-        managers post hostels and students can browse, reserve and book. Any stay,
-        payment or agreement is strictly between manager and student.
-      </Text>
-    </Section>
+  return (
+    <>
+      <AppText style={styles.body}>
+        {t('legal.terms.intro')}
+      </AppText>
 
-    <Section title="2. Accounts & Roles">
-      <BulletPoint>
-        Students use HOSTELSHUB to find accommodation, send reservations, create
-        bookings and chat with managers.
-      </BulletPoint>
-      <BulletPoint>
-        Managers list hostels, set room types and prices, and manage student
-        bookings.
-      </BulletPoint>
-      <BulletPoint>
-        Admins/Sub-admins review verifications, fees and reports, and may
-        moderate accounts.
-      </BulletPoint>
-      <BulletPoint>
-        You are responsible for all activity under your account and for keeping
-        your login details secure.
-      </BulletPoint>
-    </Section>
+      <Section title={t('legal.terms.section1_title')}>
+        <AppText style={styles.body}>
+          {t('legal.terms.section1_body1')}
+        </AppText>
+      </Section>
 
-    <Section title="3. Payments & Responsibility">
-      <BulletPoint>
-        Payments are made directly between students and managers (e.g.
-        Easypaisa, JazzCash, bank transfer). HOSTELSHUB does not hold or guarantee
-        your funds.
-      </BulletPoint>
-      <BulletPoint>
-        HOSTELSHUB is not responsible for any scams, non-payment, refund
-        disputes or personal agreements between students and managers.
-      </BulletPoint>
-      <BulletPoint>
-        Always use the in-app Chat before sending money and do not send funds if
-        something seems suspicious.
-      </BulletPoint>
-    </Section>
+      <Section title={t('legal.terms.section2_title')}>
+        <BulletPoint>
+          {t('legal.terms.section2_bullet1')}
+        </BulletPoint>
+        <BulletPoint>
+          {t('legal.terms.section2_bullet2')}
+        </BulletPoint>
+        <BulletPoint>
+          {t('legal.terms.section2_bullet3')}
+        </BulletPoint>
+        <BulletPoint>
+          {t('legal.terms.section2_bullet4')}
+        </BulletPoint>
+      </Section>
 
-    <Section title="4. Manager Platform Fee">
-      <Text style={styles.body}>Managers agree to pay a platform fee of:</Text>
-      <BulletPoint>Rs. 100 per student admission (one-time per new student).</BulletPoint>
-      <BulletPoint>Rs. 100 per active student per month.</BulletPoint>
-      <Text style={styles.body}>
-        This fee is paid by managers to keep the HOSTELSHUB platform live.
-        Students do not pay this fee directly to Hostels.
-      </Text>
-    </Section>
+      <Section title={t('legal.terms.section3_title')}>
+        <BulletPoint>
+          {t('legal.terms.section3_bullet1')}
+        </BulletPoint>
+        <BulletPoint>
+          {t('legal.terms.section3_bullet2')}
+        </BulletPoint>
+        <BulletPoint>
+          {t('legal.terms.section3_bullet3')}
+        </BulletPoint>
+      </Section>
 
-    <Section title="5. Behaviour & Misuse">
-      <BulletPoint>
-        You must not post fake listings, use fake profiles, harass others or
-        misuse the reporting/chat features.
-      </BulletPoint>
-      <BulletPoint>
-        You must follow local laws, hostel rules and any lawful instructions
-        from relevant authorities.
-      </BulletPoint>
-      <BulletPoint>
-        HOSTELSHUB may suspend or terminate accounts that break these Terms or
-        create risk for other users.
-      </BulletPoint>
-    </Section>
+      <Section title={t('legal.terms.section4_title')}>
+        <AppText style={styles.body}>
+          {t('legal.terms.section4_body1')}
+        </AppText>
+        <BulletPoint>
+          {t('legal.terms.section4_bullet1')}
+        </BulletPoint>
+        <BulletPoint>
+          {t('legal.terms.section4_bullet2')}
+        </BulletPoint>
+        <AppText style={styles.body}>
+          {t('legal.terms.section4_body2')}
+        </AppText>
+      </Section>
 
-    <Section title="6. Account Actions & Warnings">
-      <Text style={styles.body}>
-        In case of serious issues (such as scams, fraud or repeated abuse),
-        HOSTELSHUB may, at its own discretion:
-      </Text>
-      <BulletPoint>Temporarily suspend or permanently terminate accounts.</BulletPoint>
-      <BulletPoint>
-        Add warnings or visible posters/notices for specific hostels or
-        students to inform the community.
-      </BulletPoint>
-    </Section>
+      <Section title={t('legal.terms.section5_title')}>
+        <BulletPoint>
+          {t('legal.terms.section5_bullet1')}
+        </BulletPoint>
+        <BulletPoint>
+          {t('legal.terms.section5_bullet2')}
+        </BulletPoint>
+        <BulletPoint>
+          {t('legal.terms.section5_bullet3')}
+        </BulletPoint>
+      </Section>
 
-    <Section title="7. Changes to Terms">
-      <Text style={styles.body}>
-        We may update these Terms at any time. Updated versions will be available
-        on this page. Your continued use of HOSTELSHUB means you accept the
-        updated Terms.
-      </Text>
-    </Section>
-  </>
-);
+      <Section title={t('legal.terms.section6_title')}>
+        <AppText style={styles.body}>
+          {t('legal.terms.section6_body1')}
+        </AppText>
+        <BulletPoint>
+          {t('legal.terms.section6_bullet1')}
+        </BulletPoint>
+        <BulletPoint>
+          {t('legal.terms.section6_bullet2')}
+        </BulletPoint>
+      </Section>
 
-const PrivacyContent = () => (
-  <>
-    <Text style={styles.body}>
-      This Privacy & Safety Policy explains how HOSTELSHUB works, what we are
-      responsible for, and what you agree to when you use our platform as a
-      student or manager.
-    </Text>
+      <Section title={t('legal.terms.section7_title')}>
+        <AppText style={styles.body}>
+          {t('legal.terms.section7_body1')}
+        </AppText>
+      </Section>
+    </>
+  );
+};
 
-    <Section title="1. We are a platform, not hostel owners">
-      <Text style={styles.body}>
-        HOSTELSHUB is not a hostel owner or property dealer. We only provide an
-        online platform where hostel managers post their hostels and students can
-        browse, reserve and book those hostels.
-      </Text>
-    </Section>
+const PrivacyContent = () => {
+  const { t } = useTranslation();
 
-    <Section title="2. Payments, scams & responsibility">
-      <BulletPoint>
-        All payments and agreements are strictly between student and manager.
-        HOSTELSHUB does not hold your money and is not responsible for any loss,
-        scam or dispute.
-      </BulletPoint>
-      <BulletPoint>
-        Always use the "Chat with Manager" feature before sending money. Confirm
-        details (amount, account number, room type, dates, etc.) directly with the
-        manager.
-      </BulletPoint>
-      <BulletPoint>
-        Do not send money to anyone without first talking to the manager inside
-        the platform. If something feels suspicious, stop immediately and report
-        it.
-      </BulletPoint>
-    </Section>
+  return (
+    <>
+      <AppText style={styles.body}>
+        {t('legal.privacy.intro')}
+      </AppText>
 
-    <Section title="3. Manager platform fee">
-      <Text style={styles.body}>
-        To keep HOSTELSHUB running and improve the service, managers agree to pay:
-      </Text>
-      <BulletPoint>Rs. 100 per student admission (one-time per new student).</BulletPoint>
-      <BulletPoint>Rs. 100 per active student per month (monthly platform fee).</BulletPoint>
-      <Text style={styles.body}>
-        Students do not pay this platform fee directly to HOSTELSHUB. It is
-        collected from managers only.
-      </Text>
-    </Section>
+      <Section title={t('legal.privacy.section1_title')}>
+        <AppText style={styles.body}>
+          {t('legal.privacy.section1_body1')}
+        </AppText>
+      </Section>
 
-    <Section title="4. Account actions in case of scams">
-      <Text style={styles.body}>
-        If we receive serious reports or clear proof of fraud, scams or abuse,
-        HOSTELSHUB may:
-      </Text>
-      <BulletPoint>Suspend or permanently terminate manager and/or student accounts.</BulletPoint>
-      <BulletPoint>
-        Add warnings or visible notices (posters/flags) on specific hostels or
-        users to create awareness for others.
-      </BulletPoint>
-      <Text style={styles.body}>
-        These actions are at the discretion of HOSTELSHUB and may be taken even if
-        the issue happened outside the platform but is related to a booking
-        arranged through HOSTELSHUB.
-      </Text>
-    </Section>
+      <Section title={t('legal.privacy.section2_title')}>
+        <BulletPoint>
+          {t('legal.privacy.section2_bullet1')}
+        </BulletPoint>
+        <BulletPoint>
+          {t('legal.privacy.section2_bullet2')}
+        </BulletPoint>
+        <BulletPoint>
+          {t('legal.privacy.section2_bullet3')}
+        </BulletPoint>
+      </Section>
 
-    <Section title="5. Data we collect & how we use it">
-      <Text style={styles.body}>
-        We only collect information needed to run the platform and keep it safe,
-        such as:
-      </Text>
-      <BulletPoint>Account details (email, role, basic profile information).</BulletPoint>
-      <BulletPoint>
-        Student and manager profile data (contact info, hostel details,
-        verification data, payment proofs).
-      </BulletPoint>
-      <BulletPoint>Booking, reservation and fee records.</BulletPoint>
-      <BulletPoint>Messages and reports shared through the platform.</BulletPoint>
-      <Text style={styles.body}>
-        This information is used to operate your account, show hostel listings,
-        process bookings and fees, and help detect and investigate abuse or fraud.
-        We do not sell your personal data to third parties.
-      </Text>
-    </Section>
+      <Section title={t('legal.privacy.section3_title')}>
+        <AppText style={styles.body}>
+          {t('legal.privacy.section3_body1')}
+        </AppText>
+        <BulletPoint>
+          {t('legal.privacy.section3_bullet1')}
+        </BulletPoint>
+        <BulletPoint>
+          {t('legal.privacy.section3_bullet2')}
+        </BulletPoint>
+        <AppText style={styles.body}>
+          {t('legal.privacy.section3_body2')}
+        </AppText>
+      </Section>
 
-    <Section title="6. Sharing of information">
-      <BulletPoint>
-        Student details are shared with managers when you book or reserve a
-        hostel, so they can contact you and manage your stay.
-      </BulletPoint>
-      <BulletPoint>
-        Manager and hostel details are shown to students so they can decide
-        whether to book or reserve.
-      </BulletPoint>
-      <BulletPoint>
-        Admins and support staff can access relevant data to handle
-        verifications, fees and reports.
-      </BulletPoint>
-      <BulletPoint>
-        We may share data if required by law or to protect our rights, users or
-        the public.
-      </BulletPoint>
-    </Section>
+      <Section title={t('legal.privacy.section4_title')}>
+        <AppText style={styles.body}>
+          {t('legal.privacy.section4_body1')}
+        </AppText>
+        <BulletPoint>
+          {t('legal.privacy.section4_bullet1')}
+        </BulletPoint>
+        <BulletPoint>
+          {t('legal.privacy.section4_bullet2')}
+        </BulletPoint>
+        <AppText style={styles.body}>
+          {t('legal.privacy.section4_body2')}
+        </AppText>
+      </Section>
 
-    <Section title="7. Your responsibilities">
-      <BulletPoint>Use real, accurate information in your profile and verification.</BulletPoint>
-      <BulletPoint>Follow hostel rules and local laws.</BulletPoint>
-      <BulletPoint>
-        Do not misuse chat, bookings or reports to harass, spam or falsely
-        accuse others.
-      </BulletPoint>
-    </Section>
+      <Section title={t('legal.privacy.section5_title')}>
+        <AppText style={styles.body}>
+          {t('legal.privacy.section5_body1')}
+        </AppText>
+        <BulletPoint>
+          {t('legal.privacy.section5_bullet1')}
+        </BulletPoint>
+        <BulletPoint>
+          {t('legal.privacy.section5_bullet2')}
+        </BulletPoint>
+        <BulletPoint>
+          {t('legal.privacy.section5_bullet3')}
+        </BulletPoint>
+        <BulletPoint>
+          {t('legal.privacy.section5_bullet4')}
+        </BulletPoint>
+        <AppText style={styles.body}>
+          {t('legal.privacy.section5_body2')}
+        </AppText>
+      </Section>
 
-    <Section title="8. Changes to this policy">
-      <Text style={styles.body}>
-        We may update this Privacy & Safety Policy from time to time. Updates will
-        be published on this page. Continuing to use HOSTELSHUB means you accept
-        the latest version.
-      </Text>
-    </Section>
+      <Section title={t('legal.privacy.section6_title')}>
+        <BulletPoint>
+          {t('legal.privacy.section6_bullet1')}
+        </BulletPoint>
+        <BulletPoint>
+          {t('legal.privacy.section6_bullet2')}
+        </BulletPoint>
+        <BulletPoint>
+          {t('legal.privacy.section6_bullet3')}
+        </BulletPoint>
+        <BulletPoint>
+          {t('legal.privacy.section6_bullet4')}
+        </BulletPoint>
+      </Section>
 
-    <Text style={styles.disclaimer}>
-      This page is for general guidance only and does not replace independent
-      legal advice. If you have any questions or concerns, please contact us
-      through the support or contact options in the app.
-    </Text>
-  </>
-);
+      <Section title={t('legal.privacy.section7_title')}>
+        <BulletPoint>
+          {t('legal.privacy.section7_bullet1')}
+        </BulletPoint>
+        <BulletPoint>
+          {t('legal.privacy.section7_bullet2')}
+        </BulletPoint>
+        <BulletPoint>
+          {t('legal.privacy.section7_bullet3')}
+        </BulletPoint>
+      </Section>
+
+      <Section title={t('legal.privacy.section8_title')}>
+        <AppText style={styles.body}>
+          {t('legal.privacy.section8_body1')}
+        </AppText>
+      </Section>
+
+      <AppText style={styles.disclaimer}>
+        {t('legal.privacy.disclaimer')}
+      </AppText>
+    </>
+  );
+};
 
 // Helper Components
 const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
   <View style={styles.section}>
-    <Text style={styles.heading}>{title}</Text>
+    <AppText style={styles.heading}>{title}</AppText>
     {children}
   </View>
 );
@@ -300,7 +290,7 @@ const Section = ({ title, children }: { title: string; children: React.ReactNode
 const BulletPoint = ({ children }: { children: React.ReactNode }) => (
   <View style={styles.bulletContainer}>
     <View style={styles.bulletDot} />
-    <Text style={styles.bulletText}>{children}</Text>
+    <AppText style={styles.bulletText}>{children}</AppText>
   </View>
 );
 

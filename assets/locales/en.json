@@ -1,0 +1,1035 @@
+{
+  "auth": {
+    "login": {
+      "welcome_label": "Welcome back",
+      "welcome_title": "Sign in to continue",
+      "welcome_subtitle": "Access your hostel bookings and manage your stay",
+
+      "email_label": "Email",
+      "email_placeholder": "Enter your email",
+      "password_label": "Password",
+      "password_placeholder": "Enter your password",
+
+      "forgot_password": "Forgot password?",
+      "submit_button": "Sign In",
+
+      "register_text": "Don't have an account?",
+      "register_link": "Create account",
+
+      "terms_prefix": "By signing in, you agree to our",
+      "terms_and": "and",
+      "terms": "Terms",
+      "privacy_policy": "Privacy Policy",
+
+      "slow_server_title": "Ahhh, Here we go slow server",
+      "slow_server_message": "Just few more seconds. Sorry, we're working to change server but it costs 🥴",
+
+      "access_denied_title": "Access Denied",
+      "access_denied_message": "Admin accounts cannot access mobile app",
+
+      "login_success_title": "Welcome back!",
+      "logged_in_as": "Logged in as {{email}}",
+
+      "login_failed_title": "Login Failed"
+    },
+    "register": {
+      "welcome_label": "Get started",
+      "welcome_title": "Create your account",
+      "welcome_subtitle": "Join HostelsHub and find your perfect stay",
+
+      "full_name_label": "Full name",
+      "full_name_placeholder": "Enter your full name",
+
+      "email_label": "Email",
+      "email_placeholder": "Enter your email",
+      "password_label": "Password",
+      "password_placeholder": "Create a strong password",
+
+      "submit_button": "Create Account",
+
+      "info_student": "🎓 Browse hostels, book rooms, and manage your stay easily.",
+      "info_manager": "🏢 List your hostels, manage rooms, and connect with students.",
+
+      "login_text": "Already have an account?",
+      "login_link": "Sign in",
+
+      "terms_prefix": "By creating an account, you agree to our",
+      "terms_and": "and",
+      "terms": "Terms",
+      "privacy_policy": "Privacy Policy",
+
+      "slow_server_title": "Ahhh, Here we go slow server",
+      "slow_server_message": "Just few more seconds. Sorry, we're working to change server but it costs 🥴",
+
+      "success_title": "Account Created!",
+      "success_message": "Welcome to HostelsHub",
+
+      "failed_title": "Registration Failed"
+    }
+  },
+  "common": {
+    "generic_error": "Something went wrong",
+    "error": "Error",
+    "cancel": "Cancel",
+    "approve": "Approve",
+    "remove": "Remove"
+  },
+  "legal": {
+    "last_updated": "Last updated: {{date}}",
+    "terms": {
+      "title": "Terms of Use",
+      "intro": "These Terms of Use (\"Terms\") govern your use of the HOSTELSHUB platform (\"HOSTELSHUB\", \"we\", \"our\", \"us\"). By creating an account or using the website, you agree to these Terms.",
+      "section1_title": "1. Platform Only",
+      "section1_body1": "HOSTELSHUB is not a hostel owner. We only provide a platform where managers post hostels and students can browse, reserve and book. Any stay, payment or agreement is strictly between manager and student.",
+      "section2_title": "2. Accounts & Roles",
+      "section2_bullet1": "Students use HOSTELSHUB to find accommodation, send reservations, create bookings and chat with managers.",
+      "section2_bullet2": "Managers list hostels, set room types and prices, and manage student bookings.",
+      "section2_bullet3": "Admins/Sub-admins review verifications, fees and reports, and may moderate accounts.",
+      "section2_bullet4": "You are responsible for all activity under your account and for keeping your login details secure.",
+      "section3_title": "3. Payments & Responsibility",
+      "section3_bullet1": "Payments are made directly between students and managers (e.g. Easypaisa, JazzCash, bank transfer). HOSTELSHUB does not hold or guarantee your funds.",
+      "section3_bullet2": "HOSTELSHUB is not responsible for any scams, non-payment, refund disputes or personal agreements between students and managers.",
+      "section3_bullet3": "Always use the in-app Chat before sending money and do not send funds if something seems suspicious.",
+      "section4_title": "4. Manager Platform Fee",
+      "section4_body1": "Managers agree to pay a platform fee of:",
+      "section4_bullet1": "Rs. 100 per student admission (one-time per new student).",
+      "section4_bullet2": "Rs. 100 per active student per month.",
+      "section4_body2": "This fee is paid by managers to keep the HOSTELSHUB platform live. Students do not pay this fee directly to hostels.",
+      "section5_title": "5. Behaviour & Misuse",
+      "section5_bullet1": "You must not post fake listings, use fake profiles, harass others or misuse the reporting/chat features.",
+      "section5_bullet2": "You must follow local laws, hostel rules and any lawful instructions from relevant authorities.",
+      "section5_bullet3": "HOSTELSHUB may suspend or terminate accounts that break these Terms or create risk for other users.",
+      "section6_title": "6. Account Actions & Warnings",
+      "section6_body1": "In case of serious issues (such as scams, fraud or repeated abuse), HOSTELSHUB may, at its own discretion:",
+      "section6_bullet1": "Temporarily suspend or permanently terminate accounts.",
+      "section6_bullet2": "Add warnings or visible posters/notices for specific hostels or students to inform the community.",
+      "section7_title": "7. Changes to Terms",
+      "section7_body1": "We may update these Terms at any time. Updated versions will be available on this page. Your continued use of HOSTELSHUB means you accept the updated Terms."
+    },
+    "privacy": {
+      "title": "Privacy Policy",
+      "intro": "This Privacy & Safety Policy explains how HOSTELSHUB works, what we are responsible for, and what you agree to when you use our platform as a student or manager.",
+      "section1_title": "1. We are a platform, not hostel owners",
+      "section1_body1": "HOSTELSHUB is not a hostel owner or property dealer. We only provide an online platform where hostel managers post their hostels and students can browse, reserve and book those hostels.",
+      "section2_title": "2. Payments, scams & responsibility",
+      "section2_bullet1": "All payments and agreements are strictly between student and manager. HOSTELSHUB does not hold your money and is not responsible for any loss, scam or dispute.",
+      "section2_bullet2": "Always use the \"Chat with Manager\" feature before sending money. Confirm details (amount, account number, room type, dates, etc.) directly with the manager.",
+      "section2_bullet3": "Do not send money to anyone without first talking to the manager inside the platform. If something feels suspicious, stop immediately and report it.",
+      "section3_title": "3. Manager platform fee",
+      "section3_body1": "To keep HOSTELSHUB running and improve the service, managers agree to pay:",
+      "section3_bullet1": "Rs. 100 per student admission (one-time per new student).",
+      "section3_bullet2": "Rs. 100 per active student per month (monthly platform fee).",
+      "section3_body2": "Students do not pay this platform fee directly to HOSTELSHUB. It is collected from managers only.",
+      "section4_title": "4. Account actions in case of scams",
+      "section4_body1": "If we receive serious reports or clear proof of fraud, scams or abuse, HOSTELSHUB may:",
+      "section4_bullet1": "Suspend or permanently terminate manager and/or student accounts.",
+      "section4_bullet2": "Add warnings or visible notices (posters/flags) on specific hostels or users to create awareness for others.",
+      "section4_body2": "These actions are at the discretion of HOSTELSHUB and may be taken even if the issue happened outside the platform but is related to a booking arranged through HOSTELSHUB.",
+      "section5_title": "5. Data we collect & how we use it",
+      "section5_body1": "We only collect information needed to run the platform and keep it safe, such as:",
+      "section5_bullet1": "Account details (email, role, basic profile information).",
+      "section5_bullet2": "Student and manager profile data (contact info, hostel details, verification data, payment proofs).",
+      "section5_bullet3": "Booking, reservation and fee records.",
+      "section5_bullet4": "Messages and reports shared through the platform.",
+      "section5_body2": "This information is used to operate your account, show hostel listings, process bookings and fees, and help detect and investigate abuse or fraud. We do not sell your personal data to third parties.",
+      "section6_title": "6. Sharing of information",
+      "section6_bullet1": "Student details are shared with managers when you book or reserve a hostel, so they can contact you and manage your stay.",
+      "section6_bullet2": "Manager and hostel details are shown to students so they can decide whether to book or reserve.",
+      "section6_bullet3": "Admins and support staff can access relevant data to handle verifications, fees and reports.",
+      "section6_bullet4": "We may share data if required by law or to protect our rights, users or the public.",
+      "section7_title": "7. Your responsibilities",
+      "section7_bullet1": "Use real, accurate information in your profile and verification.",
+      "section7_bullet2": "Follow hostel rules and local laws.",
+      "section7_bullet3": "Do not misuse chat, bookings or reports to harass, spam or falsely accuse others.",
+      "section8_title": "8. Changes to this policy",
+      "section8_body1": "We may update this Privacy & Safety Policy from time to time. Updates will be published on this page. Continuing to use HOSTELSHUB means you accept the latest version.",
+      "disclaimer": "This page is for general guidance only and does not replace independent legal advice. If you have any questions or concerns, please contact us through the support or contact options in the app."
+    }
+  },
+  "manager": {
+    "bookings": {
+      "title": "Bookings",
+      "hostel_picker_placeholder": "Select Hostel",
+
+      "fetch_failed": "Failed to fetch bookings",
+
+      "student_fallback_name": "Student",
+
+      "detail_room_type": "Room Type",
+      "detail_transaction_label": "Transaction",
+      "detail_transaction_value": "{{date}} at {{time}}",
+      "detail_from_to": "From → To",
+      "payment_proof_label": "Payment Proof",
+
+      "status": {
+        "approved": "Approved",
+        "disapproved": "Disapproved",
+        "pending": "Pending"
+      },
+
+      "approve_alert_title": "Approve Booking",
+      "approve_alert_message": "Are you sure you want to approve this booking?",
+      "approve_success_title": "Approved",
+      "approve_success_message": "Booking approved successfully",
+      "approve_error_message": "Failed to approve",
+
+      "remove_alert_title": "Remove Student",
+      "remove_alert_message": "Are you sure you want to remove this student from the hostel?",
+      "remove_success_title": "Removed",
+      "remove_success_message": "Student removed successfully",
+      "remove_error_message": "Failed to remove student",
+
+      "coming_soon_title": "Coming Soon",
+      "coming_soon_description": "Disapprove with refund feature",
+
+      "disapprove_button": "Disapprove",
+      "mark_left_button": "Mark as Left",
+      "kick_violated_button": "Kick (Violated Rules)",
+
+      "empty_title": "No bookings",
+      "empty_description": "Booking requests will appear here when students book your hostel."
+    },
+    "chat": {
+      "title": "Messages",
+      "fetch_failed": "Failed to fetch conversations",
+      "yesterday": "Yesterday",
+      "student_fallback_name": "Student",
+      "last_message_fallback": "No messages yet",
+      "conversation_singular": "conversation",
+      "conversation_plural": "conversations",
+      "empty_title": "No messages",
+      "empty_description": "When students message you, they'll appear here."
+    },
+    "hostels": {
+      "title": "My Hostels",
+      "subtitle": "{{count}} hostel registered",
+      "subtitle_plural": "{{count}} hostels registered",
+
+      "fetch_failed": "Failed to fetch hostels",
+
+      "status": {
+        "active": "ACTIVE",
+        "inactive": "INACTIVE"
+      },
+
+      "price_prefix": "Rs.",
+      "price_suffix": "/mo",
+
+      "empty_title": "No hostels yet",
+      "empty_description": "Add your first hostel to start receiving bookings from students.",
+      "empty_action": "Add Hostel"
+    },
+    "dashboard": {
+      "greeting": "Welcome back,",
+      "fallback_name": "Manager",
+
+      "fetch_error_title": "Error",
+      "fetch_error_message": "Failed to fetch data",
+
+      "verification_pending_title": "Verification Pending",
+      "verification_required_title": "Verification Required",
+      "verification_pending_desc": "Your verification is under review",
+      "verification_required_desc": "Complete verification to add hostels",
+      "start_verification_button": "Start Verification",
+
+      "stats": {
+        "hostels": "Hostels",
+        "students": "Students",
+        "pending": "Pending"
+      },
+
+      "quick_actions_title": "Quick Actions",
+      "action_my_hostels": "My Hostels",
+      "action_reservations": "Reservations",
+      "action_bookings": "Bookings",
+      "action_messages": "Messages",
+
+      "your_hostels_title": "Your Hostels",
+      "see_all": "See all",
+
+      "room_types_count": "{{count}} room types",
+      "room_type_count_one": "{{count}} room type"
+    },
+    "profile": {
+      "title": "Profile",
+
+      "fetch_error_title": "Error",
+      "fetch_error_message": "Failed to fetch profile",
+
+      "fallback_name": "Manager",
+      "role_badge": "MANAGER",
+
+      "status": {
+        "verified": "VERIFIED",
+        "pending": "PENDING",
+        "rejected": "REJECTED",
+        "unverified": "UNVERIFIED"
+      },
+
+      "verification_pending_title": "Verification Pending",
+      "verification_rejected_title": "Verification Rejected",
+      "verification_required_title": "Verification Required",
+      "verification_pending_desc": "Your verification is under review",
+      "verification_rejected_fallback": "Please resubmit verification",
+      "verification_required_desc": "Complete verification to add hostels",
+
+      "section_account_info": "ACCOUNT INFORMATION",
+      "info_email": "Email",
+      "info_owner_name": "Owner Name",
+      "info_city": "City",
+      "info_payment_methods": "Payment Methods",
+      "info_empty": "—",
+
+      "payment_easypaisa": "Easypaisa",
+      "payment_jazzcash": "JazzCash",
+
+      "section_quick_links": "QUICK LINKS",
+      "link_my_hostels": "My Hostels",
+      "link_booking_requests": "Booking Requests",
+      "link_add_hostel": "Add New Hostel",
+      "link_settings": "Settings",
+
+      "section_account": "ACCOUNT",
+      "link_logout": "Logout",
+      "link_delete_account": "Delete Account",
+
+      "delete_modal": {
+        "title": "Delete Account",
+        "description": "This action cannot be undone. All your data including hostels will be permanently deleted.",
+        "label_prefix": "Type",
+        "confirm_phrase": "I want to delete.",
+        "label_suffix": "to confirm:",
+        "cancel": "Cancel",
+        "deleting": "Deleting...",
+        "delete": "Delete",
+        "error_title": "Error",
+        "error_message": "Failed to delete account"
+      }
+    },
+    "reservations": {
+      "title": "Reservations",
+      "hostel_picker_placeholder": "Select Hostel",
+
+      "fetch_error_title": "Error",
+      "fetch_error_message": "Failed to fetch reservations",
+
+      "student_fallback_name": "Student",
+
+      "detail_room_type": "Room Type",
+      "detail_requested": "Requested",
+      "message_label": "Message",
+
+      "accept_alert_title": "Accept Reservation",
+      "accept_alert_message": "Are you sure you want to accept this reservation?",
+      "accept_success_title": "Accepted",
+      "accept_success_message": "Reservation accepted successfully",
+      "accept_error_message": "Failed to accept",
+
+      "reject_placeholder": "Reason for rejection...",
+      "reject_reason_required": "Please provide a rejection reason",
+      "reject_success_title": "Rejected",
+      "reject_success_message": "Reservation rejected successfully",
+      "reject_error_message": "Failed to reject",
+
+      "button_cancel": "Cancel",
+      "button_reject": "Reject",
+      "button_accept": "Accept",
+
+      "empty_title": "No reservations",
+      "empty_description": "Reservation requests will appear here when students send them."
+    },
+    "verification": {
+      "title": "Verification",
+      "button_continue": "Continue",
+      "button_submit": "Submit Verification",
+
+      "step1": {
+        "title": "Basic Information",
+        "description": "Provide your hostel ownership details.",
+        "owner_name_label": "Owner Name",
+        "owner_name_placeholder": "Enter owner's full name",
+        "city_label": "City",
+        "city_placeholder": "Enter city",
+        "address_label": "Address",
+        "address_placeholder": "Enter complete address",
+        "hostel_for_label": "Hostel For",
+        "boys": "Boys",
+        "girls": "Girls",
+        "hostel_names_label": "Hostel Name(s)",
+        "hostel_name_placeholder": "Hostel name {{index}}",
+        "add_hostel": "Add another hostel"
+      },
+
+      "step2": {
+        "title": "Building Images",
+        "description": "Upload photos of your hostel building exterior.",
+        "add_photo": "Add Photo",
+        "image_hint": "Upload 1–5 images of your building exterior."
+      },
+
+      "step3": {
+        "title": "Payment Methods",
+        "description": "Add at least one payment method for receiving payments.",
+        "easypaisa_label": "Easypaisa Number",
+        "easypaisa_placeholder": "03XX XXXXXXX",
+        "jazzcash_label": "JazzCash Number",
+        "jazzcash_placeholder": "03XX XXXXXXX",
+        "bank_accounts_label": "Bank Accounts",
+        "bank_title": "Bank {{index}}",
+        "bank_name_placeholder": "Bank name",
+        "account_number_placeholder": "Account number",
+        "iban_placeholder": "IBAN (optional)",
+        "add_bank": "Add bank account",
+        "payment_hint": "* At least one payment method (Easypaisa, JazzCash, or Bank Account) is required",
+        "rules_title": "Platform Rules",
+        "rules_text": "• You agree to provide accurate information\n• You will respond to bookings within 24 hours\n• You will maintain hostel standards\n• Platform fee applies on each booking\n• You agree to our terms and conditions",
+        "accept_rules": "I accept all rules and terms"
+      },
+
+      "errors": {
+        "title": "Error",
+        "owner_name_required": "Owner name is required",
+        "city_required": "City is required",
+        "address_required": "Address is required",
+        "hostel_name_required": "At least one hostel name is required",
+        "image_required": "At least one building image is required",
+        "payment_required": "Need to add at least one Bank Detail",
+        "rules_required": "You must accept the rules",
+        "submit_failed": "Failed to submit verification"
+      },
+
+      "success": {
+        "title": "Submitted",
+        "message": "Your verification is under review"
+      }
+    },
+    "conversation": {
+      "title": "Conversation",
+
+      "fetch_error_title": "Error",
+      "fetch_error_message": "Failed to fetch messages",
+
+      "send_error_title": "Error",
+      "send_error_message": "Failed to send message",
+
+      "input_placeholder": "Message...",
+
+      "empty_title": "No messages yet",
+      "empty_subtitle": "Start the conversation!"
+    },
+    "students": {
+      "title": "Hostel students",
+
+      "fetch_error_title": "Error",
+      "fetch_error_message": "Failed to fetch students",
+
+      "count_singular": "{{count}} student currently staying",
+      "count_plural": "{{count}} students currently staying",
+
+      "joined_date": "Joined: {{date}}",
+
+      "empty_title": "No students",
+      "empty_description": "No students are currently staying at this hostel."
+    },
+    "create_hostel": {
+      "header_title": "Add hostel",
+      "button_next": "Next",
+      "button_create": "Create hostel",
+
+      "step1": {
+        "title": "Basic information",
+        "description": "Tell us about your hostel.",
+        "hostel_name_label": "Hostel name",
+        "hostel_name_placeholder": "Enter hostel name",
+        "city_label": "City",
+        "city_placeholder": "Enter city",
+        "address_label": "Address",
+        "address_placeholder": "Enter complete address",
+        "hostel_for_label": "Hostel for",
+        "boys": "Boys",
+        "girls": "Girls",
+        "nearby_locations_label": "Nearby locations (optional)",
+        "nearby_location_placeholder": "Location {{index}} (e.g., University, Market)",
+        "add_location": "Add location",
+        "seo_keywords_label": "SEO keywords (optional)",
+        "seo_keyword_placeholder": "Keyword {{index}} (e.g., boys hostel Lahore)",
+        "add_keyword": "Add keyword",
+        "rules_label": "Hostel rules (optional)",
+        "rules_placeholder": "Enter hostel rules..."
+      },
+
+      "step2": {
+        "title": "Room types",
+        "description": "Configure rooms and pricing.",
+        "room_type_label": "Room type",
+        "type_shared": "SHARED",
+        "type_private": "PRIVATE",
+        "type_shared_fullroom": "SHARED FULLROOM",
+        "total_rooms_label": "Total rooms",
+        "total_rooms_placeholder": "e.g., 10",
+        "persons_per_room_label": "Persons / room",
+        "persons_per_room_placeholder": "e.g., 4",
+        "price_label": "Price per month (Rs.)",
+        "price_placeholder": "e.g., 8000",
+        "urgent_price_label": "Urgent booking price (optional)",
+        "urgent_price_placeholder": "e.g., 25000",
+        "fullroom_discount_label": "Full room discounted price (optional)",
+        "fullroom_discount_placeholder": "e.g., 28000",
+        "add_room_type": "Add room type"
+      },
+
+      "step3": {
+        "title": "Facilities",
+        "description": "Select what your hostel offers.",
+        "hot_cold_water": "Hot / Cold water bath",
+        "drinking_water": "Drinking water",
+        "electricity_backup": "Electricity backup",
+        "electricity_billing_label": "Electricity billing",
+        "electricity_included": "Included",
+        "electricity_self": "Self (per unit)",
+        "rate_per_unit_label": "Rate per unit (Rs.)",
+        "rate_per_unit_placeholder": "e.g., 35",
+        "wifi_available": "WiFi available",
+        "wifi_plan_placeholder": "WiFi plan (e.g., 50 Mbps Unlimited)",
+        "wifi_max_users_placeholder": "Max users",
+        "wifi_avg_speed_placeholder": "Avg speed",
+        "custom_facilities_label": "Custom facilities",
+        "custom_facility_placeholder": "Facility {{index}} (e.g., Laundry, Gym)",
+        "add_facility": "Add facility"
+      },
+
+      "step4": {
+        "title": "Room images",
+        "description": "Upload clear, bright photos.",
+        "add_photo": "Add photo",
+        "image_hint": "Upload between 1–10 images of rooms and shared spaces.",
+        "summary_title": "Summary",
+        "summary_hostel_name": "Hostel name",
+        "summary_location": "Location",
+        "summary_for": "For",
+        "summary_room_types": "Room types",
+        "summary_images": "Images"
+      },
+
+      "toast": {
+        "info_title": "Info",
+        "all_room_types_added": "All room types already added",
+        "error_hostel_name_required": "Hostel name is required",
+        "error_city_required": "City is required",
+        "error_address_required": "Address is required",
+        "error_room_fields_required": "All room type fields are required",
+        "error_room_values_invalid": "Room values must be greater than 0",
+        "error_image_required": "At least one image is required",
+        "success_title": "Hostel created!",
+        "success_message": "Your hostel has been added successfully",
+        "error_create_failed": "Failed to create hostel"
+      }
+    },
+    "hostel_detail": {
+      "fetch_error_title": "Error",
+      "fetch_error_message": "Failed to fetch hostel",
+
+      "delete_alert_title": "Delete hostel",
+      "delete_alert_message": "Are you sure you want to delete this hostel? This action cannot be undone.",
+      "delete_button": "Delete",
+      "delete_success_title": "Deleted",
+      "delete_success_message": "Hostel deleted successfully",
+      "delete_error_title": "Error",
+      "delete_error_message": "Failed to delete hostel",
+
+      "no_images": "No images",
+
+      "status": {
+        "active": "ACTIVE",
+        "inactive": "INACTIVE"
+      },
+
+      "rating_na": "N/A",
+      "reviews_count": "{{count}} reviews",
+
+      "action_students": "Students",
+      "action_reservations": "Reservations",
+      "action_bookings": "Bookings",
+
+      "section_room_types": "Room types",
+      "section_facilities": "Facilities",
+      "section_rules": "Hostel rules",
+      "section_nearby_locations": "Nearby locations",
+
+      "price_format": "Rs. {{price}}/mo",
+      "price_only": "Rs. {{price}}",
+      "persons_per_room": "{{count}} person(s) per room",
+      "rooms_info": "{{total}} total • {{available}} available",
+
+      "urgent_booking": "Urgent Booking",
+      "full_room_discount_label": "Full room discount:",
+
+      "facility_hot_cold_water": "Hot/Cold water",
+      "facility_drinking_water": "Drinking water",
+      "facility_electricity_backup": "Electricity backup",
+      "facility_wifi": "WiFi available",
+
+      "edit_button": "Edit hostel"
+    },
+    "edit_hostel": {
+      "header_title": "Edit hostel",
+      "button_next": "Next",
+      "button_save": "Save changes",
+
+      "fetch_error_title": "Error",
+      "fetch_error_message": "Failed to fetch hostel",
+
+      "step1": {
+        "title": "Basic information",
+        "description": "Update your hostel details.",
+        "hostel_name_label": "Hostel name",
+        "hostel_name_placeholder": "Enter hostel name",
+        "city_label": "City",
+        "city_placeholder": "Enter city",
+        "address_label": "Address",
+        "address_placeholder": "Enter complete address",
+        "hostel_for_label": "Hostel for",
+        "boys": "Boys",
+        "girls": "Girls",
+        "nearby_locations_label": "Nearby locations (optional)",
+        "nearby_location_placeholder": "Location {{index}} (e.g., University, Market)",
+        "add_location": "Add location",
+        "seo_keywords_label": "SEO keywords (optional)",
+        "seo_keyword_placeholder": "Keyword {{index}} (e.g., boys hostel Lahore)",
+        "add_keyword": "Add keyword",
+        "rules_label": "Hostel rules (optional)",
+        "rules_placeholder": "Enter hostel rules..."
+      },
+
+      "step2": {
+        "title": "Room types",
+        "description": "Update room types and pricing.",
+        "room_type_label": "Room type",
+        "type_shared": "SHARED",
+        "type_private": "PRIVATE",
+        "type_shared_fullroom": "SHARED FULLROOM",
+        "total_rooms_label": "Total rooms",
+        "total_rooms_placeholder": "e.g., 10",
+        "persons_per_room_label": "Persons / room",
+        "persons_per_room_placeholder": "e.g., 4",
+        "price_label": "Price per month (Rs.)",
+        "price_placeholder": "e.g., 8000",
+        "urgent_price_label": "Urgent booking price (optional)",
+        "urgent_price_placeholder": "e.g., 25000",
+        "fullroom_discount_label": "Full room discounted price (optional)",
+        "fullroom_discount_placeholder": "e.g., 28000",
+        "add_room_type": "Add room type"
+      },
+
+      "step3": {
+        "title": "Facilities",
+        "description": "Update available facilities.",
+        "hot_cold_water": "Hot/Cold water bath",
+        "drinking_water": "Drinking water",
+        "electricity_backup": "Electricity backup",
+        "electricity_billing_label": "Electricity billing",
+        "electricity_included": "Included",
+        "electricity_self": "Self (per unit)",
+        "rate_per_unit_label": "Rate per unit (Rs.)",
+        "rate_per_unit_placeholder": "e.g., 35",
+        "wifi_available": "WiFi available",
+        "wifi_plan_placeholder": "WiFi plan (e.g., 50 Mbps Unlimited)",
+        "wifi_max_users_placeholder": "Max users",
+        "wifi_avg_speed_placeholder": "Avg speed",
+        "custom_facilities_label": "Custom facilities",
+        "custom_facility_placeholder": "Facility {{index}} (e.g., Laundry, Gym)",
+        "add_facility": "Add facility"
+      },
+
+      "step4": {
+        "title": "Room images",
+        "description": "Update hostel photos.",
+        "current_images": "Current images",
+        "add_new_images": "Add new images",
+        "add_photo": "Add photo",
+        "image_count": "Total: {{count}}/10 images"
+      },
+
+      "toast": {
+        "info_title": "Info",
+        "all_room_types_added": "All room types already added",
+        "error_hostel_name_required": "Hostel name is required",
+        "error_city_required": "City is required",
+        "error_address_required": "Address is required",
+        "error_room_type_required": "At least one room type is required",
+        "error_room_fields_required": "All room type fields are required",
+        "error_image_required": "At least one image is required",
+        "success_title": "Hostel updated",
+        "success_message": "Changes saved successfully",
+        "error_update_failed": "Failed to update hostel"
+      }
+    }
+  },
+  "student": {
+    "home": {
+      "greeting": "Hello,",
+      "fallback_name": "Student",
+
+      "verification_alert_title": "Complete your profile",
+      "verification_alert_desc": "Verify yourself to book hostels",
+
+      "current_stay_title": "Your Current Stay",
+      "hostel_fallback": "Hostel",
+      "city_fallback": "City",
+
+      "quick_actions_title": "Quick Actions",
+      "action_find_hostel": "Find Hostel",
+      "action_reservations": "Reservations",
+      "action_bookings": "Bookings",
+      "action_messages": "Messages",
+
+      "pending_reservations_title": "Pending Reservations",
+      "see_all": "See all"
+    },
+
+    "verify": {
+      "header_title": "Verification",
+
+      "intro": {
+        "title": "Complete Your Profile",
+        "description": "Please provide your details to verify your account. This information will be shared with hostel managers when you make a booking."
+      },
+
+      "fields": {
+        "father": {
+          "label": "Father's Name",
+          "placeholder": "Enter father's name"
+        },
+        "institute": {
+          "label": "Institute / University",
+          "placeholder": "Enter institute name"
+        },
+        "address": {
+          "label": "Permanent Address",
+          "placeholder": "Enter your permanent address"
+        },
+        "phone": {
+          "label": "Phone Number",
+          "placeholder": "03XX XXXXXXX"
+        },
+        "whatsapp": {
+          "label": "WhatsApp Number",
+          "placeholder": "03XX XXXXXXX"
+        }
+      },
+
+      "errors": {
+        "father_required": "Father's name is required",
+        "institute_required": "Institute name is required",
+        "address_required": "Permanent address is required",
+        "phone_required": "Valid phone number is required",
+        "whatsapp_required": "Valid WhatsApp number is required"
+      },
+
+      "submit_button": "Complete Verification",
+
+      "note": "Your information is securely stored and only shared with hostel managers for booking purposes.",
+
+      "toast": {
+        "success_title": "Verification Complete",
+        "success_message": "You can now book hostels",
+        "failed_title": "Verification Failed"
+      }
+    },
+
+    "search": {
+      "title": "Find Hostels",
+      "subtitle": "{{count}} hostel{{plural}} available",
+
+      "search_placeholder": "Search by city...",
+
+      "filters": {
+        "all": "All",
+        "boys": "Boys",
+        "girls": "Girls"
+      },
+
+      "toast_error_title": "Error",
+      "toast_error_message": "Failed to search hostels",
+
+      "empty": {
+        "title": "No hostels found",
+        "description": "Try adjusting your search or filters to find what you're looking for."
+      },
+
+      "price_unit": "/mo"
+    },
+    "reservations": {
+      "header_title": "My Reservations",
+
+      "toast_error_title": "Error",
+      "toast_error_message": "Failed to fetch reservations",
+      "toast_cancelled_title": "Cancelled",
+      "toast_cancelled_message": "Reservation cancelled successfully",
+      "toast_cancel_failed": "Failed to cancel",
+
+      "cancel_alert_title": "Cancel Reservation",
+      "cancel_alert_message": "Are you sure you want to cancel this reservation request?",
+      "cancel_alert_no": "No",
+      "cancel_alert_yes": "Yes, Cancel",
+
+      "requested_on": "Requested on",
+
+      "rejection_label": "Rejection reason",
+
+      "cancel_button": "Cancel Request",
+      "proceed_button": "Proceed to Booking",
+
+      "status": {
+        "pending": "Pending",
+        "accepted": "Accepted",
+        "rejected": "Rejected",
+        "cancelled": "Cancelled"
+      },
+
+      "empty_title": "No reservations",
+      "empty_description": "Your reservation requests will appear here when you send them.",
+      "empty_action": "Find Hostels"
+    },
+    "reports": {
+      "header_title": "My Reports",
+
+      "toast_error_title": "Error",
+      "toast_error_message": "Failed to fetch reports",
+
+      "hostel_fallback": "Hostel",
+
+      "status": {
+        "pending": "Pending",
+        "resolved": "Resolved"
+      },
+
+      "decision_label": "Decision",
+
+      "empty_title": "No reports yet",
+      "empty_description": "Your complaint reports will appear here when you submit them."
+    },
+    "chat": {
+      "title": "Messages",
+
+      "conversation_singular": "conversation",
+      "conversation_plural": "conversations",
+
+      "toast_error_title": "Error",
+      "toast_error_message": "Failed to fetch conversations",
+
+      "manager_fallback": "Manager",
+
+      "no_messages_yet": "No messages yet",
+      "yesterday": "Yesterday",
+
+      "empty_title": "No messages",
+      "empty_description": "Start a conversation with a hostel manager from any hostel page."
+    },
+    "bookings": {
+      "header_title": "My Bookings",
+
+      "toast_error_title": "Error",
+      "toast_error_message": "Failed to fetch bookings",
+
+      "booked_on": "Booked on",
+
+      "status": {
+        "approved": "Approved",
+        "disapproved": "Disapproved",
+        "pending": "Pending",
+        "left": "Left",
+        "kicked": "Kicked"
+      },
+
+      "empty_title": "No bookings yet",
+      "empty_description": "Your hostel bookings will appear here once you make a reservation.",
+      "empty_action": "Find Hostels"
+    },
+    "book": {
+      "title": "Book Hostel",
+
+      "error_title": "Error",
+      "error_fetch_hostel": "Failed to fetch hostel",
+      "error_select_room": "Select a room type",
+      "error_upload_screenshot": "Upload payment screenshot",
+      "error_enter_date": "Enter transaction date",
+      "error_enter_time": "Enter transaction time",
+      "error_enter_from_account": "Enter sender account",
+      "error_enter_to_account": "Enter receiver account",
+      "error_failed_submit": "Failed to submit booking",
+
+      "success_title": "Booking Submitted",
+      "success_message": "Manager will review your payment",
+
+      "select_room_type": "Select Room Type",
+      "persons": "person(s)",
+      "available": "available",
+      "per_month": "/month",
+
+      "amount_to_pay": "Amount to Pay",
+      "transfer_note": "Transfer to manager's account and upload screenshot",
+
+      "payment_proof": "Payment Proof",
+      "upload_screenshot": "Upload Payment Screenshot",
+
+      "transaction_details": "Transaction Details",
+      "date": "Date",
+      "time": "Time",
+      "from_account": "From Account (Your Account)",
+      "to_account": "To Account (Manager's Account)",
+
+      "submit_button": "Submit Booking"
+    },
+    "booking": {
+      "header_title": "Booking Details",
+      "not_found": "Booking not found",
+
+      "error_title": "Error",
+      "error_fetch_booking": "Failed to fetch booking",
+      "error_review_required": "Please write a review",
+      "error_report_required": "Please describe your complaint",
+      "error_leave_failed": "Failed to leave",
+      "error_report_failed": "Failed to submit report",
+
+      "leave_confirm_title": "Leave Hostel",
+      "leave_confirm_message": "Are you sure you want to leave? This action cannot be undone.",
+      "leave_confirm_button": "Yes, Leave",
+
+      "success_title": "Success",
+      "success_left": "You have left the hostel",
+
+      "report_success_title": "Report Submitted",
+      "report_success_message": "Admin will review your complaint",
+
+      "cancel": "Cancel",
+
+      "section_booking_information": "Booking Information",
+      "room_type": "Room Type",
+      "booking_date": "Booking Date",
+      "transaction_date": "Transaction Date",
+      "from_account": "From Account",
+      "to_account": "To Account",
+
+      "payment_proof": "Payment Proof",
+
+      "refund_info": "Refund Information",
+      "refund_on": "Refund on {{date}} at {{time}}",
+
+      "removed_from_hostel": "Removed from Hostel",
+      "kick_reason": "Reason: {{reason}}",
+
+      "leave_hostel": "Leave Hostel",
+      "leave_review_title": "Leave & Review",
+
+      "your_rating": "Your Rating",
+      "review_required": "Review *",
+      "placeholder_review": "Share your experience...",
+      "reason_optional": "Reason for Leaving (optional)",
+      "placeholder_reason": "Why are you leaving?",
+      "submit_leave": "Submit & Leave",
+
+      "report_issue": "Report an Issue",
+      "report_description": "Describe your complaint. Admin will review and take action.",
+      "placeholder_report": "Describe the issue in detail...",
+      "submit_report": "Submit Report",
+
+      "your_review": "Your Review"
+    },
+    "conversations": {
+      "header_title": "Conversation",
+
+      "error_title": "Error",
+      "error_fetch_messages": "Failed to fetch messages",
+      "error_send_message": "Failed to send message",
+
+      "empty_title": "No messages yet",
+      "empty_subtitle": "Start the conversation!",
+
+      "placeholder_message": "Type a message..."
+    },
+    "hostel": {
+      "error_title": "Error",
+      "error_fetch_hostel": "Failed to fetch hostel",
+      "error_manager_unavailable": "Manager not available for chat",
+      "error_start_chat": "Failed to start chat",
+
+      "no_images": "No images available",
+
+      "badge_for": "{{value}}",
+
+      "reviews": "{{count}} reviews",
+
+      "starting_price": "Starting price",
+      "available": "Available",
+      "room_types": "Room types",
+
+      "chat": "Chat",
+      "reserve": "Reserve",
+      "book": "Book",
+
+      "available_rooms": "Available Rooms",
+
+      "persons": "persons",
+      "person": "person",
+      "per_room": "per room",
+      "x_available": "{{count}} available",
+      "not_available": "Not available",
+      "per_month": "/month",
+
+      "facilities": "Facilities & Amenities",
+      "hot_cold_water": "Hot/Cold water",
+      "drinking_water": "Drinking water",
+      "power_backup": "Power backup",
+      "free_wifi": "Free WiFi",
+
+      "house_rules": "House Rules",
+
+      "nearby_places": "Nearby Places",
+
+      "manager": "Manager",
+      "manager_default": "Hostel Manager",
+      "tap_to_chat": "Tap to chat"
+    },
+    "reserve": {
+      "error_title": "Error",
+      "error_fetch_hostel": "Failed to fetch hostel",
+      "error_select_room": "Please select a room type",
+      "error_create_reservation": "Failed to create reservation",
+
+      "success_title": "Reservation Sent",
+      "success_message": "The manager will review your request",
+
+      "title": "Reserve Hostel",
+
+      "info_note": "Send a reservation request to the manager. Once accepted, you can proceed with booking and payment.",
+
+      "select_room_type": "Select Room Type",
+      "persons": "person(s)",
+      "available": "available",
+      "per_month": "/month",
+
+      "message_title": "Message to Manager",
+      "message_subtitle": "Optional - introduce yourself or ask questions",
+      "message_placeholder": "Hi, I'm interested in this hostel...",
+
+      "selected": "Selected",
+      "send_request": "Send Request"
+    }
+  },
+  "app": {
+    "settings": {
+      "title": "Settings",
+
+      "language_section": "LANGUAGE",
+      "language_en": "English",
+      "language_ur": "اردو",
+      "language_pinglish": "Pak-Eng (Change Language?)",
+
+      "about_section": "ABOUT",
+      "app_version": "App Version",
+
+      "made_with_love": "Made with ❤️ For You"
+    }
+  }
+}

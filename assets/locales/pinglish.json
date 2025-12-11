@@ -1,0 +1,940 @@
+{
+  "auth": {
+    "login": {
+      "welcome_label": "Arrey wah, wapis aa gaye!",
+      "welcome_title": "Chalo jaldi sign in karo",
+      "welcome_subtitle": "Apni bookings dekho aur hostel ka scene set karo",
+
+      "email_label": "Email",
+      "email_placeholder": "Apni email yahan phenko",
+      "password_label": "Password",
+      "password_placeholder": "Secret password daal do",
+
+      "forgot_password": "Password bhool gaye? Koi baat nahi!",
+      "submit_button": "Chalo sign in karo",
+
+      "register_text": "Account nahi hai abhi tak?",
+      "register_link": "Banao ek jaldi se",
+
+      "terms_prefix": "Sign in karke, tum maan rahe ho hamari",
+      "terms_and": "aur",
+      "terms": "Terms",
+      "privacy_policy": "Privacy Policy",
+
+      "slow_server_title": "Yaar, server sust hai aaj",
+      "slow_server_message": "Thora sabr karo, server upgrade mehnga hai bhai!",
+
+      "access_denied_title": "Darwaza band hai!",
+      "access_denied_message": "Admin log mobile app nahi chala sakte, sorry!",
+
+      "login_success_title": "Chalo ji, aa gaye andar!",
+      "logged_in_as": "{{email}} se login ho gaye, maza karo!",
+
+      "login_failed_title": "Oops! Login nahi hua"
+    },
+    "register": {
+      "welcome_label": "Naya safar shuru!",
+      "welcome_title": "Apna account banao",
+      "welcome_subtitle": "HostelsHub family mein shamil ho jao",
+
+      "full_name_label": "Full name",
+      "full_name_placeholder": "Apna asli naam likho yaar",
+
+      "email_label": "Email",
+      "email_placeholder": "Email daal do boss",
+      "password_label": "Password",
+      "password_placeholder": "Mazboot password banao, hackers se bacho",
+
+      "submit_button": "Account bana do!",
+
+      "info_student": "🎓 Hostels dekho, rooms book karo, aur chill karo!",
+      "info_manager": "🏢 Hostels list karo, students se milo, paisa kamao!",
+
+      "login_text": "Pehle se account hai?",
+      "login_link": "Seedha login karo",
+
+      "terms_prefix": "Account bana ke, tum maan rahe ho hamari",
+      "terms_and": "aur",
+      "terms": "Terms",
+      "privacy_policy": "Privacy Policy",
+
+      "slow_server_title": "Server thora slow hai boss",
+      "slow_server_message": "Chand second aur, upgrade ka budget nahi hai abhi!",
+
+      "success_title": "Account ban gaya, party time!",
+      "success_message": "HostelsHub mein khush aamdeed dost!",
+
+      "failed_title": "Registration fail ho gaya yaar"
+    }
+  },
+  "common": {
+    "generic_error": "Kuch toh gadbad ho gayi!",
+    "error": "Masla ho gaya",
+    "cancel": "Rehne do",
+    "approve": "Theek hai, done",
+    "remove": "Hata do"
+  },
+  "legal": {
+    "last_updated": "Aakhri update: {{date}}",
+    "terms": {
+      "title": "Terms of Use",
+      "intro": "Ye Terms of Use (\"Terms\") tumhare HOSTELSHUB platform ke istemal ko govern karte hain. Account bana ke ya website use karke, tum in sab se agree ho rahe ho.",
+      "section1_title": "1. Hum sirf platform hain",
+      "section1_body1": "HOSTELSHUB hostel nahi chalata. Hum bas ek jagah dete hain jahan managers hostels dikhate hain aur students book karte hain. Baqi sab tumhara apas ka mamla hai.",
+      "section2_title": "2. Accounts aur roles",
+      "section2_bullet1": "Students hostels dhoondhte hain, book karte hain, aur managers se baat karte hain.",
+      "section2_bullet2": "Managers hostels list karte hain, prices set karte hain, aur bookings handle karte hain.",
+      "section2_bullet3": "Admins sab dekh bhaal karte hain aur badmashon ko rokne ki koshish karte hain.",
+      "section2_bullet4": "Apne account ki zimmedari tumhari hai, password mat bhoolna!",
+      "section3_title": "3. Payments aur zimmedari",
+      "section3_bullet1": "Paisa tumhara aur manager ka mamla hai. HOSTELSHUB beech mein nahi aata.",
+      "section3_bullet2": "Kisi scam ya jhagde ka zimmedar hum nahi, samajh gaye?",
+      "section3_bullet3": "Paisa bhejne se pehle Chat use karo, aur agar kuch fishy lage toh ruk jao!",
+      "section4_title": "4. Manager platform fee",
+      "section4_body1": "Managers ye fee dete hain:",
+      "section4_bullet1": "Naye student par Rs. 100 (ek dafa).",
+      "section4_bullet2": "Har active student per mahina Rs. 100.",
+      "section4_body2": "Ye fee managers ki hai, students ki nahi.",
+      "section5_title": "5. Badtameezi mat karo",
+      "section5_bullet1": "Jhooti listings, fake profiles, harassment - sab mana hai!",
+      "section5_bullet2": "Local laws aur hostel rules follow karo.",
+      "section5_bullet3": "Rules todte pakre gaye toh account udaa denge!",
+      "section6_title": "6. Account actions aur warnings",
+      "section6_body1": "Agar koi fraud ya bakwas karta pakra gaya toh HOSTELSHUB:",
+      "section6_bullet1": "Account suspend ya permanently band kar sakta hai.",
+      "section6_bullet2": "Warning ya poster laga sakta hai taake doosre bach sakein.",
+      "section7_title": "7. Terms mein tabdili",
+      "section7_body1": "Hum ye Terms kabhi bhi change kar sakte hain. Use karte rahe matlab accept karte rahe."
+    },
+    "privacy": {
+      "title": "Privacy Policy",
+      "intro": "Ye Privacy & Safety Policy batati hai ke HOSTELSHUB kaise kaam karta hai aur tum kis baat se agree ho rahe ho.",
+      "section1_title": "1. Hum platform hain, hostel wale nahi",
+      "section1_body1": "HOSTELSHUB hostel nahi chalata. Hum sirf ek online jagah dete hain jahan managers aur students milte hain.",
+      "section2_title": "2. Payments, scams aur zimmedari",
+      "section2_bullet1": "Paisa tumhara aur manager ka scene hai. Hum beech mein nahi, nuqsan ka zimmedar bhi nahi.",
+      "section2_bullet2": "Paisa bhejne se pehle Chat use karo, details confirm karo.",
+      "section2_bullet3": "Bina manager se baat kiye paisa mat bhejna. Fishy lage toh ruk jao, report karo!",
+      "section3_title": "3. Manager platform fee",
+      "section3_body1": "Platform chalane ke liye managers ye fee dete hain:",
+      "section3_bullet1": "Naye student par Rs. 100 (ek dafa).",
+      "section3_bullet2": "Har active student per mahina Rs. 100.",
+      "section3_body2": "Students ye fee nahi dete, sirf managers dete hain.",
+      "section4_title": "4. Scam hone par kya hoga",
+      "section4_body1": "Agar fraud ya scam pakra gaya toh HOSTELSHUB:",
+      "section4_bullet1": "Accounts suspend ya permanently band kar sakta hai.",
+      "section4_bullet2": "Warnings ya notices laga sakta hai taake baaki log hoshiyar rahein.",
+      "section4_body2": "Ye actions HOSTELSHUB ki marzi par hain, chahe masla bahar hua ho.",
+      "section5_title": "5. Hum kya data lete hain aur kaise use karte hain",
+      "section5_body1": "Hum sirf zaroori maloomat lete hain:",
+      "section5_bullet1": "Account details (email, role, basic info).",
+      "section5_bullet2": "Profile data (contact, hostel details, verification, payment proofs).",
+      "section5_bullet3": "Booking, reservation aur fee records.",
+      "section5_bullet4": "Messages aur reports.",
+      "section5_body2": "Ye sab platform chalane, abuse detect karne ke liye. Data bechte nahi hum!",
+      "section6_title": "6. Data sharing",
+      "section6_bullet1": "Booking par student ki details manager ko milti hain.",
+      "section6_bullet2": "Hostel aur manager ki details students ko dikhti hain.",
+      "section6_bullet3": "Admins verification aur reports handle karne ke liye data dekh sakte hain.",
+      "section6_bullet4": "Law bole toh share karna padta hai.",
+      "section7_title": "7. Tumhari zimmedari",
+      "section7_bullet1": "Sahi maloomat do, jhoot mat bolo.",
+      "section7_bullet2": "Hostel rules aur local laws follow karo.",
+      "section7_bullet3": "Chat aur reports ko spam ya harassment ke liye mat use karo.",
+      "section8_title": "8. Policy mein tabdili",
+      "section8_body1": "Ye policy kabhi bhi update ho sakti hai. Use karte rahe matlab accept karte rahe.",
+      "disclaimer": "Ye page sirf guidance ke liye hai, legal advice nahi. Sawaal hon toh app se contact karo."
+    }
+  },
+  "manager": {
+    "bookings": {
+      "title": "Bookings",
+      "hostel_picker_placeholder": "Hostel chuno",
+
+      "fetch_failed": "Bookings laane mein panga ho gaya",
+
+      "student_fallback_name": "Student bhai/behen",
+
+      "detail_room_type": "Room type",
+      "detail_transaction_label": "Transaction",
+      "detail_transaction_value": "{{date}} ko {{time}} par",
+      "detail_from_to": "From → To",
+      "payment_proof_label": "Paisa bhejna ka saboot",
+
+      "status": {
+        "approved": "Done hai!",
+        "disapproved": "Nahi hua",
+        "pending": "Intezaar mein"
+      },
+
+      "approve_alert_title": "Booking approve karna hai?",
+      "approve_alert_message": "Pakka approve karna hai is booking ko?",
+      "approve_success_title": "Approved!",
+      "approve_success_message": "Booking set ho gayi, maza karo!",
+      "approve_error_message": "Approve karne mein gadbad ho gayi",
+
+      "remove_alert_title": "Student ko nikalna hai?",
+      "remove_alert_message": "Pakka nikalna hai is student ko hostel se?",
+      "remove_success_title": "Nikal diya!",
+      "remove_success_message": "Student hostel se nikal gaya",
+      "remove_error_message": "Nikalne mein panga ho gaya",
+
+      "coming_soon_title": "Jaldi aa raha hai!",
+      "coming_soon_description": "Refund wala disapprove feature",
+
+      "disapprove_button": "Disapprove karo",
+      "mark_left_button": "Chala gaya mark karo",
+      "kick_violated_button": "Bahar karo (rules toda)",
+
+      "empty_title": "Koi booking nahi abhi",
+      "empty_description": "Jab students book karenge toh yahan dikhai denge."
+    },
+    "chat": {
+      "title": "Messages",
+      "fetch_failed": "Conversations laane mein masla ho gaya",
+      "yesterday": "Kal",
+      "student_fallback_name": "Student",
+      "last_message_fallback": "Koi message nahi abhi tak",
+      "conversation_singular": "conversation",
+      "conversation_plural": "conversations",
+      "empty_title": "Koi message nahi",
+      "empty_description": "Jab students message karenge toh yahan aayenge."
+    },
+    "hostels": {
+      "title": "Mere hostels",
+      "subtitle": "{{count}} hostel registered hai",
+      "subtitle_plural": "{{count}} hostels registered hain",
+
+      "fetch_failed": "Hostels laane mein dikkat ho gayi",
+
+      "status": {
+        "active": "CHALU HAI",
+        "inactive": "BAND HAI"
+      },
+
+      "price_prefix": "Rs.",
+      "price_suffix": "/mahina",
+
+      "empty_title": "Abhi koi hostel nahi hai",
+      "empty_description": "Pehla hostel add karo taake students aana shuru ho!",
+      "empty_action": "Hostel add karo"
+    },
+    "dashboard": {
+      "greeting": "Wapis aaye,",
+      "fallback_name": "Manager sahab",
+
+      "fetch_error_title": "Arey nahi!",
+      "fetch_error_message": "Data laane mein masla ho gaya",
+
+      "verification_pending_title": "Verification check ho rahi hai",
+      "verification_required_title": "Pehle verification karo",
+      "verification_pending_desc": "Tumhari verification dekhi ja rahi hai",
+      "verification_required_desc": "Hostels add karne ke liye verification complete karo",
+      "start_verification_button": "Verification shuru karo",
+
+      "stats": {
+        "hostels": "Hostels",
+        "students": "Students",
+        "pending": "Pending"
+      },
+
+      "quick_actions_title": "Jaldi wale kaam",
+      "action_my_hostels": "Mere Hostels",
+      "action_reservations": "Reservations",
+      "action_bookings": "Bookings",
+      "action_messages": "Messages",
+
+      "your_hostels_title": "Tumhare Hostels",
+      "see_all": "Sab dekho",
+
+      "room_types_count": "{{count}} room types",
+      "room_type_count_one": "{{count}} room type"
+    },
+    "profile": {
+      "title": "Profile",
+
+      "fetch_error_title": "Oho!",
+      "fetch_error_message": "Profile laane mein dikkat",
+
+      "fallback_name": "Manager sahab",
+      "role_badge": "MANAGER",
+
+      "status": {
+        "verified": "VERIFIED HAI",
+        "pending": "PENDING HAI",
+        "rejected": "REJECT HO GAYA",
+        "unverified": "VERIFY NAHI HUA"
+      },
+
+      "verification_pending_title": "Verification check ho rahi hai",
+      "verification_rejected_title": "Verification reject ho gayi",
+      "verification_required_title": "Verification zaroori hai",
+      "verification_pending_desc": "Tumhari verification dekhi ja rahi hai, thora sabr",
+      "verification_rejected_fallback": "Dobara verification submit karo please",
+      "verification_required_desc": "Hostels add karne ke liye verification complete karo",
+
+      "section_account_info": "ACCOUNT KI DETAILS",
+      "info_email": "Email",
+      "info_owner_name": "Malik ka naam",
+      "info_city": "Sheher",
+      "info_payment_methods": "Payment methods",
+      "info_empty": "—",
+
+      "payment_easypaisa": "Easypaisa",
+      "payment_jazzcash": "JazzCash",
+
+      "section_quick_links": "JALDI WALE LINKS",
+      "link_my_hostels": "Mere Hostels",
+      "link_booking_requests": "Booking Requests",
+      "link_add_hostel": "Naya Hostel Add Karo",
+      "link_settings": "Settings",
+
+      "section_account": "ACCOUNT",
+      "link_logout": "Logout karo",
+      "link_delete_account": "Account Delete Karo",
+
+      "delete_modal": {
+        "title": "Account Delete Karna hai?",
+        "description": "Ye wapas nahi hoga! Sab data hostel samait udd jayega permanently.",
+        "label_prefix": "Confirm karne ke liye",
+        "confirm_phrase": "I want to delete.",
+        "label_suffix": "likho:",
+        "cancel": "Rehne do",
+        "deleting": "Delete ho raha hai...",
+        "delete": "Haan, Delete karo",
+        "error_title": "Arey!",
+        "error_message": "Account delete karne mein masla ho gaya"
+      }
+    },
+    "reservations": {
+      "title": "Reservations",
+      "hostel_picker_placeholder": "Hostel chuno",
+
+      "fetch_error_title": "Oops!",
+      "fetch_error_message": "Reservations laane mein gadbad",
+
+      "student_fallback_name": "Student",
+
+      "detail_room_type": "Room type",
+      "detail_requested": "Request ki date",
+      "message_label": "Message",
+
+      "accept_alert_title": "Reservation accept karna hai?",
+      "accept_alert_message": "Pakka accept karna hai ye reservation?",
+      "accept_success_title": "Accept ho gaya!",
+      "accept_success_message": "Reservation set ho gayi, badhai!",
+      "accept_error_message": "Accept karne mein panga",
+
+      "reject_placeholder": "Reject ki wajah batao...",
+      "reject_reason_required": "Reject ki wajah toh likho bhai",
+      "reject_success_title": "Reject ho gayi",
+      "reject_success_message": "Reservation reject ho gayi",
+      "reject_error_message": "Reject karne mein dikkat",
+
+      "button_cancel": "Rehne do",
+      "button_reject": "Reject karo",
+      "button_accept": "Accept karo",
+
+      "empty_title": "Koi reservation nahi",
+      "empty_description": "Jab students reservation bhejenge toh yahan dikhega."
+    },
+    "verification": {
+      "title": "Verification",
+      "button_continue": "Aage chalo",
+      "button_submit": "Verification bhejo",
+
+      "step1": {
+        "title": "Basic Details",
+        "description": "Apne hostel ki ownership batao.",
+        "owner_name_label": "Malik ka naam",
+        "owner_name_placeholder": "Malik ka poora naam likho",
+        "city_label": "Sheher",
+        "city_placeholder": "Sheher ka naam",
+        "address_label": "Pata",
+        "address_placeholder": "Poora pata likho",
+        "hostel_for_label": "Hostel kis ke liye hai",
+        "boys": "Larkon ke liye",
+        "girls": "Larkiyon ke liye",
+        "hostel_names_label": "Hostel ka naam / naam",
+        "hostel_name_placeholder": "Hostel ka naam {{index}}",
+        "add_hostel": "Aik aur hostel add karo"
+      },
+
+      "step2": {
+        "title": "Building ki Photos",
+        "description": "Hostel building ki bahar ki photos upload karo.",
+        "add_photo": "Photo add karo",
+        "image_hint": "Building ke bahar ki 1-5 photos daalo."
+      },
+
+      "step3": {
+        "title": "Payment Methods",
+        "description": "Payment lene ke liye kam se kam ek method add karo.",
+        "easypaisa_label": "Easypaisa Number",
+        "easypaisa_placeholder": "03XX XXXXXXX",
+        "jazzcash_label": "JazzCash Number",
+        "jazzcash_placeholder": "03XX XXXXXXX",
+        "bank_accounts_label": "Bank Accounts",
+        "bank_title": "Bank {{index}}",
+        "bank_name_placeholder": "Bank ka naam",
+        "account_number_placeholder": "Account number",
+        "iban_placeholder": "IBAN (optional hai)",
+        "add_bank": "Bank account add karo",
+        "payment_hint": "* Kam se kam ek payment method chahiye (Easypaisa, JazzCash, ya Bank Account)",
+        "rules_title": "Platform ke Rules",
+        "rules_text": "• Sahi info denge tum\n• 24 ghante mein bookings ka jawab dena hai\n• Hostel quality maintain karni hai\n• Har booking par platform fee lagegi\n• Terms aur conditions se agree ho tum",
+        "accept_rules": "Sab rules aur conditions manzoor hain"
+      },
+
+      "errors": {
+        "title": "Arey nahi!",
+        "owner_name_required": "Malik ka naam toh daalo",
+        "city_required": "Sheher ka naam daalo",
+        "address_required": "Pata toh daalo",
+        "hostel_name_required": "Kam se kam ek hostel ka naam daalo",
+        "image_required": "Kam se kam ek photo toh daalo",
+        "payment_required": "Kam se kam ek Bank detail add karo",
+        "rules_required": "Rules accept karo pehle",
+        "submit_failed": "Verification submit karne mein masla ho gaya"
+      },
+
+      "success": {
+        "title": "Submit ho gaya!",
+        "message": "Tumhari verification check ho rahi hai, thora sabr karo"
+      }
+    },
+    "conversation": {
+      "title": "Conversation",
+
+      "fetch_error_title": "Oops!",
+      "fetch_error_message": "Messages laane mein dikkat",
+
+      "send_error_title": "Arey!",
+      "send_error_message": "Message bhejne mein masla ho gaya",
+
+      "input_placeholder": "Message likho...",
+
+      "empty_title": "Koi message nahi abhi",
+      "empty_subtitle": "Baat cheet shuru karo!"
+    },
+    "students": {
+      "title": "Hostel ke students",
+
+      "fetch_error_title": "Oops!",
+      "fetch_error_message": "Students ki info laane mein dikkat",
+
+      "count_singular": "{{count}} student reh raha hai abhi",
+      "count_plural": "{{count}} students reh rahe hain abhi",
+
+      "joined_date": "Join kiya: {{date}}",
+
+      "empty_title": "Koi student nahi",
+      "empty_description": "Is hostel mein abhi koi nahi reh raha."
+    },
+    "create_hostel": {
+      "header_title": "Hostel add karo",
+      "button_next": "Aage",
+      "button_create": "Hostel bana do!",
+
+      "step1": {
+        "title": "Basic info",
+        "description": "Apne hostel ke baare mein batao.",
+        "hostel_name_label": "Hostel ka naam",
+        "hostel_name_placeholder": "Hostel ka naam daalo",
+        "city_label": "Sheher",
+        "city_placeholder": "Sheher daalo",
+        "address_label": "Pata",
+        "address_placeholder": "Poora pata daalo",
+        "hostel_for_label": "Hostel kis ke liye",
+        "boys": "Larkon ke liye",
+        "girls": "Larkiyon ke liye",
+        "nearby_locations_label": "Qareeb ki jagahein (optional)",
+        "nearby_location_placeholder": "Jagah {{index}} (jaise University, Market)",
+        "add_location": "Jagah add karo",
+        "seo_keywords_label": "SEO keywords (optional)",
+        "seo_keyword_placeholder": "Keyword {{index}} (jaise boys hostel Lahore)",
+        "add_keyword": "Keyword add karo",
+        "rules_label": "Hostel ke rules (optional)",
+        "rules_placeholder": "Hostel ke rules likho yahan..."
+      },
+
+      "step2": {
+        "title": "Room types",
+        "description": "Rooms aur prices set karo.",
+        "room_type_label": "Room ki type",
+        "type_shared": "SHARED",
+        "type_private": "PRIVATE",
+        "type_shared_fullroom": "SHARED FULLROOM",
+        "total_rooms_label": "Total rooms",
+        "total_rooms_placeholder": "jaise 10",
+        "persons_per_room_label": "Log per room",
+        "persons_per_room_placeholder": "jaise 4",
+        "price_label": "Monthly price (Rs.)",
+        "price_placeholder": "jaise 8000",
+        "urgent_price_label": "Urgent booking price (optional)",
+        "urgent_price_placeholder": "jaise 25000",
+        "fullroom_discount_label": "Full room discount price (optional)",
+        "fullroom_discount_placeholder": "jaise 28000",
+        "add_room_type": "Room type add karo"
+      },
+
+      "step3": {
+        "title": "Facilities",
+        "description": "Hostel ki facilities chuno.",
+        "hot_cold_water": "Garam / Thanda paani (nahane ke liye)",
+        "drinking_water": "Peene ka paani",
+        "electricity_backup": "Bijli ka backup",
+        "electricity_billing_label": "Bijli ka bill",
+        "electricity_included": "Included hai",
+        "electricity_self": "Khud (per unit)",
+        "rate_per_unit_label": "Per unit rate (Rs.)",
+        "rate_per_unit_placeholder": "jaise 35",
+        "wifi_available": "WiFi hai",
+        "wifi_plan_placeholder": "WiFi plan (jaise 50 Mbps Unlimited)",
+        "wifi_max_users_placeholder": "Max users",
+        "wifi_avg_speed_placeholder": "Average speed",
+        "custom_facilities_label": "Extra facilities",
+        "custom_facility_placeholder": "Facility {{index}} (jaise Laundry, Gym)",
+        "add_facility": "Facility add karo"
+      },
+
+      "step4": {
+        "title": "Room ki photos",
+        "description": "Saaf aur achi photos upload karo.",
+        "add_photo": "Photo add karo",
+        "image_hint": "Rooms aur common areas ki 1-10 photos daalo.",
+        "summary_title": "Summary",
+        "summary_hostel_name": "Hostel ka naam",
+        "summary_location": "Location",
+        "summary_for": "Kis ke liye",
+        "summary_room_types": "Room types",
+        "summary_images": "Photos"
+      },
+
+      "toast": {
+        "info_title": "Info",
+        "all_room_types_added": "Saari room types pehle se add hain!",
+        "error_hostel_name_required": "Hostel ka naam toh daalo",
+        "error_city_required": "Sheher daalo",
+        "error_address_required": "Pata daalo",
+        "error_room_fields_required": "Room ki saari fields bharo",
+        "error_room_values_invalid": "Room values 0 se zyada honi chahiye",
+        "error_image_required": "Kam se kam ek photo toh daalo",
+        "success_title": "Hostel ban gaya! 🎉",
+        "success_message": "Tumhara hostel add ho gaya, badhai!",
+        "error_create_failed": "Hostel banane mein masla ho gaya"
+      }
+    },
+    "hostel_detail": {
+      "fetch_error_title": "Oops!",
+      "fetch_error_message": "Hostel ki info laane mein dikkat",
+
+      "delete_alert_title": "Hostel delete karna hai?",
+      "delete_alert_message": "Pakka delete karna hai? Ye wapas nahi hoga!",
+      "delete_button": "Haan, Delete",
+      "delete_success_title": "Delete ho gaya!",
+      "delete_success_message": "Hostel udd gaya permanently",
+      "delete_error_title": "Arey!",
+      "delete_error_message": "Hostel delete karne mein masla",
+
+      "no_images": "Koi photo nahi",
+
+      "status": {
+        "active": "CHALU HAI",
+        "inactive": "BAND HAI"
+      },
+
+      "rating_na": "N/A",
+      "reviews_count": "{{count}} reviews",
+
+      "action_students": "Students",
+      "action_reservations": "Reservations",
+      "action_bookings": "Bookings",
+
+      "section_room_types": "Room types",
+      "section_facilities": "Facilities",
+      "section_rules": "Hostel ke rules",
+      "section_nearby_locations": "Qareeb ki jagahein",
+
+      "price_format": "Rs. {{price}}/mahina",
+      "price_only": "Rs. {{price}}",
+      "persons_per_room": "{{count}} log per room",
+      "rooms_info": "{{total}} total • {{available}} available",
+
+      "urgent_booking": "Urgent Booking",
+      "full_room_discount_label": "Full room discount:",
+
+      "facility_hot_cold_water": "Garam/Thanda paani",
+      "facility_drinking_water": "Peene ka paani",
+      "facility_electricity_backup": "Bijli backup",
+      "facility_wifi": "WiFi available",
+
+      "edit_button": "Hostel edit karo"
+    }
+  },
+  "student": {
+    "home": {
+      "greeting": "Hello,",
+      "fallback_name": "Student yaar",
+
+      "verification_alert_title": "Profile complete karo",
+      "verification_alert_desc": "Hostel book karne ke liye pehle verify ho jao",
+
+      "current_stay_title": "Tumhara current qiyam",
+      "hostel_fallback": "Hostel",
+      "city_fallback": "Sheher",
+
+      "quick_actions_title": "Jaldi wale kaam",
+      "action_find_hostel": "Hostel dhundo",
+      "action_reservations": "Reservations",
+      "action_bookings": "Bookings",
+      "action_messages": "Messages",
+
+      "pending_reservations_title": "Pending reservations",
+      "see_all": "Sab dekho"
+    },
+    "verify": {
+      "header_title": "Verification",
+
+      "intro": {
+        "title": "Profile Complete Karo",
+        "description": "Apni details do taake verify ho jao. Ye info booking par manager ko milegi."
+      },
+
+      "fields": {
+        "father": {
+          "label": "Father ka naam",
+          "placeholder": "Walid sahab ka naam"
+        },
+        "institute": {
+          "label": "Institute / University",
+          "placeholder": "University/College ka naam"
+        },
+        "address": {
+          "label": "Permanent Address",
+          "placeholder": "Ghar ka pata"
+        },
+        "phone": {
+          "label": "Phone Number",
+          "placeholder": "03XX XXXXXXX"
+        },
+        "whatsapp": {
+          "label": "WhatsApp Number",
+          "placeholder": "03XX XXXXXXX"
+        }
+      },
+
+      "errors": {
+        "father_required": "Walid ka naam toh daalo",
+        "institute_required": "Institute ka naam daalo",
+        "address_required": "Ghar ka pata daalo",
+        "phone_required": "Sahi phone number daalo",
+        "whatsapp_required": "Sahi WhatsApp number daalo"
+      },
+
+      "submit_button": "Verification Complete Karo",
+
+      "note": "Tumhari info secure hai, sirf booking par manager ko milegi.",
+
+      "toast": {
+        "success_title": "Verification Done!",
+        "success_message": "Ab hostel book kar sakte ho!",
+        "failed_title": "Verification Fail Ho Gaya"
+      }
+    },
+    "search": {
+      "title": "Hostels Dhundo",
+      "subtitle": "{{count}} hostel{{plural}} available hain",
+
+      "search_placeholder": "City likh kar search karo...",
+
+      "filters": {
+        "all": "Sab",
+        "boys": "Larke",
+        "girls": "Larkiyan"
+      },
+
+      "toast_error_title": "Oops!",
+      "toast_error_message": "Hostels dhundne mein masla ho gaya",
+
+      "empty": {
+        "title": "Koi hostel nahi mila",
+        "description": "Search ya filters change karke try karo."
+      },
+
+      "price_unit": "/mahina"
+    },
+    "reservations": {
+      "header_title": "Meri Reservations",
+
+      "toast_error_title": "Oops!",
+      "toast_error_message": "Reservations laane mein dikkat",
+      "toast_cancelled_title": "Cancel ho gaya!",
+      "toast_cancelled_message": "Reservation cancel ho gayi",
+      "toast_cancel_failed": "Cancel karne mein masla",
+
+      "cancel_alert_title": "Cancel karna hai?",
+      "cancel_alert_message": "Pakka cancel karna hai ye reservation?",
+      "cancel_alert_no": "Nahi",
+      "cancel_alert_yes": "Haan, Cancel",
+
+      "requested_on": "Request ki date",
+
+      "rejection_label": "Reject ki wajah",
+
+      "cancel_button": "Cancel Request",
+      "proceed_button": "Booking par jao",
+
+      "status": {
+        "pending": "Intezaar mein",
+        "accepted": "Accept ho gaya!",
+        "rejected": "Reject ho gaya",
+        "cancelled": "Cancel ho gaya"
+      },
+
+      "empty_title": "Koi reservation nahi",
+      "empty_description": "Jab reservation bhejoge toh yahan dikhega.",
+      "empty_action": "Hostels dhundo"
+    },
+    "reports": {
+      "header_title": "Meri Reports",
+
+      "toast_error_title": "Oops!",
+      "toast_error_message": "Reports laane mein dikkat",
+
+      "hostel_fallback": "Hostel",
+
+      "status": {
+        "pending": "Dekhi ja rahi hai",
+        "resolved": "Hal ho gaya"
+      },
+
+      "decision_label": "Decision",
+
+      "empty_title": "Koi report nahi abhi",
+      "empty_description": "Jab complaint karoge toh yahan dikhegi."
+    },
+    "chat": {
+      "title": "Messages",
+
+      "conversation_singular": "conversation",
+      "conversation_plural": "conversations",
+
+      "toast_error_title": "Oops!",
+      "toast_error_message": "Conversations laane mein dikkat",
+
+      "manager_fallback": "Manager",
+
+      "no_messages_yet": "Koi message nahi abhi",
+      "yesterday": "Kal",
+
+      "empty_title": "Koi message nahi",
+      "empty_description": "Kisi hostel page se manager ko message karo."
+    },
+    "bookings": {
+      "header_title": "Meri Bookings",
+
+      "toast_error_title": "Oops!",
+      "toast_error_message": "Bookings laane mein masla",
+
+      "booked_on": "Book kiya",
+
+      "status": {
+        "approved": "Approved hai!",
+        "disapproved": "Nahi hua",
+        "pending": "Intezaar mein",
+        "left": "Chor diya",
+        "kicked": "Nikaal diya gaya"
+      },
+
+      "empty_title": "Koi booking nahi abhi",
+      "empty_description": "Jab booking karoge toh yahan dikhegi.",
+      "empty_action": "Hostels dhundo"
+    },
+    "book": {
+      "title": "Hostel Book Karo",
+
+      "error_title": "Arey!",
+      "error_fetch_hostel": "Hostel nahi mil raha",
+      "error_select_room": "Room type chuno pehle",
+      "error_upload_screenshot": "Payment screenshot daalo",
+      "error_enter_date": "Transaction date daalo",
+      "error_enter_time": "Transaction time daalo",
+      "error_enter_from_account": "Apna account number daalo",
+      "error_enter_to_account": "Manager ka account number daalo",
+      "error_failed_submit": "Booking submit nahi ho saki",
+
+      "success_title": "Booking Chali Gayi!",
+      "success_message": "Manager payment check karega",
+
+      "select_room_type": "Room Type Chuno",
+      "persons": "log",
+      "available": "available",
+      "per_month": "/mahina",
+
+      "amount_to_pay": "Kitna dena hai",
+      "transfer_note": "Manager ke account mein transfer karo aur screenshot daalo",
+
+      "payment_proof": "Payment Proof",
+      "upload_screenshot": "Payment Screenshot Upload Karo",
+
+      "transaction_details": "Transaction Details",
+      "date": "Date",
+      "time": "Time",
+      "from_account": "From Account (Tumhara)",
+      "to_account": "To Account (Manager ka)",
+
+      "submit_button": "Booking Submit Karo"
+    },
+    "booking": {
+      "header_title": "Booking Details",
+      "not_found": "Booking nahi mili",
+
+      "error_title": "Arey!",
+      "error_fetch_booking": "Booking nahi mil rahi",
+      "error_review_required": "Review likho please",
+      "error_report_required": "Complaint ki detail likho",
+      "error_leave_failed": "Leave nahi ho saka",
+      "error_report_failed": "Report submit nahi hui",
+
+      "leave_confirm_title": "Hostel Leave Karna hai?",
+      "leave_confirm_message": "Pakka leave karna hai? Wapas nahi hoga ye!",
+      "leave_confirm_button": "Haan, Leave Karo",
+
+      "success_title": "Ho Gaya!",
+      "success_left": "Hostel leave ho gaya",
+
+      "report_success_title": "Report Chali Gayi!",
+      "report_success_message": "Admin tumhari complaint dekhega",
+
+      "cancel": "Rehne do",
+
+      "section_booking_information": "Booking Information",
+      "room_type": "Room Type",
+      "booking_date": "Booking Date",
+      "transaction_date": "Transaction Date",
+      "from_account": "From Account",
+      "to_account": "To Account",
+
+      "payment_proof": "Payment Proof",
+
+      "refund_info": "Refund Information",
+      "refund_on": "Refund on {{date}} at {{time}}",
+
+      "removed_from_hostel": "Hostel se nikaal diya gaya",
+      "kick_reason": "Wajah: {{reason}}",
+
+      "leave_hostel": "Leave Hostel",
+      "leave_review_title": "Leave & Review",
+
+      "your_rating": "Rating do",
+      "review_required": "Review *",
+      "placeholder_review": "Apna experience batao...",
+      "reason_optional": "Leave ki wajah (optional)",
+      "placeholder_reason": "Kyu leave kar rahe ho?",
+      "submit_leave": "Submit & Leave",
+
+      "report_issue": "Issue Report Karo",
+      "report_description": "Complaint detail se likho. Admin action lega.",
+      "placeholder_report": "Masle ki detail likho...",
+      "submit_report": "Report Submit Karo",
+
+      "your_review": "Tumhara Review"
+    },
+    "conversations": {
+      "header_title": "Conversation",
+
+      "error_title": "Oops!",
+      "error_fetch_messages": "Messages nahi aa rahe",
+      "error_send_message": "Message nahi gaya",
+
+      "empty_title": "Koi message nahi abhi",
+      "empty_subtitle": "Baat shuru karo!",
+
+      "placeholder_message": "Message likho..."
+    },
+    "hostel": {
+      "error_title": "Oops!",
+      "error_fetch_hostel": "Hostel nahi mil raha",
+      "error_manager_unavailable": "Manager abhi available nahi chat ke liye",
+      "error_start_chat": "Chat start nahi ho saki",
+
+      "no_images": "Koi photo nahi",
+
+      "badge_for": "{{value}}",
+
+      "reviews": "{{count}} reviews",
+
+      "starting_price": "Starting price",
+      "available": "Available",
+      "room_types": "Room types",
+
+      "chat": "Chat",
+      "reserve": "Reserve",
+      "book": "Book",
+
+      "available_rooms": "Available Rooms",
+
+      "persons": "log",
+      "person": "banda",
+      "per_room": "per room",
+      "x_available": "{{count}} available",
+      "not_available": "Available nahi",
+      "per_month": "/mahina",
+
+      "facilities": "Facilities aur Amenities",
+      "hot_cold_water": "Garam/Thanda paani",
+      "drinking_water": "Peene ka paani",
+      "power_backup": "Bijli backup",
+      "free_wifi": "Free WiFi",
+
+      "house_rules": "Hostel ke Rules",
+
+      "nearby_places": "Qareeb ki Jagahein",
+
+      "manager": "Manager",
+      "manager_default": "Hostel Manager",
+      "tap_to_chat": "Chat karne ke liye tap karo"
+    },
+    "reserve": {
+      "error_title": "Oops!",
+      "error_fetch_hostel": "Hostel nahi mil raha",
+      "error_select_room": "Room type chuno pehle",
+      "error_create_reservation": "Reservation nahi ban saki",
+
+      "success_title": "Reservation Chali Gayi!",
+      "success_message": "Manager tumhari request dekhega",
+
+      "title": "Hostel Reserve Karo",
+
+      "info_note": "Manager ko reservation request bhejo. Accept hone ke baad booking aur payment kar sakte ho.",
+
+      "select_room_type": "Room Type Chuno",
+      "persons": "log",
+      "available": "available",
+      "per_month": "/mahina",
+
+      "message_title": "Manager ko Message",
+      "message_subtitle": "Optional - apna intro do ya kuch poocho",
+      "message_placeholder": "Hello, mujhe is hostel mein interest hai...",
+
+      "selected": "Selected",
+      "send_request": "Request Bhejo"
+    }
+  },
+  "app": {
+    "settings": {
+      "title": "Settings",
+
+      "language_section": "Zuban",
+      "language_en": "English",
+      "language_ur": "Urdu",
+      "language_pinglish": "Pakistani-English (Zuban Badlo?)",
+
+      "about_section": "ABOUT",
+      "app_version": "App Version",
+
+      "made_with_love": "❤️ se banaya gaya hai is app ko"
+    }
+  }
+}

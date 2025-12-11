@@ -11,6 +11,7 @@ import {
   Zap,
 } from "lucide-react-native";
 import React, { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Animated,
   Image,
@@ -19,7 +20,6 @@ import {
   ScrollView,
   StyleSheet,
   Switch,
-  Text,
   TextInput,
   TouchableOpacity,
   View,
@@ -28,8 +28,10 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
 
 import { hostelsApi } from "@/api/hostels";
+import AppText from "@/components/common/AppText";
 import { Button, Card, Input } from "@/components/ui";
 import { COLORS } from "@/constants/colors";
+
 
 type RoomTypeConfig = {
   type: "SHARED" | "PRIVATE" | "SHARED_FULLROOM";
@@ -50,11 +52,11 @@ type RoomTypeForm = {
 };
 
 export default function CreateHostelScreen() {
+  const { t } = useTranslation();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
 
-  // Step 1: Basic Info
   const [hostelName, setHostelName] = useState("");
   const [city, setCity] = useState("");
   const [address, setAddress] = useState("");
@@ -63,7 +65,6 @@ export default function CreateHostelScreen() {
   const [rules, setRules] = useState("");
   const [seoKeywords, setSeoKeywords] = useState<string[]>([""]);
 
-  // Step 2: Room Types
   const [roomTypes, setRoomTypes] = useState<RoomTypeForm[]>([
     {
       type: "SHARED",
@@ -75,7 +76,6 @@ export default function CreateHostelScreen() {
     },
   ]);
 
-  // Step 3: Facilities
   const [facilities, setFacilities] = useState({
     hotColdWaterBath: false,
     drinkingWater: false,
@@ -89,10 +89,8 @@ export default function CreateHostelScreen() {
     customFacilities: [""],
   });
 
-  // Step 4: Images
   const [roomImages, setRoomImages] = useState<string[]>([]);
 
-  // Light transition between steps
   const stepAnim = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
@@ -104,7 +102,6 @@ export default function CreateHostelScreen() {
     }).start();
   }, [step, stepAnim]);
 
-  // Image handlers
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -122,7 +119,6 @@ export default function CreateHostelScreen() {
     setRoomImages((prev) => prev.filter((_, i) => i !== index));
   };
 
-  // Nearby locations handlers
   const addNearbyLocation = () => {
     setNearbyLocations((prev) => [...prev, ""]);
   };
@@ -139,7 +135,6 @@ export default function CreateHostelScreen() {
     }
   };
 
-  // SEO keywords handlers
   const addSeoKeyword = () => {
     setSeoKeywords((prev) => [...prev, ""]);
   };
@@ -156,7 +151,6 @@ export default function CreateHostelScreen() {
     }
   };
 
-  // Room type handlers
   const addRoomType = () => {
     const usedTypes = roomTypes.map((rt) => rt.type);
     const availableTypes: RoomTypeConfig["type"][] = [
@@ -181,8 +175,8 @@ export default function CreateHostelScreen() {
     } else {
       Toast.show({
         type: "info",
-        text1: "Info",
-        text2: "All room types already added",
+        text1: t("manager.create_hostel.toast.info_title"),
+        text2: t("manager.create_hostel.toast.all_room_types_added"),
       });
     }
   };
@@ -206,7 +200,6 @@ export default function CreateHostelScreen() {
     }
   };
 
-  // Custom facilities handlers
   const addCustomFacility = () => {
     setFacilities((prev) => ({
       ...prev,
@@ -232,29 +225,28 @@ export default function CreateHostelScreen() {
     }
   };
 
-  // Validation
   const validateStep1 = () => {
     if (!hostelName.trim()) {
       Toast.show({
         type: "error",
-        text1: "Error",
-        text2: "Hostel name is required",
+        text1: t("common.error"),
+        text2: t("manager.create_hostel.toast.error_hostel_name_required"),
       });
       return false;
     }
     if (!city.trim()) {
       Toast.show({
         type: "error",
-        text1: "Error",
-        text2: "City is required",
+        text1: t("common.error"),
+        text2: t("manager.create_hostel.toast.error_city_required"),
       });
       return false;
     }
     if (!address.trim()) {
       Toast.show({
         type: "error",
-        text1: "Error",
-        text2: "Address is required",
+        text1: t("common.error"),
+        text2: t("manager.create_hostel.toast.error_address_required"),
       });
       return false;
     }
@@ -266,8 +258,8 @@ export default function CreateHostelScreen() {
       if (!rt.totalRooms || !rt.personsInRoom || !rt.price) {
         Toast.show({
           type: "error",
-          text1: "Error",
-          text2: "All room type fields are required",
+          text1: t("common.error"),
+          text2: t("manager.create_hostel.toast.error_room_fields_required"),
         });
         return false;
       }
@@ -278,8 +270,8 @@ export default function CreateHostelScreen() {
       ) {
         Toast.show({
           type: "error",
-          text1: "Error",
-          text2: "Room values must be greater than 0",
+          text1: t("common.error"),
+          text2: t("manager.create_hostel.toast.error_room_values_invalid"),
         });
         return false;
       }
@@ -293,8 +285,8 @@ export default function CreateHostelScreen() {
     if (roomImages.length === 0) {
       Toast.show({
         type: "error",
-        text1: "Error",
-        text2: "At least one image is required",
+        text1: t("common.error"),
+        text2: t("manager.create_hostel.toast.error_image_required"),
       });
       return false;
     }
@@ -374,8 +366,8 @@ export default function CreateHostelScreen() {
       if (response.success) {
         Toast.show({
           type: "success",
-          text1: "Hostel created!",
-          text2: "Your hostel has been added successfully",
+          text1: t("manager.create_hostel.toast.success_title"),
+          text2: t("manager.create_hostel.toast.success_message"),
         });
         router.replace("/(app)/manager/hostels");
       }
@@ -384,11 +376,12 @@ export default function CreateHostelScreen() {
         ? Object.values(error.response.data.errors as Record<string, string[]>)
             .flat()
             .join("\n")
-        : error?.response?.data?.message || "Failed to create hostel";
+        : error?.response?.data?.message ||
+          t("manager.create_hostel.toast.error_create_failed");
 
       Toast.show({
         type: "error",
-        text1: "Error",
+        text1: t("common.error"),
         text2: errorMessage,
       });
     } finally {
@@ -396,36 +389,53 @@ export default function CreateHostelScreen() {
     }
   };
 
-  // Step renderers
+  const getRoomTypeLabel = (type: string) => {
+    switch (type) {
+      case "SHARED":
+        return t("manager.create_hostel.step2.type_shared");
+      case "PRIVATE":
+        return t("manager.create_hostel.step2.type_private");
+      case "SHARED_FULLROOM":
+        return t("manager.create_hostel.step2.type_shared_fullroom");
+      default:
+        return type.replace("_", " ");
+    }
+  };
 
   const renderStep1 = () => (
     <>
-      <Text style={styles.stepTitle}>Basic information</Text>
-      <Text style={styles.stepDesc}>Tell us about your hostel.</Text>
+      <AppText style={styles.stepTitle}>
+        {t("manager.create_hostel.step1.title")}
+      </AppText>
+      <AppText style={styles.stepDesc}>
+        {t("manager.create_hostel.step1.description")}
+      </AppText>
 
       <Input
-        label="Hostel name"
-        placeholder="Enter hostel name"
+        label={t("manager.create_hostel.step1.hostel_name_label")}
+        placeholder={t("manager.create_hostel.step1.hostel_name_placeholder")}
         value={hostelName}
         onChangeText={setHostelName}
       />
 
       <Input
-        label="City"
-        placeholder="Enter city"
+        label={t("manager.create_hostel.step1.city_label")}
+        placeholder={t("manager.create_hostel.step1.city_placeholder")}
         value={city}
         onChangeText={setCity}
       />
 
       <Input
-        label="Address"
-        placeholder="Enter complete address"
+        label={t("manager.create_hostel.step1.address_label")}
+        placeholder={t("manager.create_hostel.step1.address_placeholder")}
         value={address}
         onChangeText={setAddress}
         multiline
       />
 
-      <Text style={styles.label}>Hostel for</Text>
+      <AppText style={styles.label}>
+        {t("manager.create_hostel.step1.hostel_for_label")}
+      </AppText>
       <View style={styles.segmentRow}>
         <TouchableOpacity
           style={[
@@ -434,14 +444,14 @@ export default function CreateHostelScreen() {
           ]}
           onPress={() => setHostelFor("BOYS")}
         >
-          <Text
+          <AppText
             style={[
               styles.segmentText,
               hostelFor === "BOYS" && styles.segmentTextActive,
             ]}
           >
-            Boys
-          </Text>
+            {t("manager.create_hostel.step1.boys")}
+          </AppText>
         </TouchableOpacity>
         <TouchableOpacity
           style={[
@@ -450,23 +460,28 @@ export default function CreateHostelScreen() {
           ]}
           onPress={() => setHostelFor("GIRLS")}
         >
-          <Text
+          <AppText
             style={[
               styles.segmentText,
               hostelFor === "GIRLS" && styles.segmentTextActive,
             ]}
           >
-            Girls
-          </Text>
+            {t("manager.create_hostel.step1.girls")}
+          </AppText>
         </TouchableOpacity>
       </View>
 
-      <Text style={styles.label}>Nearby locations (optional)</Text>
+      <AppText style={styles.label}>
+        {t("manager.create_hostel.step1.nearby_locations_label")}
+      </AppText>
       {nearbyLocations.map((location, index) => (
         <View key={index} style={styles.inputRow}>
           <TextInput
             style={styles.rowInput}
-            placeholder={`Location ${index + 1} (e.g., University, Market)`}
+            placeholder={t(
+              "manager.create_hostel.step1.nearby_location_placeholder",
+              { index: index + 1 }
+            )}
             placeholderTextColor={COLORS.textMuted}
             value={location}
             onChangeText={(v) => updateNearbyLocation(index, v)}
@@ -483,15 +498,22 @@ export default function CreateHostelScreen() {
       ))}
       <TouchableOpacity style={styles.addBtn} onPress={addNearbyLocation}>
         <Plus size={18} color={COLORS.primary} />
-        <Text style={styles.addBtnText}>Add location</Text>
+        <AppText style={styles.addBtnText}>
+          {t("manager.create_hostel.step1.add_location")}
+        </AppText>
       </TouchableOpacity>
 
-      <Text style={styles.label}>SEO keywords (optional)</Text>
+      <AppText style={styles.label}>
+        {t("manager.create_hostel.step1.seo_keywords_label")}
+      </AppText>
       {seoKeywords.map((keyword, index) => (
         <View key={index} style={styles.inputRow}>
           <TextInput
             style={styles.rowInput}
-            placeholder={`Keyword ${index + 1} (e.g., boys hostel Lahore)`}
+            placeholder={t(
+              "manager.create_hostel.step1.seo_keyword_placeholder",
+              { index: index + 1 }
+            )}
             placeholderTextColor={COLORS.textMuted}
             value={keyword}
             onChangeText={(v) => updateSeoKeyword(index, v)}
@@ -508,13 +530,17 @@ export default function CreateHostelScreen() {
       ))}
       <TouchableOpacity style={styles.addBtn} onPress={addSeoKeyword}>
         <Plus size={18} color={COLORS.primary} />
-        <Text style={styles.addBtnText}>Add keyword</Text>
+        <AppText style={styles.addBtnText}>
+          {t("manager.create_hostel.step1.add_keyword")}
+        </AppText>
       </TouchableOpacity>
 
-      <Text style={styles.label}>Hostel rules (optional)</Text>
+      <AppText style={styles.label}>
+        {t("manager.create_hostel.step1.rules_label")}
+      </AppText>
       <TextInput
         style={styles.textArea}
-        placeholder="Enter hostel rules..."
+        placeholder={t("manager.create_hostel.step1.rules_placeholder")}
         placeholderTextColor={COLORS.textMuted}
         value={rules}
         onChangeText={setRules}
@@ -527,15 +553,19 @@ export default function CreateHostelScreen() {
 
   const renderStep2 = () => (
     <>
-      <Text style={styles.stepTitle}>Room types</Text>
-      <Text style={styles.stepDesc}>Configure rooms and pricing.</Text>
+      <AppText style={styles.stepTitle}>
+        {t("manager.create_hostel.step2.title")}
+      </AppText>
+      <AppText style={styles.stepDesc}>
+        {t("manager.create_hostel.step2.description")}
+      </AppText>
 
       {roomTypes.map((rt, index) => (
         <Card key={index} style={styles.roomTypeCard}>
           <View style={styles.roomTypeHeader}>
-            <Text style={styles.roomTypeTitle}>
-              {rt.type.replace("_", " ")}
-            </Text>
+            <AppText style={styles.roomTypeTitle}>
+              {getRoomTypeLabel(rt.type)}
+            </AppText>
             {roomTypes.length > 1 && (
               <TouchableOpacity onPress={() => removeRoomType(index)}>
                 <X size={20} color={COLORS.error} />
@@ -543,7 +573,9 @@ export default function CreateHostelScreen() {
             )}
           </View>
 
-          <Text style={styles.inputLabel}>Room type</Text>
+          <AppText style={styles.inputLabel}>
+            {t("manager.create_hostel.step2.room_type_label")}
+          </AppText>
           <View style={styles.typeRow}>
             {(["SHARED", "PRIVATE", "SHARED_FULLROOM"] as const).map((type) => {
               const isUsed = roomTypes.some(
@@ -562,14 +594,14 @@ export default function CreateHostelScreen() {
                   disabled={isUsed}
                   onPress={() => !isUsed && updateRoomType(index, "type", type)}
                 >
-                  <Text
+                  <AppText
                     style={[
                       styles.typeChipText,
                       isActive && styles.typeChipTextActive,
                     ]}
                   >
-                    {type.replace("_", " ")}
-                  </Text>
+                    {getRoomTypeLabel(type)}
+                  </AppText>
                 </TouchableOpacity>
               );
             })}
@@ -577,10 +609,14 @@ export default function CreateHostelScreen() {
 
           <View style={styles.row}>
             <View style={styles.halfInput}>
-              <Text style={styles.inputLabel}>Total rooms</Text>
+              <AppText style={styles.inputLabel}>
+                {t("manager.create_hostel.step2.total_rooms_label")}
+              </AppText>
               <TextInput
                 style={styles.input}
-                placeholder="e.g., 10"
+                placeholder={t(
+                  "manager.create_hostel.step2.total_rooms_placeholder"
+                )}
                 placeholderTextColor={COLORS.textMuted}
                 value={rt.totalRooms}
                 onChangeText={(v) => updateRoomType(index, "totalRooms", v)}
@@ -588,10 +624,14 @@ export default function CreateHostelScreen() {
               />
             </View>
             <View style={styles.halfInput}>
-              <Text style={styles.inputLabel}>Persons / room</Text>
+              <AppText style={styles.inputLabel}>
+                {t("manager.create_hostel.step2.persons_per_room_label")}
+              </AppText>
               <TextInput
                 style={styles.input}
-                placeholder="e.g., 4"
+                placeholder={t(
+                  "manager.create_hostel.step2.persons_per_room_placeholder"
+                )}
                 placeholderTextColor={COLORS.textMuted}
                 value={rt.personsInRoom}
                 onChangeText={(v) => updateRoomType(index, "personsInRoom", v)}
@@ -600,20 +640,26 @@ export default function CreateHostelScreen() {
             </View>
           </View>
 
-          <Text style={styles.inputLabel}>Price per month (Rs.)</Text>
+          <AppText style={styles.inputLabel}>
+            {t("manager.create_hostel.step2.price_label")}
+          </AppText>
           <TextInput
             style={styles.input}
-            placeholder="e.g., 8000"
+            placeholder={t("manager.create_hostel.step2.price_placeholder")}
             placeholderTextColor={COLORS.textMuted}
             value={rt.price}
             onChangeText={(v) => updateRoomType(index, "price", v)}
             keyboardType="numeric"
           />
 
-          <Text style={styles.inputLabel}>Urgent booking price (optional)</Text>
+          <AppText style={styles.inputLabel}>
+            {t("manager.create_hostel.step2.urgent_price_label")}
+          </AppText>
           <TextInput
             style={styles.input}
-            placeholder="e.g., 25000"
+            placeholder={t(
+              "manager.create_hostel.step2.urgent_price_placeholder"
+            )}
             placeholderTextColor={COLORS.textMuted}
             value={rt.urgentBookingPrice}
             onChangeText={(v) => updateRoomType(index, "urgentBookingPrice", v)}
@@ -622,12 +668,14 @@ export default function CreateHostelScreen() {
 
           {rt.type === "SHARED_FULLROOM" && (
             <>
-              <Text style={styles.inputLabel}>
-                Full room discounted price (optional)
-              </Text>
+              <AppText style={styles.inputLabel}>
+                {t("manager.create_hostel.step2.fullroom_discount_label")}
+              </AppText>
               <TextInput
                 style={styles.input}
-                placeholder="e.g., 28000"
+                placeholder={t(
+                  "manager.create_hostel.step2.fullroom_discount_placeholder"
+                )}
                 placeholderTextColor={COLORS.textMuted}
                 value={rt.fullRoomPriceDiscounted}
                 onChangeText={(v) =>
@@ -643,7 +691,9 @@ export default function CreateHostelScreen() {
       {roomTypes.length < 3 && (
         <TouchableOpacity style={styles.addBtn} onPress={addRoomType}>
           <Plus size={18} color={COLORS.primary} />
-          <Text style={styles.addBtnText}>Add room type</Text>
+          <AppText style={styles.addBtnText}>
+            {t("manager.create_hostel.step2.add_room_type")}
+          </AppText>
         </TouchableOpacity>
       )}
     </>
@@ -651,14 +701,20 @@ export default function CreateHostelScreen() {
 
   const renderStep3 = () => (
     <>
-      <Text style={styles.stepTitle}>Facilities</Text>
-      <Text style={styles.stepDesc}>Select what your hostel offers.</Text>
+      <AppText style={styles.stepTitle}>
+        {t("manager.create_hostel.step3.title")}
+      </AppText>
+      <AppText style={styles.stepDesc}>
+        {t("manager.create_hostel.step3.description")}
+      </AppText>
 
       <Card style={styles.facilityCard}>
         <View style={styles.facilityRow}>
           <View style={styles.facilityInfo}>
             <Droplets size={20} color={COLORS.info} />
-            <Text style={styles.facilityText}>Hot / Cold water bath</Text>
+            <AppText style={styles.facilityText}>
+              {t("manager.create_hostel.step3.hot_cold_water")}
+            </AppText>
           </View>
           <Switch
             value={facilities.hotColdWaterBath}
@@ -677,7 +733,9 @@ export default function CreateHostelScreen() {
         <View style={styles.facilityRow}>
           <View style={styles.facilityInfo}>
             <Droplets size={20} color={COLORS.info} />
-            <Text style={styles.facilityText}>Drinking water</Text>
+            <AppText style={styles.facilityText}>
+              {t("manager.create_hostel.step3.drinking_water")}
+            </AppText>
           </View>
           <Switch
             value={facilities.drinkingWater}
@@ -696,7 +754,9 @@ export default function CreateHostelScreen() {
         <View style={styles.facilityRow}>
           <View style={styles.facilityInfo}>
             <Zap size={20} color={COLORS.warning} />
-            <Text style={styles.facilityText}>Electricity backup</Text>
+            <AppText style={styles.facilityText}>
+              {t("manager.create_hostel.step3.electricity_backup")}
+            </AppText>
           </View>
           <Switch
             value={facilities.electricityBackup}
@@ -711,7 +771,9 @@ export default function CreateHostelScreen() {
         </View>
       </Card>
 
-      <Text style={styles.label}>Electricity billing</Text>
+      <AppText style={styles.label}>
+        {t("manager.create_hostel.step3.electricity_billing_label")}
+      </AppText>
       <View style={styles.segmentRow}>
         <TouchableOpacity
           style={[
@@ -723,15 +785,15 @@ export default function CreateHostelScreen() {
             setFacilities((prev) => ({ ...prev, electricityType: "INCLUDED" }))
           }
         >
-          <Text
+          <AppText
             style={[
               styles.segmentText,
               facilities.electricityType === "INCLUDED" &&
                 styles.segmentTextActive,
             ]}
           >
-            Included
-          </Text>
+            {t("manager.create_hostel.step3.electricity_included")}
+          </AppText>
         </TouchableOpacity>
         <TouchableOpacity
           style={[
@@ -742,23 +804,27 @@ export default function CreateHostelScreen() {
             setFacilities((prev) => ({ ...prev, electricityType: "SELF" }))
           }
         >
-          <Text
+          <AppText
             style={[
               styles.segmentText,
               facilities.electricityType === "SELF" && styles.segmentTextActive,
             ]}
           >
-            Self (per unit)
-          </Text>
+            {t("manager.create_hostel.step3.electricity_self")}
+          </AppText>
         </TouchableOpacity>
       </View>
 
       {facilities.electricityType === "SELF" && (
         <>
-          <Text style={styles.inputLabel}>Rate per unit (Rs.)</Text>
+          <AppText style={styles.inputLabel}>
+            {t("manager.create_hostel.step3.rate_per_unit_label")}
+          </AppText>
           <TextInput
             style={styles.input}
-            placeholder="e.g., 35"
+            placeholder={t(
+              "manager.create_hostel.step3.rate_per_unit_placeholder"
+            )}
             placeholderTextColor={COLORS.textMuted}
             value={facilities.electricityRatePerUnit}
             onChangeText={(v) =>
@@ -773,7 +839,9 @@ export default function CreateHostelScreen() {
         <View style={styles.facilityRow}>
           <View style={styles.facilityInfo}>
             <Wifi size={20} color={COLORS.success} />
-            <Text style={styles.facilityText}>WiFi available</Text>
+            <AppText style={styles.facilityText}>
+              {t("manager.create_hostel.step3.wifi_available")}
+            </AppText>
           </View>
           <Switch
             value={facilities.wifiEnabled}
@@ -792,7 +860,9 @@ export default function CreateHostelScreen() {
             <View style={styles.divider} />
             <TextInput
               style={styles.input}
-              placeholder="WiFi plan (e.g., 50 Mbps Unlimited)"
+              placeholder={t(
+                "manager.create_hostel.step3.wifi_plan_placeholder"
+              )}
               placeholderTextColor={COLORS.textMuted}
               value={facilities.wifiPlan}
               onChangeText={(v) =>
@@ -802,7 +872,9 @@ export default function CreateHostelScreen() {
             <View style={styles.row}>
               <TextInput
                 style={[styles.input, styles.halfInput]}
-                placeholder="Max users"
+                placeholder={t(
+                  "manager.create_hostel.step3.wifi_max_users_placeholder"
+                )}
                 placeholderTextColor={COLORS.textMuted}
                 value={facilities.wifiMaxUsers}
                 onChangeText={(v) =>
@@ -812,7 +884,9 @@ export default function CreateHostelScreen() {
               />
               <TextInput
                 style={[styles.input, styles.halfInput]}
-                placeholder="Avg speed"
+                placeholder={t(
+                  "manager.create_hostel.step3.wifi_avg_speed_placeholder"
+                )}
                 placeholderTextColor={COLORS.textMuted}
                 value={facilities.wifiAvgSpeed}
                 onChangeText={(v) =>
@@ -824,12 +898,17 @@ export default function CreateHostelScreen() {
         )}
       </Card>
 
-      <Text style={styles.label}>Custom facilities</Text>
+      <AppText style={styles.label}>
+        {t("manager.create_hostel.step3.custom_facilities_label")}
+      </AppText>
       {facilities.customFacilities.map((facility, index) => (
         <View key={index} style={styles.inputRow}>
           <TextInput
             style={styles.rowInput}
-            placeholder={`Facility ${index + 1} (e.g., Laundry, Gym)`}
+            placeholder={t(
+              "manager.create_hostel.step3.custom_facility_placeholder",
+              { index: index + 1 }
+            )}
             placeholderTextColor={COLORS.textMuted}
             value={facility}
             onChangeText={(v) => updateCustomFacility(index, v)}
@@ -846,15 +925,21 @@ export default function CreateHostelScreen() {
       ))}
       <TouchableOpacity style={styles.addBtn} onPress={addCustomFacility}>
         <Plus size={18} color={COLORS.primary} />
-        <Text style={styles.addBtnText}>Add facility</Text>
+        <AppText style={styles.addBtnText}>
+          {t("manager.create_hostel.step3.add_facility")}
+        </AppText>
       </TouchableOpacity>
     </>
   );
 
   const renderStep4 = () => (
     <>
-      <Text style={styles.stepTitle}>Room images</Text>
-      <Text style={styles.stepDesc}>Upload clear, bright photos.</Text>
+      <AppText style={styles.stepTitle}>
+        {t("manager.create_hostel.step4.title")}
+      </AppText>
+      <AppText style={styles.stepDesc}>
+        {t("manager.create_hostel.step4.description")}
+      </AppText>
 
       <View style={styles.imagesGrid}>
         {roomImages.map((uri, index) => (
@@ -872,38 +957,56 @@ export default function CreateHostelScreen() {
         {roomImages.length < 10 && (
           <TouchableOpacity style={styles.addImageBtn} onPress={pickImage}>
             <Camera size={30} color={COLORS.textMuted} />
-            <Text style={styles.addImageText}>Add photo</Text>
+            <AppText style={styles.addImageText}>
+              {t("manager.create_hostel.step4.add_photo")}
+            </AppText>
           </TouchableOpacity>
         )}
       </View>
 
-      <Text style={styles.imageHint}>
-        Upload between 1–10 images of rooms and shared spaces.
-      </Text>
+      <AppText style={styles.imageHint}>
+        {t("manager.create_hostel.step4.image_hint")}
+      </AppText>
 
       <Card style={styles.summaryCard}>
-        <Text style={styles.summaryTitle}>Summary</Text>
+        <AppText style={styles.summaryTitle}>
+          {t("manager.create_hostel.step4.summary_title")}
+        </AppText>
         <View style={styles.summaryRow}>
-          <Text style={styles.summaryLabel}>Hostel name</Text>
-          <Text style={styles.summaryValue}>{hostelName || "-"}</Text>
+          <AppText style={styles.summaryLabel}>
+            {t("manager.create_hostel.step4.summary_hostel_name")}
+          </AppText>
+          <AppText style={styles.summaryValue}>{hostelName || "-"}</AppText>
         </View>
         <View style={styles.summaryRow}>
-          <Text style={styles.summaryLabel}>Location</Text>
-          <Text style={styles.summaryValue}>
+          <AppText style={styles.summaryLabel}>
+            {t("manager.create_hostel.step4.summary_location")}
+          </AppText>
+          <AppText style={styles.summaryValue}>
             {[city, address].filter(Boolean).join(", ") || "-"}
-          </Text>
+          </AppText>
         </View>
         <View style={styles.summaryRow}>
-          <Text style={styles.summaryLabel}>For</Text>
-          <Text style={styles.summaryValue}>{hostelFor}</Text>
+          <AppText style={styles.summaryLabel}>
+            {t("manager.create_hostel.step4.summary_for")}
+          </AppText>
+          <AppText style={styles.summaryValue}>
+            {hostelFor === "BOYS"
+              ? t("manager.create_hostel.step1.boys")
+              : t("manager.create_hostel.step1.girls")}
+          </AppText>
         </View>
         <View style={styles.summaryRow}>
-          <Text style={styles.summaryLabel}>Room types</Text>
-          <Text style={styles.summaryValue}>{roomTypes.length}</Text>
+          <AppText style={styles.summaryLabel}>
+            {t("manager.create_hostel.step4.summary_room_types")}
+          </AppText>
+          <AppText style={styles.summaryValue}>{roomTypes.length}</AppText>
         </View>
         <View style={styles.summaryRow}>
-          <Text style={styles.summaryLabel}>Images</Text>
-          <Text style={styles.summaryValue}>{roomImages.length}</Text>
+          <AppText style={styles.summaryLabel}>
+            {t("manager.create_hostel.step4.summary_images")}
+          </AppText>
+          <AppText style={styles.summaryValue}>{roomImages.length}</AppText>
         </View>
       </Card>
     </>
@@ -911,16 +1014,16 @@ export default function CreateHostelScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={["top", "bottom"]}>
-      {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={handleBack} style={styles.backButton}>
           <ArrowLeft size={24} color={COLORS.textPrimary} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Add hostel</Text>
+        <AppText style={styles.headerTitle}>
+          {t("manager.create_hostel.header_title")}
+        </AppText>
         <View style={{ width: 40 }} />
       </View>
 
-      {/* Progress */}
       <View style={styles.progressContainer}>
         {[1, 2, 3, 4].map((s) => {
           const isComplete = s < step;
@@ -937,14 +1040,14 @@ export default function CreateHostelScreen() {
                 {isComplete ? (
                   <Check size={14} color={COLORS.textInverse} />
                 ) : (
-                  <Text
+                  <AppText
                     style={[
                       styles.progressText,
                       (isActive || isComplete) && styles.progressTextActive,
                     ]}
                   >
                     {s}
-                  </Text>
+                  </AppText>
                 )}
               </View>
               {s < 4 && <View style={styles.progressSpacer} />}
@@ -961,7 +1064,6 @@ export default function CreateHostelScreen() {
         </View>
       </View>
 
-      {/* Content */}
       <KeyboardAvoidingView
         style={styles.keyboardView}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -997,10 +1099,13 @@ export default function CreateHostelScreen() {
         </Animated.View>
       </KeyboardAvoidingView>
 
-      {/* Bottom actions */}
       <View style={styles.bottomBar}>
         <Button
-          title={step < 4 ? "Next" : "Create hostel"}
+          title={
+            step < 4
+              ? t("manager.create_hostel.button_next")
+              : t("manager.create_hostel.button_create")
+          }
           onPress={step < 4 ? handleNext : handleSubmit}
           loading={step === 4 && loading}
           style={styles.nextButton}

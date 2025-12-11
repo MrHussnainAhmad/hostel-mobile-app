@@ -1,39 +1,43 @@
 // screens/VerifyScreen.tsx
 
-import { COLORS, OPACITY } from '@/constants/colors';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useRouter } from 'expo-router';
-import { ArrowLeft, Building, MapPin, Phone, User } from 'lucide-react-native';
-import React, { useState } from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import { COLORS, OPACITY } from "@/constants/colors";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "expo-router";
+import { ArrowLeft, Building, MapPin, Phone, User } from "lucide-react-native";
+import React, { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 import {
   KeyboardAvoidingView,
   Platform,
   Pressable,
   ScrollView,
   StyleSheet,
-  Text,
   View,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import Toast from 'react-native-toast-message';
-import { z } from 'zod';
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import Toast from "react-native-toast-message";
+import { z } from "zod";
 
-import { usersApi } from '@/api/users';
-import { Button, Input } from '@/components/ui';
-import { useAuthStore } from '@/stores/authStore';
+import { usersApi } from "@/api/users";
+import AppText from "@/components/common/AppText";
+import { Button, Input } from "@/components/ui";
+import { useAuthStore } from "@/stores/authStore";
 
+
+// FIXED: Added "student." prefix to match JSON structure
 const verifySchema = z.object({
-  fatherName: z.string().min(1, "Father's name is required"),
-  instituteName: z.string().min(1, 'Institute name is required'),
-  permanentAddress: z.string().min(1, 'Permanent address is required'),
-  phoneNumber: z.string().min(10, 'Valid phone number is required'),
-  whatsappNumber: z.string().min(10, 'Valid WhatsApp number is required'),
+  fatherName: z.string().min(1, "student.verify.errors.father_required"),
+  instituteName: z.string().min(1, "student.verify.errors.institute_required"),
+  permanentAddress: z.string().min(1, "student.verify.errors.address_required"),
+  phoneNumber: z.string().min(10, "student.verify.errors.phone_required"),
+  whatsappNumber: z.string().min(10, "student.verify.errors.whatsapp_required"),
 });
 
 type VerifyFormData = z.infer<typeof verifySchema>;
 
 export default function VerifyScreen() {
+  const { t } = useTranslation();
   const router = useRouter();
   const { setUser, user } = useAuthStore();
   const [loading, setLoading] = useState(false);
@@ -45,11 +49,11 @@ export default function VerifyScreen() {
   } = useForm<VerifyFormData>({
     resolver: zodResolver(verifySchema),
     defaultValues: {
-      fatherName: '',
-      instituteName: '',
-      permanentAddress: '',
-      phoneNumber: '',
-      whatsappNumber: '',
+      fatherName: "",
+      instituteName: "",
+      permanentAddress: "",
+      phoneNumber: "",
+      whatsappNumber: "",
     },
   });
 
@@ -57,7 +61,7 @@ export default function VerifyScreen() {
     if (router.canGoBack()) {
       router.back();
     } else {
-      router.replace('/(app)/student');
+      router.replace("/(app)/student");
     }
   };
 
@@ -79,19 +83,21 @@ export default function VerifyScreen() {
           setUser(newUser);
         }
 
+        // FIXED: Added "student." prefix
         Toast.show({
-          type: 'success',
-          text1: 'Verification Complete',
-          text2: 'You can now book hostels',
+          type: "success",
+          text1: t("student.verify.toast.success_title"),
+          text2: t("student.verify.toast.success_message"),
         });
 
-        router.replace('/(app)/student');
+        router.replace("/(app)/student");
       }
     } catch (error: any) {
+      // FIXED: Added "student." prefix
       Toast.show({
-        type: 'error',
-        text1: 'Verification Failed',
-        text2: error?.response?.data?.message || 'Something went wrong',
+        type: "error",
+        text1: t("student.verify.toast.failed_title"),
+        text2: error?.response?.data?.message || t("common.generic_error"),
       });
     } finally {
       setLoading(false);
@@ -99,7 +105,7 @@ export default function VerifyScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+    <SafeAreaView style={styles.container} edges={["top", "bottom"]}>
       {/* Header */}
       <View style={styles.header}>
         <Pressable
@@ -111,16 +117,16 @@ export default function VerifyScreen() {
         >
           <ArrowLeft size={22} color={COLORS.textPrimary} strokeWidth={1.5} />
         </Pressable>
-        
-        <Text style={styles.headerTitle}>Verification</Text>
-        
+
+        {/* FIXED: Added "student." prefix */}
+        <AppText style={styles.headerTitle}>{t("student.verify.header_title")}</AppText>
+
         <View style={styles.headerSpacer} />
       </View>
 
       <KeyboardAvoidingView
         style={styles.keyboardView}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
         <ScrollView
           contentContainerStyle={styles.scrollContent}
@@ -130,11 +136,11 @@ export default function VerifyScreen() {
         >
           {/* Intro Section */}
           <View style={styles.introSection}>
-            <Text style={styles.introTitle}>Complete Your Profile</Text>
-            <Text style={styles.introDesc}>
-              Please provide your details to verify your account. This information 
-              will be shared with hostel managers when you make a booking.
-            </Text>
+            {/* FIXED: Added "student." prefix */}
+            <AppText style={styles.introTitle}>{t("student.verify.intro.title")}</AppText>
+            <AppText style={styles.introDesc}>
+              {t("student.verify.intro.description")}
+            </AppText>
           </View>
 
           {/* Form */}
@@ -145,13 +151,21 @@ export default function VerifyScreen() {
               name="fatherName"
               render={({ field: { onChange, onBlur, value } }) => (
                 <Input
-                  label="Father's Name"
-                  placeholder="Enter father's name"
-                  leftIcon={<User size={20} color={COLORS.textMuted} strokeWidth={1.5} />}
+                  label={t("student.verify.fields.father.label")}
+                  placeholder={t("student.verify.fields.father.placeholder")}
+                  leftIcon={
+                    <User
+                      size={20}
+                      color={COLORS.textMuted}
+                      strokeWidth={1.5}
+                    />
+                  }
                   value={value}
                   onChangeText={onChange}
                   onBlur={onBlur}
-                  error={errors.fatherName?.message}
+                  error={
+                    errors.fatherName?.message && t(errors.fatherName.message)
+                  }
                 />
               )}
             />
@@ -162,13 +176,22 @@ export default function VerifyScreen() {
               name="instituteName"
               render={({ field: { onChange, onBlur, value } }) => (
                 <Input
-                  label="Institute / University"
-                  placeholder="Enter institute name"
-                  leftIcon={<Building size={20} color={COLORS.textMuted} strokeWidth={1.5} />}
+                  label={t("student.verify.fields.institute.label")}
+                  placeholder={t("student.verify.fields.institute.placeholder")}
+                  leftIcon={
+                    <Building
+                      size={20}
+                      color={COLORS.textMuted}
+                      strokeWidth={1.5}
+                    />
+                  }
                   value={value}
                   onChangeText={onChange}
                   onBlur={onBlur}
-                  error={errors.instituteName?.message}
+                  error={
+                    errors.instituteName?.message &&
+                    t(errors.instituteName.message)
+                  }
                 />
               )}
             />
@@ -179,13 +202,22 @@ export default function VerifyScreen() {
               name="permanentAddress"
               render={({ field: { onChange, onBlur, value } }) => (
                 <Input
-                  label="Permanent Address"
-                  placeholder="Enter your permanent address"
-                  leftIcon={<MapPin size={20} color={COLORS.textMuted} strokeWidth={1.5} />}
+                  label={t("student.verify.fields.address.label")}
+                  placeholder={t("student.verify.fields.address.placeholder")}
+                  leftIcon={
+                    <MapPin
+                      size={20}
+                      color={COLORS.textMuted}
+                      strokeWidth={1.5}
+                    />
+                  }
                   value={value}
                   onChangeText={onChange}
                   onBlur={onBlur}
-                  error={errors.permanentAddress?.message}
+                  error={
+                    errors.permanentAddress?.message &&
+                    t(errors.permanentAddress.message)
+                  }
                   multiline
                 />
               )}
@@ -197,14 +229,22 @@ export default function VerifyScreen() {
               name="phoneNumber"
               render={({ field: { onChange, onBlur, value } }) => (
                 <Input
-                  label="Phone Number"
-                  placeholder="03XX XXXXXXX"
-                  leftIcon={<Phone size={20} color={COLORS.textMuted} strokeWidth={1.5} />}
+                  label={t("student.verify.fields.phone.label")}
+                  placeholder={t("student.verify.fields.phone.placeholder")}
+                  leftIcon={
+                    <Phone
+                      size={20}
+                      color={COLORS.textMuted}
+                      strokeWidth={1.5}
+                    />
+                  }
                   value={value}
                   onChangeText={onChange}
                   onBlur={onBlur}
-                  error={errors.phoneNumber?.message}
                   keyboardType="phone-pad"
+                  error={
+                    errors.phoneNumber?.message && t(errors.phoneNumber.message)
+                  }
                 />
               )}
             />
@@ -215,22 +255,32 @@ export default function VerifyScreen() {
               name="whatsappNumber"
               render={({ field: { onChange, onBlur, value } }) => (
                 <Input
-                  label="WhatsApp Number"
-                  placeholder="03XX XXXXXXX"
-                  leftIcon={<Phone size={20} color={COLORS.textMuted} strokeWidth={1.5} />}
+                  label={t("student.verify.fields.whatsapp.label")}
+                  placeholder={t("student.verify.fields.whatsapp.placeholder")}
+                  leftIcon={
+                    <Phone
+                      size={20}
+                      color={COLORS.textMuted}
+                      strokeWidth={1.5}
+                    />
+                  }
                   value={value}
                   onChangeText={onChange}
                   onBlur={onBlur}
-                  error={errors.whatsappNumber?.message}
                   keyboardType="phone-pad"
+                  error={
+                    errors.whatsappNumber?.message &&
+                    t(errors.whatsappNumber.message)
+                  }
                 />
               )}
             />
 
             {/* Submit Button */}
             <View style={styles.buttonContainer}>
+              {/* FIXED: Added "student." prefix */}
               <Button
-                title="Complete Verification"
+                title={t("student.verify.submit_button")}
                 onPress={handleSubmit(onSubmit)}
                 loading={loading}
               />
@@ -238,10 +288,8 @@ export default function VerifyScreen() {
 
             {/* Note */}
             <View style={styles.noteBox}>
-              <Text style={styles.noteText}>
-                Your information is securely stored and only shared with hostel 
-                managers for booking purposes.
-              </Text>
+              {/* FIXED: Added "student." prefix */}
+              <AppText style={styles.noteText}>{t("student.verify.note")}</AppText>
             </View>
           </View>
 
@@ -257,12 +305,12 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.bgPrimary,
   },
-  
+
   // Header
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: 16,
     paddingVertical: 12,
     backgroundColor: COLORS.bgPrimary,
@@ -274,21 +322,21 @@ const styles = StyleSheet.create({
     height: 44,
     borderRadius: 14,
     backgroundColor: COLORS.bgCard,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     borderWidth: 1,
     borderColor: COLORS.borderLight,
   },
   headerTitle: {
     fontSize: 17,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.textPrimary,
     letterSpacing: -0.2,
   },
   headerSpacer: {
     width: 44,
   },
-  
+
   // Content
   keyboardView: {
     flex: 1,
@@ -298,14 +346,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingTop: 24,
   },
-  
+
   // Intro Section
   introSection: {
     marginBottom: 28,
   },
   introTitle: {
     fontSize: 24,
-    fontWeight: '700',
+    fontWeight: "700",
     color: COLORS.textPrimary,
     marginBottom: 10,
     letterSpacing: -0.4,
@@ -315,7 +363,7 @@ const styles = StyleSheet.create({
     color: COLORS.textSecondary,
     lineHeight: 22,
   },
-  
+
   // Form Section
   formSection: {
     flex: 1,
@@ -323,7 +371,7 @@ const styles = StyleSheet.create({
   buttonContainer: {
     marginTop: 8,
   },
-  
+
   // Note Box
   noteBox: {
     marginTop: 20,
@@ -335,6 +383,6 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: COLORS.textMuted,
     lineHeight: 20,
-    textAlign: 'center',
+    textAlign: "center",
   },
 });

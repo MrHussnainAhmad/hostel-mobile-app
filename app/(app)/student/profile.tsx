@@ -7,6 +7,7 @@ import {
   Building,
   Calendar,
   ChevronRight,
+  Cog,
   FileText,
   LogOut,
   MapPin,
@@ -15,12 +16,12 @@ import {
   User,
 } from 'lucide-react-native';
 import React, { useState } from 'react';
+import { useTranslation } from "react-i18next";
 import {
   Modal,
   Pressable,
   ScrollView,
   StyleSheet,
-  Text,
   TextInput,
   View,
 } from 'react-native';
@@ -28,9 +29,11 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
 import { usersApi } from '@/api/users';
+import AppText from "@/components/common/AppText";
 import { useAuthStore } from '@/stores/authStore';
 
 export default function ProfileScreen() {
+  const { t } = useTranslation();
   const { user, logout } = useAuthStore();
   const router = useRouter();
 
@@ -41,13 +44,16 @@ export default function ProfileScreen() {
   const profile = user?.studentProfile;
   const isVerified = profile?.selfVerified;
 
+  // Key from JSON: "I want to delete."
+  const DELETE_PHRASE = t('manager.profile.delete_modal.confirm_phrase');
+
   const handleLogout = async () => {
     await logout();
     router.replace('/(auth)/login');
   };
 
   const handleDeleteAccount = async () => {
-    if (confirmText !== 'I want to delete.') return;
+    if (confirmText !== DELETE_PHRASE) return;
 
     setDeleting(true);
     try {
@@ -57,8 +63,8 @@ export default function ProfileScreen() {
     } catch (err: any) {
       Toast.show({
         type: 'error',
-        text1: 'Error',
-        text2: err?.response?.data?.message || 'Failed to delete account',
+        text1: t('manager.profile.delete_modal.error_title'),
+        text2: err?.response?.data?.message || t('manager.profile.delete_modal.error_message'),
       });
     } finally {
       setDeleting(false);
@@ -66,12 +72,12 @@ export default function ProfileScreen() {
   };
 
   const infoItems = [
-    { label: 'Full name', value: profile?.fullName, icon: User },
-    { label: 'Father name', value: profile?.fatherName, icon: User },
-    { label: 'Institute', value: profile?.instituteName, icon: Building },
-    { label: 'Address', value: profile?.permanentAddress, icon: MapPin },
-    { label: 'Phone', value: profile?.phoneNumber, icon: Phone },
-    { label: 'WhatsApp', value: profile?.whatsappNumber, icon: Phone },
+    { label: t('auth.register.full_name_label'), value: profile?.fullName, icon: User },
+    { label: t('student.verify.fields.father.label'), value: profile?.fatherName, icon: User },
+    { label: t('student.verify.fields.institute.label'), value: profile?.instituteName, icon: Building },
+    { label: t('student.verify.fields.address.label'), value: profile?.permanentAddress, icon: MapPin },
+    { label: t('student.verify.fields.phone.label'), value: profile?.phoneNumber, icon: Phone },
+    { label: t('student.verify.fields.whatsapp.label'), value: profile?.whatsappNumber, icon: Phone },
   ];
 
   return (
@@ -82,34 +88,36 @@ export default function ProfileScreen() {
       >
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.title}>Profile</Text>
+          <AppText style={styles.title}>{t('manager.profile.title')}</AppText>
         </View>
 
         {/* Profile Card */}
         <View style={styles.profileCard}>
           <View style={styles.avatar}>
-            <Text style={styles.avatarText}>
+            <AppText style={styles.avatarText}>
               {profile?.fullName?.charAt(0) || user?.email?.charAt(0) || 'S'}
-            </Text>
+            </AppText>
           </View>
 
-          <Text style={styles.name}>{profile?.fullName || 'Student'}</Text>
-          <Text style={styles.email}>{user?.email}</Text>
+          <AppText style={styles.name}>{profile?.fullName || t('student.home.fallback_name')}</AppText>
+          <AppText style={styles.email}>{user?.email}</AppText>
 
           <View style={styles.badgeRow}>
             <View style={styles.badgeInfo}>
-              <Text style={styles.badgeInfoText}>STUDENT</Text>
+              <AppText style={styles.badgeInfoText}>
+                {t('student.home.fallback_name').toUpperCase()}
+              </AppText>
             </View>
             <View style={[
               styles.badge,
               isVerified ? styles.badgeSuccess : styles.badgeWarning
             ]}>
-              <Text style={[
+              <AppText style={[
                 styles.badgeText,
                 isVerified ? styles.badgeSuccessText : styles.badgeWarningText
               ]}>
-                {isVerified ? 'VERIFIED' : 'UNVERIFIED'}
-              </Text>
+                {isVerified ? t('manager.profile.status.verified') : t('manager.profile.status.unverified')}
+              </AppText>
             </View>
           </View>
         </View>
@@ -127,8 +135,8 @@ export default function ProfileScreen() {
               <AlertCircle size={20} color={COLORS.warning} strokeWidth={1.5} />
             </View>
             <View style={styles.verifyContent}>
-              <Text style={styles.verifyTitle}>Complete verification</Text>
-              <Text style={styles.verifyDesc}>Verify your profile to book hostels</Text>
+              <AppText style={styles.verifyTitle}>{t('student.verify.submit_button')}</AppText>
+              <AppText style={styles.verifyDesc}>{t('student.home.verification_alert_desc')}</AppText>
             </View>
             <ChevronRight size={18} color={COLORS.warning} strokeWidth={1.5} />
           </Pressable>
@@ -137,7 +145,8 @@ export default function ProfileScreen() {
         {/* Personal Info */}
         {isVerified && profile && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>PERSONAL INFORMATION</Text>
+            {/* Using Manager's Account Info key as best fit */}
+            <AppText style={styles.sectionTitle}>{t('manager.profile.section_account_info')}</AppText>
             
             <View style={styles.card}>
               {infoItems.map((item, idx) => (
@@ -148,8 +157,8 @@ export default function ProfileScreen() {
                       <item.icon size={16} color={COLORS.textMuted} strokeWidth={1.5} />
                     </View>
                     <View style={styles.infoContent}>
-                      <Text style={styles.infoLabel}>{item.label}</Text>
-                      <Text style={styles.infoValue}>{item.value || '—'}</Text>
+                      <AppText style={styles.infoLabel}>{item.label}</AppText>
+                      <AppText style={styles.infoValue}>{item.value || '—'}</AppText>
                     </View>
                   </View>
                 </View>
@@ -160,13 +169,13 @@ export default function ProfileScreen() {
 
         {/* Quick Links */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>QUICK LINKS</Text>
+          <AppText style={styles.sectionTitle}>{t('manager.profile.section_quick_links')}</AppText>
           
           <View style={styles.card}>
             <LinkRow
               icon={<Calendar size={16} color={COLORS.info} strokeWidth={1.5} />}
               iconBg={COLORS.infoLight}
-              label="My Reservations"
+              label={t('student.reservations.header_title')}
               onPress={() => router.push('/(app)/student/reservations')}
             />
             
@@ -175,21 +184,30 @@ export default function ProfileScreen() {
             <LinkRow
               icon={<FileText size={16} color={COLORS.success} strokeWidth={1.5} />}
               iconBg={COLORS.successLight}
-              label="My Bookings"
+              label={t('student.bookings.header_title')}
               onPress={() => router.push('/(app)/student/bookings')}
+            />
+            
+            <View style={styles.divider} />
+            
+            <LinkRow
+              icon={<Cog size={16} color={COLORS.textSecondary} strokeWidth={1.5} />}
+              iconBg={COLORS.bgSecondary}
+              label={t('app.settings.title')}
+              onPress={() => router.push('/(app)/settings')}
             />
           </View>
         </View>
 
         {/* Account */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>ACCOUNT</Text>
+          <AppText style={styles.sectionTitle}>{t('manager.profile.section_account')}</AppText>
           
           <View style={styles.card}>
             <LinkRow
               icon={<LogOut size={16} color={COLORS.textSecondary} strokeWidth={1.5} />}
               iconBg={COLORS.bgSecondary}
-              label="Logout"
+              label={t('manager.profile.link_logout')}
               onPress={handleLogout}
             />
             
@@ -198,7 +216,7 @@ export default function ProfileScreen() {
             <LinkRow
               icon={<Trash2 size={16} color={COLORS.error} strokeWidth={1.5} />}
               iconBg={COLORS.errorLight}
-              label="Delete Account"
+              label={t('manager.profile.link_delete_account')}
               labelColor={COLORS.error}
               chevronColor={COLORS.error}
               onPress={() => setConfirmVisible(true)}
@@ -222,18 +240,20 @@ export default function ProfileScreen() {
               <Trash2 size={28} color={COLORS.error} strokeWidth={1.5} />
             </View>
 
-            <Text style={styles.modalTitle}>Delete Account</Text>
-            <Text style={styles.modalDesc}>
-              This action cannot be undone. All your data will be permanently deleted.
-            </Text>
+            <AppText style={styles.modalTitle}>{t('manager.profile.delete_modal.title')}</AppText>
+            <AppText style={styles.modalDesc}>
+              {t('manager.profile.delete_modal.description')}
+            </AppText>
 
-            <Text style={styles.modalLabel}>
-              Type <Text style={styles.modalHighlight}>"I want to delete."</Text> to confirm:
-            </Text>
+            <AppText style={styles.modalLabel}>
+              {t('manager.profile.delete_modal.label_prefix')}{' '}
+              <AppText style={styles.modalHighlight}>"{DELETE_PHRASE}"</AppText>{' '}
+              {t('manager.profile.delete_modal.label_suffix')}
+            </AppText>
 
             <TextInput
               style={styles.modalInput}
-              placeholder="I want to delete."
+              placeholder={DELETE_PHRASE}
               placeholderTextColor={COLORS.inputPlaceholder}
               value={confirmText}
               onChangeText={setConfirmText}
@@ -251,21 +271,21 @@ export default function ProfileScreen() {
                   setConfirmText('');
                 }}
               >
-                <Text style={styles.cancelBtnText}>Cancel</Text>
+                <AppText style={styles.cancelBtnText}>{t('manager.profile.delete_modal.cancel')}</AppText>
               </Pressable>
 
               <Pressable
                 style={({ pressed }) => [
                   styles.deleteBtn,
-                  confirmText !== 'I want to delete.' && styles.deleteBtnDisabled,
-                  pressed && confirmText === 'I want to delete.' && { opacity: OPACITY.pressed },
+                  confirmText !== DELETE_PHRASE && styles.deleteBtnDisabled,
+                  pressed && confirmText === DELETE_PHRASE && { opacity: OPACITY.pressed },
                 ]}
                 onPress={handleDeleteAccount}
-                disabled={confirmText !== 'I want to delete.' || deleting}
+                disabled={confirmText !== DELETE_PHRASE || deleting}
               >
-                <Text style={styles.deleteBtnText}>
-                  {deleting ? 'Deleting...' : 'Delete'}
-                </Text>
+                <AppText style={styles.deleteBtnText}>
+                  {deleting ? t('manager.profile.delete_modal.deleting') : t('manager.profile.delete_modal.delete')}
+                </AppText>
               </Pressable>
             </View>
           </View>
@@ -303,7 +323,7 @@ const LinkRow: React.FC<LinkRowProps> = ({
     <View style={[styles.iconBox, { backgroundColor: iconBg }]}>
       {icon}
     </View>
-    <Text style={[styles.linkText, { color: labelColor }]}>{label}</Text>
+    <AppText style={[styles.linkText, { color: labelColor }]}>{label}</AppText>
     <ChevronRight size={18} color={chevronColor} strokeWidth={1.5} />
   </Pressable>
 );

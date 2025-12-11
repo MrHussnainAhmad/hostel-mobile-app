@@ -12,10 +12,11 @@ import {
   Image,
   StatusBar,
   StyleSheet,
-  Text,
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+
+import AppText from '../src/components/common/AppText';
 
 const { width, height } = Dimensions.get('window');
 
@@ -199,7 +200,7 @@ export default function SplashScreen() {
             ]}
           >
             <View style={styles.divider} />
-            <Text style={styles.tagline}>Find your perfect stay</Text>
+            <AppText style={styles.tagline}>Find your perfect stay</AppText>
           </Animated.View>
         </View>
 
@@ -218,7 +219,7 @@ export default function SplashScreen() {
               ]}
             />
           </View>
-          <Text style={styles.loadingText}>Loading...</Text>
+          <AppText style={styles.loadingText}>Loading...</AppText>
         </Animated.View>
       </View>
     </SafeAreaView>

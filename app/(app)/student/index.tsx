@@ -1,43 +1,49 @@
 // screens/StudentHomeScreen.tsx
 
-import { COLORS, OPACITY } from '@/constants/colors';
-import { useFocusEffect, useRouter } from 'expo-router';
+import { COLORS, OPACITY } from "@/constants/colors";
+import { useFocusEffect, useRouter } from "expo-router";
 import {
   AlertCircle,
   Calendar,
   ChevronRight,
+  Cog,
   Home,
   MessageCircle,
   Search,
   Star,
-} from 'lucide-react-native';
-import React, { useCallback, useState } from 'react';
+} from "lucide-react-native";
+import React, { useCallback, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Image,
   Pressable,
   RefreshControl,
   ScrollView,
   StyleSheet,
-  Text,
   View,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-import { bookingsApi } from '@/api/bookings';
-import { reservationsApi } from '@/api/reservations';
-import { usersApi } from '@/api/users';
-import { Badge, LoadingScreen } from '@/components/ui';
-import { useAuthStore } from '@/stores/authStore';
-import { Booking, Reservation, StudentProfile } from '@/types';
+import { bookingsApi } from "@/api/bookings";
+import { reservationsApi } from "@/api/reservations";
+import { usersApi } from "@/api/users";
+import AppText from "@/components/common/AppText";
+import { Badge, LoadingScreen } from "@/components/ui";
+import { useAuthStore } from "@/stores/authStore";
+import { Booking, Reservation, StudentProfile } from "@/types";
+
 
 export default function StudentHomeScreen() {
+  const { t } = useTranslation();
   const { user } = useAuthStore();
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [profile, setProfile] = useState<StudentProfile | null>(null);
   const [currentBooking, setCurrentBooking] = useState<Booking | null>(null);
-  const [pendingReservations, setPendingReservations] = useState<Reservation[]>([]);
+  const [pendingReservations, setPendingReservations] = useState<Reservation[]>(
+    []
+  );
 
   const fetchData = async () => {
     try {
@@ -53,19 +59,19 @@ export default function StudentHomeScreen() {
 
       if (bookingsRes.success) {
         const activeBooking = bookingsRes.data.find(
-          (b) => b.status === 'APPROVED'
+          (b) => b.status === "APPROVED"
         );
         setCurrentBooking(activeBooking || null);
       }
 
       if (reservationsRes.success) {
         const pending = reservationsRes.data.filter(
-          (r) => r.status === 'PENDING' || r.status === 'ACCEPTED'
+          (r) => r.status === "PENDING" || r.status === "ACCEPTED"
         );
         setPendingReservations(pending);
       }
     } catch (error: any) {
-      console.log('Error fetching data:', error);
+      console.log("Error fetching data:", error);
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -88,10 +94,14 @@ export default function StudentHomeScreen() {
   }
 
   const isVerified = user?.studentProfile?.selfVerified;
-  const firstName = (profile?.fullName || user?.fullName || 'Student').split(' ')[0];
+  const firstName = (
+    profile?.fullName ||
+    user?.fullName ||
+    t("student.home.fallback_name")
+  ).split(" ")[0];
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={styles.container} edges={["top"]}>
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
@@ -107,9 +117,19 @@ export default function StudentHomeScreen() {
         {/* Header */}
         <View style={styles.header}>
           <View>
-            <Text style={styles.greeting}>Hello,</Text>
-            <Text style={styles.name}>{firstName} 👋</Text>
+            <AppText style={styles.greeting}>{t("student.home.greeting")}</AppText>
+            <AppText style={styles.name}>{firstName} 👋</AppText>
           </View>
+          {/* Settings Button */}
+          <Pressable
+            onPress={() => router.push("/(app)/settings")}
+            style={({ pressed }) => [
+              styles.settingsButton,
+              pressed && { opacity: OPACITY.pressed },
+            ]}
+          >
+            <Cog size={24} color={COLORS.textSecondary} strokeWidth={1.5} />
+          </Pressable>
         </View>
 
         {/* Verification Alert */}
@@ -119,32 +139,42 @@ export default function StudentHomeScreen() {
               styles.alertCard,
               pressed && { opacity: OPACITY.pressed },
             ]}
-            onPress={() => router.push('/(app)/student/verify')}
+            onPress={() => router.push("/(app)/student/verify")}
           >
             <View style={styles.alertIcon}>
               <AlertCircle size={22} color={COLORS.warning} strokeWidth={1.5} />
             </View>
             <View style={styles.alertContent}>
-              <Text style={styles.alertTitle}>Complete your profile</Text>
-              <Text style={styles.alertDesc}>
-                Verify yourself to book hostels
-              </Text>
+              <AppText style={styles.alertTitle}>
+                {t("student.home.verification_alert_title")}
+              </AppText>
+              <AppText style={styles.alertDesc}>
+                {t("student.home.verification_alert_desc")}
+              </AppText>
             </View>
-            <ChevronRight size={20} color={COLORS.textMuted} strokeWidth={1.5} />
+            <ChevronRight
+              size={20}
+              color={COLORS.textMuted}
+              strokeWidth={1.5}
+            />
           </Pressable>
         )}
 
         {/* Current Booking */}
         {currentBooking && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Your Current Stay</Text>
-            
+            <AppText style={styles.sectionTitle}>
+              {t("student.home.current_stay_title")}
+            </AppText>
+
             <Pressable
               style={({ pressed }) => [
                 styles.bookingCard,
                 pressed && { opacity: OPACITY.pressed },
               ]}
-              onPress={() => router.push(`/(app)/student/booking/${currentBooking.id}`)}
+              onPress={() =>
+                router.push(`/(app)/student/booking/${currentBooking.id}`)
+              }
             >
               {currentBooking.hostel?.roomImages?.[0] ? (
                 <Image
@@ -156,18 +186,20 @@ export default function StudentHomeScreen() {
                   <Home size={28} color={COLORS.textMuted} strokeWidth={1.5} />
                 </View>
               )}
-              
+
               <View style={styles.bookingContent}>
-                <Text style={styles.bookingName} numberOfLines={1}>
-                  {currentBooking.hostel?.hostelName || 'Hostel'}
-                </Text>
-                <Text style={styles.bookingLocation} numberOfLines={1}>
-                  {currentBooking.hostel?.city || 'City'}
-                </Text>
-                
+                <AppText style={styles.bookingName} numberOfLines={1}>
+                  {currentBooking.hostel?.hostelName ||
+                    t("student.home.hostel_fallback")}
+                </AppText>
+                <AppText style={styles.bookingLocation} numberOfLines={1}>
+                  {currentBooking.hostel?.city ||
+                    t("student.home.city_fallback")}
+                </AppText>
+
                 <View style={styles.bookingFooter}>
                   <Badge
-                    label={currentBooking.roomType.replace('_', ' ')}
+                    label={currentBooking.roomType.replace("_", " ")}
                     variant="primary"
                     size="sm"
                   />
@@ -178,51 +210,71 @@ export default function StudentHomeScreen() {
                         color={COLORS.warning}
                         fill={COLORS.warning}
                       />
-                      <Text style={styles.ratingText}>
+                      <AppText style={styles.ratingText}>
                         {currentBooking.hostel.rating.toFixed(1)}
-                      </Text>
+                      </AppText>
                     </View>
                   )}
                 </View>
               </View>
-              
-              <ChevronRight size={20} color={COLORS.textMuted} strokeWidth={1.5} />
+
+              <ChevronRight
+                size={20}
+                color={COLORS.textMuted}
+                strokeWidth={1.5}
+              />
             </Pressable>
           </View>
         )}
 
         {/* Quick Actions */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Quick Actions</Text>
-          
+          <AppText style={styles.sectionTitle}>
+            {t("student.home.quick_actions_title")}
+          </AppText>
+
           <View style={styles.actionsGrid}>
             <ActionCard
-              icon={<Search size={24} color={COLORS.primary} strokeWidth={1.5} />}
-              label="Find Hostel"
+              icon={
+                <Search size={24} color={COLORS.primary} strokeWidth={1.5} />
+              }
+              label={t("student.home.action_find_hostel")}
               color={COLORS.primaryLight}
-              onPress={() => router.push('/(app)/student/search')}
+              onPress={() => router.push("/(app)/student/search")}
             />
-            
+
             <ActionCard
-              icon={<Calendar size={24} color={COLORS.warning} strokeWidth={1.5} />}
-              label="Reservations"
+              icon={
+                <Calendar size={24} color={COLORS.warning} strokeWidth={1.5} />
+              }
+              label={t("student.home.action_reservations")}
               color={COLORS.warningLight}
-              badge={pendingReservations.length > 0 ? pendingReservations.length : undefined}
-              onPress={() => router.push('/(app)/student/reservations')}
+              badge={
+                pendingReservations.length > 0
+                  ? pendingReservations.length
+                  : undefined
+              }
+              onPress={() => router.push("/(app)/student/reservations")}
             />
-            
+
             <ActionCard
               icon={<Home size={24} color={COLORS.success} strokeWidth={1.5} />}
-              label="Bookings"
+              label={t("student.home.action_bookings")}
               color={COLORS.successLight}
-              onPress={() => router.push('/(app)/student/bookings')}
+              onPress={() => router.push("/(app)/student/bookings")}
             />
-            
+
             <ActionCard
-              icon={<MessageCircle size={24} color={COLORS.info} strokeWidth={1.5} />}
-              label="Messages"
+              icon={
+                <MessageCircle
+                  size={24}
+                  color={COLORS.info}
+                  strokeWidth={1.5}
+                />
+              }
+              label={t("student.home.action_messages")}
               color={COLORS.infoLight}
-              onPress={() => router.push('/(app)/student/chat')}
+              onPress={() => router.push("/(app)/student/chat")}
             />
           </View>
         </View>
@@ -231,31 +283,36 @@ export default function StudentHomeScreen() {
         {pendingReservations.length > 0 && (
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>Pending Reservations</Text>
+              <AppText style={styles.sectionTitle}>
+                {t("student.home.pending_reservations_title")}
+              </AppText>
               <Pressable
-                onPress={() => router.push('/(app)/student/reservations')}
+                onPress={() => router.push("/(app)/student/reservations")}
                 style={({ pressed }) => pressed && { opacity: OPACITY.pressed }}
               >
-                <Text style={styles.seeAll}>See all</Text>
+                <AppText style={styles.seeAll}>{t("student.home.see_all")}</AppText>
               </Pressable>
             </View>
 
             {pendingReservations.slice(0, 2).map((reservation) => (
               <View key={reservation.id} style={styles.reservationCard}>
                 <View style={styles.reservationHeader}>
-                  <Text style={styles.reservationName} numberOfLines={1}>
-                    {reservation.hostel?.hostelName || 'Hostel'}
-                  </Text>
+                  <AppText style={styles.reservationName} numberOfLines={1}>
+                    {reservation.hostel?.hostelName ||
+                      t("student.home.hostel_fallback")}
+                  </AppText>
                   <Badge
                     label={reservation.status}
-                    variant={reservation.status === 'ACCEPTED' ? 'success' : 'warning'}
+                    variant={
+                      reservation.status === "ACCEPTED" ? "success" : "warning"
+                    }
                     size="sm"
                   />
                 </View>
-                <Text style={styles.reservationLocation}>
-                  {reservation.hostel?.city || 'City'} •{' '}
-                  {reservation.roomType.replace('_', ' ')}
-                </Text>
+                <AppText style={styles.reservationLocation}>
+                  {reservation.hostel?.city || t("student.home.city_fallback")}{" "}
+                  • {reservation.roomType.replace("_", " ")}
+                </AppText>
               </View>
             ))}
           </View>
@@ -266,7 +323,6 @@ export default function StudentHomeScreen() {
     </SafeAreaView>
   );
 }
-
 // Action Card Component
 interface ActionCardProps {
   icon: React.ReactNode;
@@ -290,14 +346,12 @@ const ActionCard: React.FC<ActionCardProps> = ({
     ]}
     onPress={onPress}
   >
-    <View style={[styles.actionIcon, { backgroundColor: color }]}>
-      {icon}
-    </View>
-    <Text style={styles.actionText}>{label}</Text>
-    
+    <View style={[styles.actionIcon, { backgroundColor: color }]}>{icon}</View>
+    <AppText style={styles.actionText}>{label}</AppText>
+
     {badge !== undefined && badge > 0 && (
       <View style={styles.actionBadge}>
-        <Text style={styles.actionBadgeText}>{badge}</Text>
+        <AppText style={styles.actionBadgeText}>{badge}</AppText>
       </View>
     )}
   </Pressable>
@@ -311,12 +365,12 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingBottom: 24,
   },
-  
+
   // Header
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row", // Added for horizontal layout
+    justifyContent: "space-between", // Pushes content to ends
+    alignItems: "center", // Vertically aligns items
     paddingHorizontal: 24,
     paddingTop: 20,
     paddingBottom: 24,
@@ -328,15 +382,20 @@ const styles = StyleSheet.create({
   },
   name: {
     fontSize: 28,
-    fontWeight: '700',
+    fontWeight: "700",
     color: COLORS.textPrimary,
     letterSpacing: -0.5,
   },
-  
+  settingsButton: {
+    padding: 8, // Add some padding for easier tapping
+    borderRadius: 12, // Make it circular
+    backgroundColor: COLORS.bgSecondary, // Optional: add a subtle background
+  },
+
   // Alert Card
   alertCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginHorizontal: 20,
     marginBottom: 24,
     padding: 16,
@@ -350,8 +409,8 @@ const styles = StyleSheet.create({
     height: 44,
     borderRadius: 12,
     backgroundColor: COLORS.white,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     marginRight: 14,
   },
   alertContent: {
@@ -359,7 +418,7 @@ const styles = StyleSheet.create({
   },
   alertTitle: {
     fontSize: 15,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.textPrimary,
     marginBottom: 2,
   },
@@ -367,21 +426,21 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: COLORS.textSecondary,
   },
-  
+
   // Section
   section: {
     marginBottom: 24,
   },
   sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingHorizontal: 24,
     marginBottom: 14,
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.textPrimary,
     paddingHorizontal: 24,
     marginBottom: 14,
@@ -389,14 +448,14 @@ const styles = StyleSheet.create({
   },
   seeAll: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.primary,
   },
-  
+
   // Booking Card
   bookingCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginHorizontal: 20,
     padding: 14,
     backgroundColor: COLORS.bgCard,
@@ -414,8 +473,8 @@ const styles = StyleSheet.create({
     height: 80,
     borderRadius: 14,
     backgroundColor: COLORS.bgSecondary,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   bookingContent: {
     flex: 1,
@@ -424,7 +483,7 @@ const styles = StyleSheet.create({
   },
   bookingName: {
     fontSize: 17,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.textPrimary,
     marginBottom: 4,
     letterSpacing: -0.2,
@@ -435,71 +494,71 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   bookingFooter: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 12,
   },
   ratingRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 4,
   },
   ratingText: {
     fontSize: 13,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.textSecondary,
   },
-  
+
   // Actions Grid
   actionsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: "row",
+    flexWrap: "wrap",
     paddingHorizontal: 20,
     gap: 12,
   },
   actionCard: {
-    width: '47%',
+    width: "47%",
     backgroundColor: COLORS.bgCard,
     borderRadius: 16,
     paddingVertical: 20,
     paddingHorizontal: 16,
-    alignItems: 'center',
+    alignItems: "center",
     borderWidth: 1,
     borderColor: COLORS.borderLight,
-    position: 'relative',
+    position: "relative",
   },
   actionIcon: {
     width: 52,
     height: 52,
     borderRadius: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     marginBottom: 12,
   },
   actionText: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.textPrimary,
     letterSpacing: -0.1,
   },
   actionBadge: {
-    position: 'absolute',
+    position: "absolute",
     top: 12,
     right: 12,
     backgroundColor: COLORS.error,
     minWidth: 22,
     height: 22,
     borderRadius: 11,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     paddingHorizontal: 6,
   },
   actionBadgeText: {
     fontSize: 12,
-    fontWeight: '700',
+    fontWeight: "700",
     color: COLORS.textInverse,
   },
-  
+
   // Reservation Card
   reservationCard: {
     marginHorizontal: 20,
@@ -511,14 +570,14 @@ const styles = StyleSheet.create({
     borderColor: COLORS.borderLight,
   },
   reservationHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 6,
   },
   reservationName: {
     fontSize: 15,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.textPrimary,
     flex: 1,
     marginRight: 12,
