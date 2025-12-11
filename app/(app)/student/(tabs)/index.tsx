@@ -93,7 +93,11 @@ export default function StudentHomeScreen() {
     return <LoadingScreen />;
   }
 
-  const isVerified = user?.studentProfile?.selfVerified;
+  const isVerified =
+    profile?.isSelfVerified ||
+    (profile as any)?.selfVerified ||
+    (user as any)?.studentProfile?.selfVerified ||
+    (user as any)?.studentProfile?.isSelfVerified;
   const firstName = (
     profile?.fullName ||
     user?.fullName ||

@@ -26,11 +26,12 @@ import Toast from "react-native-toast-message";
 
 import { bookingsApi } from "@/api/bookings";
 import { hostelsApi } from "@/api/hostels";
+import { usersApi } from "@/api/users";
 import { Verification, verificationApi } from "@/api/verification";
 import AppText from "@/components/common/AppText";
 import { Badge, LoadingScreen } from "@/components/ui";
 import { useAuthStore } from "@/stores/authStore";
-import { Booking, Hostel } from "@/types";
+import { Booking, Hostel, ManagerProfile } from "@/types";
 
 
 export default function ManagerDashboard() {
@@ -41,19 +42,25 @@ export default function ManagerDashboard() {
   const [hostels, setHostels] = useState<Hostel[]>([]);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [verification, setVerification] = useState<Verification | null>(null);
+  const [profile, setProfile] = useState<ManagerProfile | null>(null);
 
   const fetchData = async () => {
     try {
-      const [hostelsRes, verificationRes, bookingsRes] = await Promise.all([
-        hostelsApi.getMyHostels(),
-        verificationApi.getMyVerifications(),
-        bookingsApi.getManagerBookings(),
-      ]);
+      const [hostelsRes, verificationRes, bookingsRes, profileRes] =
+        await Promise.all([
+          hostelsApi.getMyHostels(),
+          verificationApi.getMyVerifications(),
+          bookingsApi.getManagerBookings(),
+          usersApi.getManagerProfile(),
+        ]);
 
       if (hostelsRes.success) setHostels(hostelsRes.data);
       if (bookingsRes.success) setBookings(bookingsRes.data);
       if (verificationRes.success && verificationRes.data.length > 0) {
         setVerification(verificationRes.data[0]);
+      }
+      if (profileRes.success) {
+        setProfile(profileRes.data);
       }
     } catch (error: any) {
       Toast.show({
@@ -76,7 +83,10 @@ export default function ManagerDashboard() {
     fetchData();
   };
 
-  const isVerified = verification?.status === "APPROVED";
+  const isVerified =
+    profile?.isVerified ||
+    verification?.status === "APPROVED" ||
+    (user as any)?.managerProfile?.isVerified;
   const isPending = verification?.status === "PENDING";
   const totalStudents = bookings.filter((b) => b.status === "APPROVED").length;
   const pendingBookings = bookings.filter((b) => b.status === "PENDING").length;
