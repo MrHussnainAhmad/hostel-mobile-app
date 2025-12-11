@@ -39,9 +39,9 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "f6d7012c-524f-4eda-a6e7-1f03d7f5d25a"
+        "projectId": "646931b7-15a3-4a26-bb60-c55b7ef65b5d"
       }
     },
-    "owner": "hostelshub"
+    "owner": "hostelshub-mobile"
   }
 }
