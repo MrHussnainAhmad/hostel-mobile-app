@@ -80,6 +80,25 @@ export interface Hostel {
     fullName?: string;
     phone?: string;
   };
+  reviews?: Review[];
+}
+
+export interface Review {
+  id: string;
+  rating: number;
+  comment: string | null;
+  createdAt: string;
+  booking?: {
+    student?: {
+      fullName: string | null;
+      user?: {
+        email: string;
+      };
+    };
+  };
+  user?: {
+    email: string;
+  };
 }
 
 export interface RoomType {

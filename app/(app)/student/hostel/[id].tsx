@@ -2,6 +2,7 @@
 
 import { COLORS, OPACITY } from "@/constants/colors";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import * as Linking from "expo-linking";
 import {
   ArrowLeft,
   Building2,
@@ -25,6 +26,7 @@ import {
   Image,
   Pressable,
   ScrollView,
+  Share,
   StyleSheet,
   View,
 } from "react-native";
@@ -75,6 +77,19 @@ export default function HostelDetailScreen() {
   const handleGoBack = () => {
     if (router.canGoBack()) router.back();
     else router.replace("/(app)/student/search");
+  };
+
+  const handleShare = async () => {
+    if (!hostel) return;
+    try {
+      const link = Linking.createURL(`/student/hostel/${hostel.id}`);
+      await Share.share({
+        message: `${hostel.hostelName} - ${hostel.city}\n${link}`,
+        url: link, // iOS often uses this
+      });
+    } catch (error) {
+      // ignore
+    }
   };
 
   const handleStartChat = async () => {
@@ -197,6 +212,7 @@ export default function HostelDetailScreen() {
                   styles.headerBtn,
                   pressed && { opacity: OPACITY.pressed },
                 ]}
+                onPress={handleShare}
               >
                 <Share2
                   size={20}
@@ -450,6 +466,52 @@ export default function HostelDetailScreen() {
                   </View>
                 ))}
               </View>
+            </Section>
+          )}
+
+          {/* Reviews */}
+          {hostel.reviews && hostel.reviews.length > 0 && (
+            <Section
+              title={t("student.hostel.reviews_title", {
+                count: hostel.reviews.length,
+              })}
+            >
+              {hostel.reviews.map((review) => (
+                <View key={review.id} style={styles.reviewCard}>
+                  <View style={styles.reviewHeader}>
+                    <View>
+                      <AppText style={styles.reviewName}>
+                        {review.booking?.student?.fullName ||
+                          review.user?.email?.split("@")[0] ||
+                          t("student.hostel.anonymous")}
+                      </AppText>
+                      <View style={styles.ratingRow}>
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <Star
+                            key={star}
+                            size={12}
+                            color={COLORS.warning}
+                            fill={
+                              star <= review.rating
+                                ? COLORS.warning
+                                : "transparent"
+                            }
+                            strokeWidth={1.5}
+                          />
+                        ))}
+                      </View>
+                    </View>
+                    <AppText style={styles.reviewDate}>
+                      {new Date(review.createdAt).toLocaleDateString()}
+                    </AppText>
+                  </View>
+                  {review.comment && (
+                    <AppText style={styles.reviewComment}>
+                      {review.comment}
+                    </AppText>
+                  )}
+                </View>
+              ))}
             </Section>
           )}
 
@@ -909,6 +971,41 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: COLORS.primary,
     fontWeight: "500",
+  },
+
+  // Reviews
+  reviewCard: {
+    backgroundColor: COLORS.bgCard,
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: COLORS.borderLight,
+  },
+  reviewHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    marginBottom: 8,
+  },
+  reviewName: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: COLORS.textPrimary,
+    marginBottom: 4,
+  },
+  ratingRow: {
+    flexDirection: "row",
+    gap: 2,
+  },
+  reviewDate: {
+    fontSize: 12,
+    color: COLORS.textMuted,
+  },
+  reviewComment: {
+    fontSize: 14,
+    color: COLORS.textSecondary,
+    lineHeight: 20,
   },
 
   // Manager

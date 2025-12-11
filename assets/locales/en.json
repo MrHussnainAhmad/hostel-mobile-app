@@ -989,7 +989,11 @@
 
       "manager": "Manager",
       "manager_default": "Hostel Manager",
-      "tap_to_chat": "Tap to chat"
+      "tap_to_chat": "Tap to chat",
+
+      "reviews_title": "Reviews ({{count}})",
+      "reviews_section": "Reviews",
+      "anonymous": "Anonymous"
     },
     "reserve": {
       "error_title": "Error",
